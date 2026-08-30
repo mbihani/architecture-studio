@@ -3,8 +3,8 @@
 //
 // Lists industries from GET /api/industries (parsed from the mxfile's
 // <diagram> elements). On selection, calls POST /api/industries/:id/activate
-// to get the single-page mxfile XML, then passes it to the parent via
-// onActivate so the editor loads the new page.
+// for backend bookkeeping, then asks the editor to switch to that page tab
+// (which preserves every page — see useDrawioEmbed.switchPage).
 // ---------------------------------------------------------------------------
 
 import { useEffect, useState } from "react";
@@ -13,8 +13,8 @@ import { api, type ApiError } from "../api/client.ts";
 import type { Industry } from "../types/index.ts";
 
 interface IndustrySwitcherProps {
-  /** Called with the activated industry's single-page mxfile XML. */
-  onActivate: (drawioXml: string) => void;
+  /** Called with the activated industry's id to switch the editor page. */
+  onActivate: (id: string) => void;
 }
 
 export function IndustrySwitcher({ onActivate }: IndustrySwitcherProps): React.ReactElement {
@@ -52,8 +52,9 @@ export function IndustrySwitcher({ onActivate }: IndustrySwitcherProps): React.R
     setActivating(true);
     setError(null);
     try {
-      const res = await api.activateIndustry(id);
-      onActivate(res.drawioXml);
+      // Bookkeeping (+ validates the id); then switch the editor page tab.
+      await api.activateIndustry(id);
+      onActivate(id);
     } catch (err) {
       setError((err as ApiError).message);
     } finally {

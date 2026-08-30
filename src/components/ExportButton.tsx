@@ -3,13 +3,13 @@
 //
 // Export is handled entirely client-side via the draw.io postMessage
 // protocol: the hook's exportPng() sends {action: "export", format: "png"}
-// to the iframe and resolves with base64 PNG data. No backend round-trip.
+// to the iframe and resolves with a PNG data URI. No backend round-trip.
 // ---------------------------------------------------------------------------
 
 import { useState } from "react";
 
 interface ExportButtonProps {
-  /** Export the current diagram as PNG; resolves with raw base64 data. */
+  /** Export the current diagram as PNG; resolves with a PNG data URI. */
   onExport: () => Promise<string>;
 }
 
@@ -21,9 +21,8 @@ export function ExportButton({ onExport }: ExportButtonProps): React.ReactElemen
     setExporting(true);
     setError(null);
     try {
-      const base64 = await onExport();
-      // draw.io returns raw base64 PNG data; create a data URI for download.
-      const dataUri = `data:image/png;base64,${base64}`;
+      // draw.io returns a ready-to-use data URI (data:image/png;base64,…).
+      const dataUri = await onExport();
       const a = document.createElement("a");
       a.href = dataUri;
       a.download = "architecture.png";

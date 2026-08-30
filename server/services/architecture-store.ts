@@ -2,9 +2,8 @@
 // In-memory draw.io XML architecture store.
 //
 // On startup the store loads the architecture mxfile from (in order):
-//   1. data/architecture.drawio     — the last-saved edited state (if any)
-//   2. converter/sample-output/architecture.drawio — the seed file generated
-//      by converter/json_to_drawio.py from the normalised ArchitectureDoc.
+//   1. data/architecture.drawio — the last-saved edited state (if any)
+//   2. a minimal one-page fallback mxfile (see SEED_MXFILE below)
 //
 // Industries are parsed from the mxfile's <diagram id="…" name="…"> elements
 // with a lightweight regex (no XML dependency). The full XML is served to the
@@ -22,33 +21,35 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** Directory for persisted (user-edited) state. */
 const DATA_DIR = path.resolve(__dirname, "..", "..", "data");
-/** Last-saved edited XML, if present this takes priority over the seed. */
+/** Last-saved edited XML, if present this takes priority over the fallback. */
 const SAVED_FILE = path.join(DATA_DIR, "architecture.drawio");
-/** Seed file produced by the converter (converter/json_to_drawio.py). */
-const SEED_FILE = path.resolve(
-  __dirname,
-  "..",
-  "..",
-  "converter",
-  "sample-output",
-  "architecture.drawio",
-);
 
-/** Minimal mxfile used when neither the saved file nor the seed exists. */
-const EMPTY_MXFILE =
-  '<mxfile host="Architecture Studio" version="24.0.0">\n</mxfile>';
+/**
+ * Minimal one-page mxfile used when no saved file exists yet. Gives the app a
+ * single "Databricks Platform" page to render and edit on a fresh start; the
+ * first save persists it to data/architecture.drawio.
+ */
+const SEED_MXFILE = `<mxfile host="Architecture Studio" version="24.0.0">
+  <diagram id="platform" name="Databricks Platform">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>`;
 
 let architectureXml = loadInitialXml();
+/** Last activated industry id (session-level bookkeeping). */
+let activeIndustryId: string | null = null;
 
-/** Load the architecture XML from disk at startup (saved file → seed → empty). */
+/** Load the architecture XML from disk at startup (saved file → fallback). */
 function loadInitialXml(): string {
   if (existsSync(SAVED_FILE)) {
     return readFileSync(SAVED_FILE, "utf-8");
   }
-  if (existsSync(SEED_FILE)) {
-    return readFileSync(SEED_FILE, "utf-8");
-  }
-  return EMPTY_MXFILE;
+  return SEED_MXFILE;
 }
 
 /** Decode the five common HTML entities that appear in diagram name attributes. */
@@ -61,11 +62,6 @@ function decodeHtmlEntities(value: string): string {
     .replace(/&#39;/g, "'");
 }
 
-/** Escape a string for safe interpolation into a RegExp. */
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 /** Return the full architecture mxfile XML. */
 export function getArchitectureXml(): string {
   return architectureXml;
@@ -76,6 +72,11 @@ export function saveArchitectureXml(xml: string): void {
   architectureXml = xml;
   mkdirSync(DATA_DIR, { recursive: true });
   writeFileSync(SAVED_FILE, xml, "utf-8");
+}
+
+/** Record the active industry id (backend bookkeeping for activation). */
+export function activateIndustry(id: string): void {
+  activeIndustryId = id;
 }
 
 /**
@@ -92,24 +93,4 @@ export function getIndustries(): Industry[] {
     industries.push({ id: match[1], label: decodeHtmlEntities(match[2]) });
   }
   return industries;
-}
-
-/**
- * Extract a single diagram page as a self-contained mxfile XML string.
- *
- * Returns an <mxfile> containing only the requested <diagram>, ready to be
- * loaded into the embed iframe via {action: "load", xml: …}. Returns null
- * when no diagram with the given id exists.
- */
-export function getIndustryXml(id: string): string | null {
-  const re = new RegExp(
-    `<diagram\\s+id="${escapeRegExp(id)}"[^>]*>[\\s\\S]*?</diagram>`,
-  );
-  const match = architectureXml.match(re);
-  if (!match) return null;
-  return (
-    `<mxfile host="Architecture Studio" version="24.0.0">\n` +
-    `  ${match[0]}\n` +
-    `</mxfile>`
-  );
 }

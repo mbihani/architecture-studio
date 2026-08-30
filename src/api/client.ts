@@ -66,7 +66,7 @@ export const api = {
   // --- Industries -------------------------------------------------------
   getIndustries: () => request<Industry[]>("/industries"),
 
-  /** Activate an industry overlay; returns the single-page mxfile XML. */
+  /** Activate an industry (backend bookkeeping); the editor switches page client-side. */
   activateIndustry: (id: string) =>
     request<ActivateIndustryResponse>(
       `/industries/${encodeURIComponent(id)}/activate`,

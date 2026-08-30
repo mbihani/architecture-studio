@@ -5,10 +5,12 @@
 // area hosting the draw.io (diagrams.net) embeddable editor.
 //
 // Flow:
-//   1. useDrawioEmbed loads the architecture mxfile XML from GET /api/architecture.
+//   1. useDrawioEmbed loads the full architecture mxfile XML from
+//      GET /api/architecture (all pages as tabs).
 //   2. Once loaded, EmbedFrame renders the draw.io iframe; the hook drives the
 //      postMessage protocol (init → load, save → persist, export → PNG).
-//   3. The industry switcher loads a single-page mxfile into the editor.
+//   3. The industry switcher switches the editor to the selected page tab
+//      (all pages preserved — see useDrawioEmbed.switchPage).
 //
 // No auth, no OAuth, no document lifecycle — the draw.io embed is free and
 // keyless.
@@ -21,7 +23,7 @@ import { IndustrySwitcher } from "./components/IndustrySwitcher.tsx";
 import { useDrawioEmbed } from "./hooks/useDrawioEmbed.ts";
 
 export function App(): React.ReactElement {
-  const { iframeRef, loading, error, exportPng, loadPage } = useDrawioEmbed();
+  const { iframeRef, loading, error, exportPng, switchPage } = useDrawioEmbed();
 
   return (
     <div className="app">
@@ -29,7 +31,7 @@ export function App(): React.ReactElement {
         title="Architecture Studio"
         controls={
           <>
-            <IndustrySwitcher onActivate={loadPage} />
+            <IndustrySwitcher onActivate={switchPage} />
             <ExportButton onExport={exportPng} />
           </>
         }

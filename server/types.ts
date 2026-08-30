@@ -112,6 +112,4 @@ export interface SaveArchitectureResponse {
 export interface ActivateIndustryResponse {
   id: string;
   activated: boolean;
-  /** A single-page mxfile XML containing only the selected industry's diagram. */
-  drawioXml: string;
 }
