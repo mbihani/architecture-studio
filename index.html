@@ -17982,6 +17982,13 @@ console.log("[arch-studio] init complete");
     "#edit-tools button.on { background:#7c3aed; border-color:#7c3aed; color:white; }",
     "#multi-count { align-self:center; min-width:68px; color:#7c3aed; font-weight:750; text-align:center; }",
     "body.edit-mode .rgroup .rtiles:empty { min-height:18px; border:1px dashed var(--line-strong); border-radius:7px; }",
+    "body.edit-mode .rgroup.sel-group { position:relative; }",
+    ".resize-handle { position:absolute; width:12px; height:12px; right:-7px; bottom:-7px; z-index:30;",
+    "  border:2px solid var(--card); border-radius:3px; background:var(--brand); cursor:nwse-resize; box-shadow:0 1px 4px #0004; }",
+    ".rgroup.is-resizing { transition:none!important; box-shadow:0 0 0 4px color-mix(in srgb,var(--brand) 25%,transparent); }",
+    ".rgroup.is-resizing::after { content:attr(data-size); position:absolute; right:4px; bottom:4px; z-index:31;",
+    "  padding:2px 5px; border-radius:4px; background:var(--ink); color:var(--card); font:10px/1.2 monospace; }",
+    ".rgroup[data-custom-size] .rtiles { flex:1 1 auto; align-content:start; grid-template-columns:repeat(auto-fit,minmax(92px,1fr))!important; overflow:auto; }",
     "/* zone (whole column/pocket) selection in edit mode */",
     "body.edit-mode .col.sel-zone, body.edit-mode .pocket.sel-zone {",
     "  outline:3px solid var(--brand); outline-offset:2px; border-radius:10px; }",
@@ -18118,7 +18125,19 @@ console.log("[arch-studio] init complete");
     });
   }
   var _origBuild = build;
-  build = function(){ _origBuild.apply(this, arguments); clearSel(); if(typeof hideDeletedZones === 'function') hideDeletedZones(); };
+  build = function(){
+    _origBuild.apply(this, arguments); clearSel();
+    RAIL_IDS.forEach(function(zid){
+      (ARCH.rails[zid].groups || []).forEach(function(g, i){
+        var el = document.querySelector('.rgroup[data-zone="' + zid + '"][data-gidx="' + i + '"]');
+        if(!el) return;
+        if(Number.isFinite(g._w)){ el.style.width = Math.max(140, g._w) + 'px'; el.style.flex = '0 0 ' + Math.max(140, g._w) + 'px'; }
+        if(Number.isFinite(g._h)){ el.style.height = Math.max(90, g._h) + 'px'; }
+        if(Number.isFinite(g._w) || Number.isFinite(g._h)) el.setAttribute('data-custom-size','');
+      });
+    });
+    if(typeof hideDeletedZones === 'function') hideDeletedZones();
+  };
 
   buildIndTabs();
 
@@ -18149,6 +18168,7 @@ console.log("[arch-studio] init complete");
 
   var selected = null;   /* { type:'atom'|'group'|'cloud'|'zone', el?, zone?, gidx? } */
   var drag = null;
+  var resize = null;
   var multiMode = false;
   var multiSelection = new Map();
   var rangeAnchor = null;
@@ -18217,7 +18237,11 @@ console.log("[arch-studio] init complete");
   };
 
   function clearSel(){
-    if(selected && selected.el) selected.el.classList.remove("sel-group","sel-atom");
+    if(selected && selected.el){
+      selected.el.classList.remove("sel-group","sel-atom");
+      var handle = selected.el.querySelector && selected.el.querySelector(":scope > .resize-handle");
+      if(handle) handle.remove();
+    }
     if(selected && selected.type === "zone" && selected.zone){
       var zc = document.querySelector(".col." + selected.zone + ", .pocket." + selected.zone);
       if(zc) zc.classList.remove("sel-zone");
@@ -18237,7 +18261,12 @@ console.log("[arch-studio] init complete");
     var rec = byId[elm.dataset.id];
     deleteBtn.style.display = (rec && Array.isArray(rec.arr)) ? "inline-block" : "none";
   }
-  function selectGroup(elm, zone, gidx){ clearSel(); selected = { type:"group", el:elm, zone:zone, gidx:gidx }; elm.classList.add("sel-group"); deleteBtn.style.display = "inline-block"; }
+  function selectGroup(elm, zone, gidx){
+    clearSel(); selected = { type:"group", el:elm, zone:zone, gidx:gidx }; elm.classList.add("sel-group");
+    var h = document.createElement("span"); h.className = "resize-handle"; h.setAttribute("role","slider");
+    h.setAttribute("aria-label","Resize " + ((ARCH.rails[zone].groups[gidx] || {}).box || "group")); h.title = "Drag to resize this box";
+    elm.appendChild(h); deleteBtn.style.display = "inline-block";
+  }
   function selectCloud(elm){ clearSel(); selected = { type:"cloud", el:elm }; elm.classList.add("sel-group"); deleteBtn.style.display = "none"; }
   /* Select a whole zone (all groups in the column/pocket). The container stays in
      the DOM (it's part of the grid layout) — deleting only empties its groups. */
@@ -18260,6 +18289,11 @@ console.log("[arch-studio] init complete");
      click on a component selects the component, not the box around it. */
   document.addEventListener("mousedown", function(e){
     if(!editMode || e.button !== 0 || inUI(e.target)) return;
+    if(e.target.classList && e.target.classList.contains("resize-handle") && selected && selected.type === "group"){
+      var model = ARCH.rails[selected.zone].groups[selected.gidx], rect = selected.el.getBoundingClientRect();
+      resize = { el:selected.el, model:model, x:e.clientX, y:e.clientY, w:rect.width, h:rect.height };
+      selected.el.classList.add("is-resizing"); e.preventDefault(); e.stopPropagation(); return;
+    }
     /* zone header (.colhead/.pockhead) → select the whole zone. Checked first
        since the header is a sibling of the rail, not nested in .rgroup/.atom. */
     var zhead = e.target.closest && e.target.closest(".colhead, .pockhead");
@@ -18312,6 +18346,14 @@ console.log("[arch-studio] init complete");
   }, true);
 
   document.addEventListener("mousemove", function(e){
+    if(resize){
+      e.preventDefault();
+      resize.model._w = Math.max(140, Math.round(resize.w + e.clientX - resize.x));
+      resize.model._h = Math.max(90, Math.round(resize.h + e.clientY - resize.y));
+      resize.el.style.width = resize.model._w + "px"; resize.el.style.flex = "0 0 " + resize.model._w + "px";
+      resize.el.style.height = resize.model._h + "px"; resize.el.setAttribute("data-custom-size","");
+      resize.el.dataset.size = resize.model._w + " × " + resize.model._h; return;
+    }
     if(!drag) return;
     var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     if(!drag.moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
@@ -18326,7 +18368,10 @@ console.log("[arch-studio] init complete");
     drag.el.style.top  = (drag.top + dy) + "px";
   }, true);
 
-  document.addEventListener("mouseup", function(){ drag = null; }, true);
+  document.addEventListener("mouseup", function(){
+    drag = null;
+    if(resize){ resize.el.classList.remove("is-resizing"); resize.el.removeAttribute("data-size"); resize = null; persistCustom(); }
+  }, true);
 
   /* double-click a component → native edit dialog (openEdit writes back to ARCH) */
   document.addEventListener("dblclick", function(e){
