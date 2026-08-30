@@ -33,3 +33,14 @@ Amr's batch_*.py + ARCH (HTML)
 ## License
 
 MIT
+
+## ⚠️ Data converter security
+
+The data converter (`converter/`) executes third-party Python from
+[Amr Alieg's repo](https://github.com/amralieg/interactive-databricks-enterprise-architecture)
+to parse industry overlays — the `batch_*.py` files use helper functions that
+build the data dicts at import time, so static parsing alone is not practical.
+The converter mitigates this by (1) pinning to a specific commit SHA and (2)
+AST-scanning each file for dangerous imports/calls before executing it. See
+[`converter/README.md`](converter/README.md#security-executing-third-party-python)
+for details. Do not point `--repo` at untrusted Python.

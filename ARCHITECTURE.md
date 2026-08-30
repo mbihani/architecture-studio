@@ -70,7 +70,9 @@ The normalized, serializable representation of an architecture. This is what we 
 
 Reference: https://developer.lucid.co/docs/overview-si
 
-Packaged as a `.lucid` archive (ZIP) containing `document.json`. Key structure:
+Packaged as a `.lucid` archive (ZIP) containing `document.json`. Key structure
+(field names match the official SI spec — `boundingBox` + `style` for shapes,
+`endpoint1`/`endpoint2` for lines, `groups` array on each page):
 
 ```jsonc
 {
@@ -78,26 +80,29 @@ Packaged as a `.lucid` archive (ZIP) containing `document.json`. Key structure:
   "pages": [
     {
       "id": "page-1",
-      "name": "Platform",
+      "title": "Platform",
       "shapes": [
         {
           "id": "shape-1",
           "type": "rectangle",
-          "x": 100, "y": 100,
-          "width": 200, "height": 80,
+          "boundingBox": { "x": 100, "y": 100, "w": 200, "h": 80 },
           "text": "Unity Catalog",
-          "fillColor": "#FF6B35",
-          "strokeColor": "#333333"
+          "style": {
+            "fill":   { "type": "color", "color": "#FF6B35" },
+            "stroke": { "color": "#333333", "width": 1, "style": "solid" }
+          }
         }
       ],
       "lines": [
         {
           "id": "line-1",
-          "sourceId": "shape-1",
-          "destinationId": "shape-2"
+          "lineType": "elbow",
+          "endpoint1": { "type": "shapeEndpoint", "style": "none",  "shapeId": "shape-1" },
+          "endpoint2": { "type": "shapeEndpoint", "style": "arrow", "shapeId": "shape-2" },
+          "stroke": { "color": "#9CA3AF", "width": 1, "style": "solid" }
         }
       ],
-      "groups": [...]
+      "groups": []
     }
   ]
 }

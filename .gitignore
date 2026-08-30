@@ -7,4 +7,4 @@ dist/
 .polly/
 converter/tmp/
 *.lucid
-*.tsbuildinfo
+__pycache__/
