@@ -118,4 +118,4 @@ python3 -m json.tool converter/sample-output/document.json >/dev/null
 - **63 pages** (1 platform + 62 industries)
 - **4,097 shapes** (min 57 per page, all ≥ 20)
 - **2,238 connectors** (min 25 per page, all ≥ 10)
-- **1.81 MB** document.json (under Lucid's 2 MB limit)
+- **1.86 MB** document.json (under Lucid's 2 MB limit)

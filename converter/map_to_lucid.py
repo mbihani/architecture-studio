@@ -58,7 +58,7 @@ def _shape(component: dict[str, Any], shape_id: str, x: int, y: int) -> dict[str
         "id": shape_id,
         "type": "rectangle",
         "boundingBox": {"x": x, "y": y, "w": SHAPE_W, "h": SHAPE_H},
-        "text": {"text": _text_html(component)},
+        "text": _text_html(component),
         "style": {
             "fill": {"type": "color", "color": colour},
             "stroke": {"color": "#475569", "width": 1, "style": "solid"},
