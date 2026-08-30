@@ -17959,6 +17959,9 @@ console.log("[arch-studio] init complete");
     "#ind-tabs .ind-filter { flex:0 0 150px; border:1px solid var(--line-strong); border-radius:7px;",
     "  padding:5px 9px; background:var(--well); color:var(--ink); font:inherit; }",
     "@media print { #ind-tabs { display:none !important; } }",
+    "#canvas-status { flex:0 0 auto; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;",
+    "  padding:6px 10px; border-radius:999px; background:color-mix(in srgb,var(--brand) 12%,var(--card));",
+    "  color:var(--brand); font-weight:750; }",
     "/* edit toolbar */",
     "#edit-tools { position:fixed; top:108px; right:16px; z-index:1000; display:flex; gap:8px;",
     "  padding:8px; border:1px solid var(--line-strong); border-radius:10px; background:var(--card);",
@@ -18020,11 +18023,20 @@ console.log("[arch-studio] init complete");
   indTabs.id = "ind-tabs";
   indTabs.innerHTML =
     '<div class="ind-tabs-scroll" id="ind-tabs-scroll"></div>' +
+    '<span id="canvas-status" role="status" aria-live="polite"></span>' +
     '<input class="ind-filter" id="ind-filter" type="search" autocomplete="off" placeholder="Filter industries…">';
   (document.getElementsByTagName("header")[0] || document.body).after(indTabs);
 
   var tabsScroll = byId2("ind-tabs-scroll");
   var filterInput = byId2("ind-filter");
+  var canvasStatus = byId2("canvas-status");
+
+  function currentIndustryName(){ return industryLabel(ARCH.industry || "generic") || "Standard"; }
+  function updateCanvasStatus(){
+    var boardName = activeBoard === "reference" ? "My Canvas" : currentBoardName();
+    canvasStatus.textContent = "Editing: " + currentIndustryName() + " — " + boardName;
+    canvasStatus.title = canvasStatus.textContent;
+  }
 
   function buildIndTabs(){
     var cur = ARCH.industry || "generic";
@@ -18037,7 +18049,7 @@ console.log("[arch-studio] init complete");
     }).join("");
     tabsScroll.querySelectorAll(".ind-tab").forEach(function(b){
       if(b.disabled) return;
-      b.onclick = function(e){ e.stopPropagation(); applyIndustry(b.dataset.ind, true); };
+      b.onclick = function(e){ e.stopPropagation(); requestIndustrySwitch(b.dataset.ind); };
     });
     applyIndFilter();
   }
@@ -18054,6 +18066,7 @@ console.log("[arch-studio] init complete");
     tabsScroll.querySelectorAll(".ind-tab").forEach(function(b){
       b.classList.toggle("on", b.dataset.ind === cur);
     });
+    updateCanvasStatus();
   }
   filterInput.oninput = applyIndFilter;
   filterInput.onclick = function(e){ e.stopPropagation(); };
@@ -18106,6 +18119,8 @@ console.log("[arch-studio] init complete");
   tools.id = "edit-tools";
   tools.innerHTML =
     '<button id="edit-toggle" type="button">Edit Mode: ON</button>' +
+    '<button id="edit-reset" type="button">Reset to Reference</button>' +
+    '<button id="edit-duplicate" type="button">Duplicate Canvas</button>' +
     '<button id="edit-newbox" type="button">New Box</button>' +
     '<button id="edit-add" type="button">Add Component</button>' +
     '<button id="edit-delete" type="button">Delete</button>';
@@ -18113,11 +18128,48 @@ console.log("[arch-studio] init complete");
 
   var toggleBtn  = byId2("edit-toggle");
   var newboxBtn  = byId2("edit-newbox");
+  var resetBtn   = byId2("edit-reset");
+  var duplicateBtn = byId2("edit-duplicate");
   var addCompBtn = byId2("edit-add");
   var deleteBtn  = byId2("edit-delete");
 
   var selected = null;   /* { type:'atom'|'group'|'cloud'|'zone', el?, zone?, gidx? } */
   var drag = null;
+
+  var bypassSwitchConfirm = false;
+  var _editApplyIndustry = applyIndustry;
+  function performIndustrySwitch(id){
+    bypassSwitchConfirm = true;
+    try { _editApplyIndustry(id, true); }
+    finally { bypassSwitchConfirm = false; }
+    activeBoard = "reference";
+    updateCanvasStatus();
+  }
+  function requestIndustrySwitch(id){
+    if(id === (ARCH.industry || "generic")) return;
+    openModal({
+      title:"Switch reference architecture?",
+      sub:"Switching to " + industryLabel(id) + " will discard your current edits to " + currentIndustryName() + ". Continue?",
+      body:"",
+      okText:"Switch",
+      onOk:function(){ performIndustrySwitch(id); return true; }
+    });
+  }
+  /* Cover the native dropdown as well as the new tab bar. */
+  applyIndustry = function(id, remember){
+    if(bypassSwitchConfirm || id === (ARCH.industry || "generic")) return _editApplyIndustry(id, remember);
+    requestIndustrySwitch(id);
+  };
+
+  resetBtn.onclick = function(){
+    openModal({ title:"Reset to Reference?", sub:"This clears all edits on the current canvas and restores the pristine " + currentIndustryName() + " architecture.", body:"", okText:"Reset",
+      onOk:function(){ performIndustrySwitch(ARCH.industry || "generic"); toast("Canvas reset to the reference architecture."); return true; } });
+  };
+  duplicateBtn.onclick = function(){
+    cloneCurrent();
+    updateCanvasStatus();
+    toast("Canvas duplicated into a new custom tab.");
+  };
 
   function clearSel(){
     if(selected && selected.el) selected.el.classList.remove("sel-group","sel-atom");
