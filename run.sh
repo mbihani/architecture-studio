@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Databricks Apps entrypoint: install deps (if missing), build, then serve.
-# The --registry flag is required on hosts that block npmjs.org (this Mac
-# blackholes it in /etc/hosts); registry.npmmirror.com is reachable.
-set -e
+# Databricks Apps entrypoint: install deps, build frontend, then serve.
+set -ex
 cd "$(dirname "$0")"
-[ -d node_modules ] || npm install --registry=https://registry.npmmirror.com
+echo "=== Node $(node --version) npm $(npm --version) ==="
+[ -d node_modules ] || npm install
+echo "=== Building ==="
 npm run build
-exec npx tsx server/index.ts
+echo "=== Starting server on PORT ${PORT:-8080} ==="
+NODE_ENV=production exec ./node_modules/.bin/tsx server/index.ts
