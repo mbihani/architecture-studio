@@ -15,6 +15,7 @@ import {
   getDocumentContents,
   listDocuments,
 } from "../services/lucid-api.ts";
+import { getSessionId } from "../services/session.ts";
 import type { LucidImportJson } from "../types.ts";
 
 export const documentsRouter = Router();
@@ -36,7 +37,7 @@ documentsRouter.post("/documents/create", async (req, res) => {
   }
 
   try {
-    const doc = await createDocumentFromImport(importJson, name);
+    const doc = await createDocumentFromImport(getSessionId(req), importJson, name);
     res.json(doc);
   } catch (err) {
     res
@@ -45,9 +46,9 @@ documentsRouter.post("/documents/create", async (req, res) => {
   }
 });
 
-documentsRouter.get("/documents", async (_req, res) => {
+documentsRouter.get("/documents", async (req, res) => {
   try {
-    const docs = await listDocuments();
+    const docs = await listDocuments(getSessionId(req));
     res.json(docs);
   } catch (err) {
     res
@@ -59,7 +60,7 @@ documentsRouter.get("/documents", async (_req, res) => {
 documentsRouter.get("/documents/:id/contents", async (req, res) => {
   const id = req.params.id;
   try {
-    const contents = await getDocumentContents(id);
+    const contents = await getDocumentContents(getSessionId(req), id);
     res.json(contents);
   } catch (err) {
     res
@@ -72,7 +73,7 @@ documentsRouter.get("/documents/:id/export", async (req, res) => {
   const id = req.params.id;
   const format = req.query.format === "pdf" ? "pdf" : "png";
   try {
-    const { buffer, contentType } = await exportDocument(id, format);
+    const { buffer, contentType } = await exportDocument(getSessionId(req), id, format);
     res.setHeader("Content-Type", contentType);
     res.setHeader(
       "Content-Disposition",

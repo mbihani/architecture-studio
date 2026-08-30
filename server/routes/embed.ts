@@ -7,6 +7,7 @@
 import { Router } from "express";
 
 import { generateEmbedSession } from "../services/lucid-api.ts";
+import { getSessionId } from "../services/session.ts";
 
 export const embedRouter = Router();
 
@@ -20,7 +21,7 @@ embedRouter.post("/embed/session", async (req, res) => {
   }
 
   try {
-    const session = await generateEmbedSession(documentId);
+    const session = await generateEmbedSession(getSessionId(req), documentId);
     res.json(session);
   } catch (err) {
     res
