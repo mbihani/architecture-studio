@@ -17963,10 +17963,11 @@ console.log("[arch-studio] init complete");
     "  padding:6px 10px; border-radius:999px; background:color-mix(in srgb,var(--brand) 12%,var(--card));",
     "  color:var(--brand); font-weight:750; }",
     "/* edit toolbar */",
-    "#edit-tools { position:fixed; top:108px; right:16px; z-index:1000; display:flex; flex-wrap:wrap; gap:8px;",
-    "  max-width:min(760px,calc(100vw - 32px)); max-height:calc(100vh - 130px); overflow:auto; box-sizing:border-box;",
+    "#edit-tools { position:sticky; top:0; z-index:1000; display:none; flex-wrap:nowrap; gap:8px;",
+    "  max-width:100%; max-height:none; overflow-x:auto; box-sizing:border-box;",
     "  padding:8px; border:1px solid var(--line-strong); border-radius:10px; background:var(--card);",
     "  box-shadow:var(--shadow-lg); font:12px/1.2 system-ui,sans-serif; }",
+    "body.edit-mode #edit-tools { display:flex; }",
     "#edit-tools button { flex:0 0 auto; min-height:32px; border:1px solid var(--line-strong); border-radius:7px; padding:7px 10px;",
     "  background:var(--card); color:var(--ink); cursor:pointer; font:inherit; }",
     "#edit-tools button:hover { border-color:var(--brand); color:var(--brand); }",
@@ -18025,7 +18026,7 @@ console.log("[arch-studio] init complete");
     ".atom .nm, .rg-label, .ct-name, .ct-sub { overflow:hidden; text-overflow:ellipsis; }",
     ".rg-label, .ct-name { white-space:nowrap; }",
     "@media (max-width:720px){ #canvas-status{display:none} #ind-tabs{padding-inline:8px;gap:5px}",
-    "  #edit-tools{right:8px;max-width:calc(100vw - 16px)} #edit-tools button{padding:6px 8px}",
+    "  #edit-tools button{padding:6px 8px}",
     "  #edit-toast{bottom:14px;max-width:calc(100vw - 28px)} }"
   ].join("\n");
   document.head.appendChild(style);
@@ -18188,7 +18189,7 @@ console.log("[arch-studio] init complete");
     '<button id="edit-newbox" type="button" aria-label="Create a new empty box in a zone">New Box</button>' +
     '<button id="edit-add" type="button" aria-label="Add a component to the selected box">Add Component</button>' +
     '<button id="edit-delete" type="button" aria-label="Delete the selected item or items">Delete</button>';
-  document.body.appendChild(tools);
+  document.getElementById('board').insertAdjacentElement('beforebegin', tools);
 
   var toggleBtn  = byId2("edit-toggle");
   var newboxBtn  = byId2("edit-newbox");
