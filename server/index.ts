@@ -1,25 +1,23 @@
 // ---------------------------------------------------------------------------
 // Architecture Studio backend — Express server entry point.
 //
-// Runs on port 8080 by default (overridable via the PORT env var). Serves the
-// JSON API consumed by the React frontend (proxied via Vite in dev) and, in
-// production, the built frontend from dist/. API routes live under /api.
+// Runs on port 3001 by default — matching the Vite dev proxy (vite.config.ts)
+// so /api is same-origin in dev and no CORS is needed. Overridable via the PORT
+// env var, which the Databricks App platform sets in production. Serves the
+// JSON API consumed by the React frontend and, in production, the built
+// frontend from dist/. API routes live under /api.
 // ---------------------------------------------------------------------------
 
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import cors from "cors";
 import express from "express";
 
-import { authRouter } from "./routes/auth.ts";
-import { documentsRouter } from "./routes/documents.ts";
-import { embedRouter } from "./routes/embed.ts";
-import { exportRouter } from "./routes/export.ts";
+import { architectureRouter } from "./routes/architecture.ts";
 import { industriesRouter } from "./routes/industries.ts";
 
-const PORT = Number(process.env.PORT ?? 8080);
+const PORT = Number(process.env.PORT ?? 3001);
 
 /**
  * Best-effort .env loader so the backend works locally without an external
@@ -52,15 +50,14 @@ function loadEnv(): void {
 loadEnv();
 
 const app = express();
-app.use(cors());
+// No CORS middleware: in production this server serves the built frontend
+// from the same origin, and in dev Vite proxies /api to this same origin — so
+// the browser never makes a cross-origin request to the API.
 app.use(express.json({ limit: "10mb" }));
 
 // Mount every route group under /api.
-app.use("/api", authRouter);
-app.use("/api", embedRouter);
-app.use("/api", documentsRouter);
+app.use("/api", architectureRouter);
 app.use("/api", industriesRouter);
-app.use("/api", exportRouter);
 
 // Health check.
 app.get("/api/health", (_req, res) => {

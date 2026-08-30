@@ -1,8 +1,10 @@
 // ---------------------------------------------------------------------------
-// IndustrySwitcher — dropdown to switch the active industry overlay.
+// IndustrySwitcher — dropdown to switch the active industry diagram page.
 //
-// Lists industries from GET /api/industries and, on selection, calls
-// POST /api/industries/:id/activate (which may create/switch a Lucid page).
+// Lists industries from GET /api/industries (parsed from the mxfile's
+// <diagram> elements). On selection, calls POST /api/industries/:id/activate
+// for backend bookkeeping, then asks the editor to switch to that page tab
+// (which preserves every page — see useDrawioEmbed.switchPage).
 // ---------------------------------------------------------------------------
 
 import { useEffect, useState } from "react";
@@ -10,7 +12,12 @@ import { useEffect, useState } from "react";
 import { api, type ApiError } from "../api/client.ts";
 import type { Industry } from "../types/index.ts";
 
-export function IndustrySwitcher(): React.ReactElement {
+interface IndustrySwitcherProps {
+  /** Called with the activated industry's id to switch the editor page. */
+  onActivate: (id: string) => void;
+}
+
+export function IndustrySwitcher({ onActivate }: IndustrySwitcherProps): React.ReactElement {
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [activeId, setActiveId] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -45,7 +52,9 @@ export function IndustrySwitcher(): React.ReactElement {
     setActivating(true);
     setError(null);
     try {
+      // Bookkeeping (+ validates the id); then switch the editor page tab.
       await api.activateIndustry(id);
+      onActivate(id);
     } catch (err) {
       setError((err as ApiError).message);
     } finally {

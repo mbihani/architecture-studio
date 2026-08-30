@@ -1,8 +1,13 @@
 // ---------------------------------------------------------------------------
-// Industry routes — list and activate industry overlays.
+// Industry routes — list and activate industry diagram pages.
 //
 //   GET  /api/industries              → Industry[]
 //   POST /api/industries/:id/activate → { id, activated }
+//
+// Industries are parsed from the mxfile's <diagram> elements. Activating an
+// industry records it as the active page (backend bookkeeping); the frontend
+// switches the editor tab client-side (see useDrawioEmbed.switchPage), so the
+// full mxfile — and therefore every page — is always preserved on save.
 // ---------------------------------------------------------------------------
 
 import { Router } from "express";
@@ -19,11 +24,12 @@ industriesRouter.get("/industries", (_req, res) => {
 });
 
 industriesRouter.post("/industries/:id/activate", (req, res) => {
-  const industry = activateIndustry(req.params.id);
+  const id = req.params.id;
+  const industry = getIndustries().find((ind) => ind.id === id);
   if (!industry) {
-    res.status(404).json({ error: `Unknown industry: ${req.params.id}` });
+    res.status(404).json({ error: `Unknown industry: ${id}` });
     return;
   }
-  // TODO: create/switch the Lucid page scoped to industry.componentIds.
+  activateIndustry(id);
   res.json({ id: industry.id, activated: true });
 });

@@ -3,49 +3,14 @@
 //
 // The frontend (src/types/index.ts) and backend keep their own copies of the
 // shared data-model types so each TS project (tsconfig.app.json /
-// server/tsconfig.json) is self-contained under project references. Both
-// mirror the data model defined in ARCHITECTURE.md.
+// server/tsconfig.json) is self-contained under project references.
+//
+// The ArchitectureDoc family (Component, Edge, Industry, …) is retained for
+// semantic modelling; the draw.io integration surfaces industries via the
+// mxfile XML, so Industry's non-essential fields are optional.
 // ---------------------------------------------------------------------------
 
-// --- Lucid Standard Import JSON (Lucid's format) -------------------------
-
-export interface LucidShape {
-  id: string;
-  type: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  text?: string;
-  fillColor?: string;
-  strokeColor?: string;
-}
-
-export interface LucidLine {
-  id: string;
-  sourceId: string;
-  destinationId: string;
-}
-
-export interface LucidGroup {
-  id: string;
-  children: string[];
-}
-
-export interface LucidPage {
-  id: string;
-  name: string;
-  shapes: LucidShape[];
-  lines: LucidLine[];
-  groups: LucidGroup[];
-}
-
-export interface LucidImportJson {
-  version: 1;
-  pages: LucidPage[];
-}
-
-// --- ArchitectureDoc (our semantic format) -------------------------------
+// --- ArchitectureDoc (semantic format) ------------------------------------
 
 export type ComponentCategory =
   | "platform"
@@ -106,12 +71,16 @@ export interface Medallion {
   Gold: MedallionLayer;
 }
 
+/** An industry overlay selecting a subset of components. */
 export interface Industry {
   id: string;
   label: string;
-  blurb: string;
-  componentIds: string[];
-  medallion: Medallion;
+  /** Short description — omitted when the industry is parsed from a draw.io diagram name. */
+  blurb?: string;
+  /** Component IDs — omitted when the industry is parsed from a draw.io diagram name. */
+  componentIds?: string[];
+  /** Medallion layers — omitted when the industry is parsed from a draw.io diagram name. */
+  medallion?: Medallion;
 }
 
 export interface ArchitectureDoc {
@@ -119,4 +88,28 @@ export interface ArchitectureDoc {
   components: Component[];
   edges: Edge[];
   industries: Industry[];
+}
+
+// --- draw.io API response shapes -----------------------------------------
+
+/** Response from GET /api/architecture. */
+export interface ArchitectureResponse {
+  /** The full mxfile XML with all diagram pages. */
+  drawioXml: string;
+}
+
+/** Request body for POST /api/architecture. */
+export interface SaveArchitectureRequest {
+  drawioXml: string;
+}
+
+/** Response from POST /api/architecture. */
+export interface SaveArchitectureResponse {
+  saved: boolean;
+}
+
+/** Response from POST /api/industries/:id/activate. */
+export interface ActivateIndustryResponse {
+  id: string;
+  activated: boolean;
 }
