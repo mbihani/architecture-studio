@@ -17989,6 +17989,11 @@ console.log("[arch-studio] init complete");
     ".rgroup.is-resizing::after { content:attr(data-size); position:absolute; right:4px; bottom:4px; z-index:31;",
     "  padding:2px 5px; border-radius:4px; background:var(--ink); color:var(--card); font:10px/1.2 monospace; }",
     ".rgroup[data-custom-size] .rtiles { flex:1 1 auto; align-content:start; grid-template-columns:repeat(auto-fit,minmax(92px,1fr))!important; overflow:auto; }",
+    "#custom-flows { position:fixed; inset:0; width:100vw; height:100vh; z-index:25; pointer-events:none; overflow:visible; }",
+    "#custom-flows .custom-flow { fill:none; stroke:#7c3aed; stroke-width:3; pointer-events:stroke; cursor:pointer; }",
+    "#custom-flows .custom-flow:hover { stroke:var(--danger); stroke-width:5; }",
+    "body.connect-mode .atom { cursor:crosshair!important; }",
+    "body.connect-mode .atom.connect-start { outline:4px solid #7c3aed; outline-offset:3px; }",
     "/* zone (whole column/pocket) selection in edit mode */",
     "body.edit-mode .col.sel-zone, body.edit-mode .pocket.sel-zone {",
     "  outline:3px solid var(--brand); outline-offset:2px; border-radius:10px; }",
@@ -18137,6 +18142,7 @@ console.log("[arch-studio] init complete");
       });
     });
     if(typeof hideDeletedZones === 'function') hideDeletedZones();
+    if(flowSvg) requestAnimationFrame(renderCustomFlows);
   };
 
   buildIndTabs();
@@ -18152,6 +18158,7 @@ console.log("[arch-studio] init complete");
     '<button id="edit-duplicate" type="button">Duplicate Canvas</button>' +
     '<button id="edit-multi" type="button">Multi-Select</button>' +
     '<span id="multi-count" role="status" aria-live="polite">0 selected</span>' +
+    '<button id="edit-connect" type="button">Connect</button>' +
     '<button id="edit-newbox" type="button">New Box</button>' +
     '<button id="edit-add" type="button">Add Component</button>' +
     '<button id="edit-delete" type="button">Delete</button>';
@@ -18163,6 +18170,7 @@ console.log("[arch-studio] init complete");
   var duplicateBtn = byId2("edit-duplicate");
   var multiBtn = byId2("edit-multi");
   var multiCount = byId2("multi-count");
+  var connectBtn = byId2("edit-connect");
   var addCompBtn = byId2("edit-add");
   var deleteBtn  = byId2("edit-delete");
 
@@ -18172,6 +18180,57 @@ console.log("[arch-studio] init complete");
   var multiMode = false;
   var multiSelection = new Map();
   var rangeAnchor = null;
+  var connectMode = false;
+  var connectStart = null;
+
+  /* Extend the app's existing snapshot/persistence contract without touching the
+     authored ARCH literal. Old snapshots simply restore an empty flow list. */
+  var _flowBoardSnapshot = boardSnapshot;
+  boardSnapshot = function(){ var s = _flowBoardSnapshot(); s._customFlows = JSON.parse(JSON.stringify(ARCH._customFlows || [])); return s; };
+  var _flowLoadBoardSnap = loadBoardSnap;
+  loadBoardSnap = function(s){ _flowLoadBoardSnap(s); ARCH._customFlows = JSON.parse(JSON.stringify((s && s._customFlows) || [])); };
+  persistCustom = function(){
+    if(activeBoard !== "reference"){
+      var r = customTabs.get(activeBoard); if(r){ r.snap = boardSnapshot(); persistTabs(); } return;
+    }
+    store.set(CUSTOM_LS, JSON.stringify({ schema:SCHEMA, industry:ARCH.industry, bands:ARCH.bands, rails:ARCH.rails,
+      top:ARCH.top, cloud:ARCH.cloud, _customFlows:ARCH._customFlows || [] }));
+  };
+  try{
+    var initialSaved = JSON.parse(store.get(CUSTOM_LS) || "null");
+    ARCH._customFlows = initialSaved && initialSaved.industry === ARCH.industry && Array.isArray(initialSaved._customFlows)
+      ? initialSaved._customFlows : (ARCH._customFlows || []);
+  }catch(_flowLoadError){ ARCH._customFlows = []; }
+
+  var flowSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  flowSvg.id = "custom-flows"; flowSvg.setAttribute("aria-label","Custom architecture flows");
+  flowSvg.innerHTML = '<defs><marker id="custom-arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#7c3aed"/></marker></defs>';
+  document.body.appendChild(flowSvg);
+  function atomForName(name){
+    var found = null;
+    document.querySelectorAll(".atom[data-id]").forEach(function(el){ var rec = byId[el.dataset.id]; if(!found && rec && rec.tile && rec.tile.n === name) found = el; });
+    return found;
+  }
+  function renderCustomFlows(){
+    flowSvg.querySelectorAll(".custom-flow").forEach(function(n){ n.remove(); });
+    (ARCH._customFlows || []).forEach(function(flow, i){
+      var a = atomForName(flow.from), b = atomForName(flow.to); if(!a || !b) return;
+      var ar = a.getBoundingClientRect(), br = b.getBoundingClientRect();
+      var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      var x1=ar.left+ar.width/2, y1=ar.top+ar.height/2, x2=br.left+br.width/2, y2=br.top+br.height/2;
+      path.setAttribute("d","M"+x1+","+y1+" C"+(x1+x2)/2+","+y1+" "+(x1+x2)/2+","+y2+" "+x2+","+y2);
+      path.setAttribute("marker-end","url(#custom-arrow)"); path.setAttribute("class","custom-flow");
+      path.setAttribute("role","button"); path.setAttribute("aria-label","Delete flow from " + flow.from + " to " + flow.to);
+      path.onclick = function(e){ e.stopPropagation(); ARCH._customFlows.splice(i,1); persistCustom(); renderCustomFlows(); toast("Flow deleted."); };
+      flowSvg.appendChild(path);
+    });
+  }
+  function setConnectMode(on){
+    connectMode = !!on; connectBtn.classList.toggle("on",connectMode); connectBtn.setAttribute("aria-pressed",connectMode ? "true":"false");
+    document.body.classList.toggle("connect-mode",connectMode);
+    if(!connectMode && connectStart){ connectStart.el.classList.remove("connect-start"); connectStart = null; }
+  }
+  connectBtn.onclick = function(){ setConnectMode(!connectMode); };
 
   function updateMultiUI(){
     multiBtn.classList.toggle("on", multiMode);
@@ -18205,7 +18264,7 @@ console.log("[arch-studio] init complete");
   var _editApplyIndustry = applyIndustry;
   function performIndustrySwitch(id){
     bypassSwitchConfirm = true;
-    try { _editApplyIndustry(id, true); }
+    try { _editApplyIndustry(id, true); ARCH._customFlows = []; persistCustom(); }
     finally { bypassSwitchConfirm = false; }
     activeBoard = "reference";
     updateCanvasStatus();
@@ -18311,6 +18370,16 @@ console.log("[arch-studio] init complete");
     var atom = e.target.closest && e.target.closest(".atom");
     if(atom){
       e.preventDefault();
+      if(connectMode){
+        var connectionRec = byId[atom.dataset.id]; if(!connectionRec || !connectionRec.tile) return;
+        if(!connectStart){ connectStart = { el:atom, name:connectionRec.tile.n }; atom.classList.add("connect-start"); toast("Select the destination component."); }
+        else if(connectStart.el !== atom){
+          ARCH._customFlows = ARCH._customFlows || [];
+          ARCH._customFlows.push({ from:connectStart.name, to:connectionRec.tile.n, label:"" });
+          connectStart.el.classList.remove("connect-start"); connectStart = null; persistCustom(); renderCustomFlows(); setConnectMode(false); toast("Flow added.");
+        }
+        return;
+      }
       if(multiMode){
         var item = atomMultiItem(atom);
         if(!item) return;
@@ -18372,6 +18441,8 @@ console.log("[arch-studio] init complete");
     drag = null;
     if(resize){ resize.el.classList.remove("is-resizing"); resize.el.removeAttribute("data-size"); resize = null; persistCustom(); }
   }, true);
+  window.addEventListener("resize", renderCustomFlows);
+  window.addEventListener("scroll", renderCustomFlows, true);
 
   /* double-click a component → native edit dialog (openEdit writes back to ARCH) */
   document.addEventListener("dblclick", function(e){
@@ -18561,6 +18632,7 @@ console.log("[arch-studio] init complete");
   setEditMode(true);
   toggleBtn.textContent = "Edit Mode: ON";
   updateMultiUI();
+  renderCustomFlows();
   syncIndTabs();
   placeTools();
   window.addEventListener("resize", placeTools);
