@@ -18070,7 +18070,18 @@ restoreActiveTab();
     selected = null;
     deleteBtn.style.display = "none";
   }
-  function selectAtom(elm){ clearSel(); selected = { type:"atom", el:elm }; elm.classList.add("sel-atom"); deleteBtn.style.display = "inline-block"; }
+  function selectAtom(elm){
+    clearSel();
+    selected = { type:"atom", el:elm };
+    elm.classList.add("sel-atom");
+    /* Only offer Delete for atoms with a mutable backing array. Native
+       platform-band atoms are registered with arr === null, so splicing
+       their (non-existent) array is a silent no-op — hide Delete there.
+       Groups (selectGroup) stay always-deletable: they live in
+       ARCH.rails[zone].groups, not in an atom backing array. */
+    var rec = byId[elm.dataset.id];
+    deleteBtn.style.display = (rec && Array.isArray(rec.arr)) ? "inline-block" : "none";
+  }
   function selectGroup(elm, zone, gidx){ clearSel(); selected = { type:"group", el:elm, zone:zone, gidx:gidx }; elm.classList.add("sel-group"); deleteBtn.style.display = "inline-block"; }
   function selectCloud(elm){ clearSel(); selected = { type:"cloud", el:elm }; elm.classList.add("sel-group"); deleteBtn.style.display = "none"; }
 
@@ -18223,13 +18234,15 @@ restoreActiveTab();
 
   /* ---------- generic modal dialog (inline, no libs) ---------- */
   var modalEl = null;
+  var modalOpener = null;   /* element that held focus before the modal opened */
   function openModal(opts){
     closeModal();
+    modalOpener = document.activeElement;
     modalEl = document.createElement("div");
     modalEl.className = "modal-overlay";
     modalEl.innerHTML =
-      '<div class="modal">' +
-        '<h3>' + esc(opts.title || "") + '</h3>' +
+      '<div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">' +
+        '<h3 id="m-title">' + esc(opts.title || "") + '</h3>' +
         (opts.sub ? '<p class="m-sub">' + esc(opts.sub) + '</p>' : '') +
         opts.body +
         '<div class="modal-actions">' +
@@ -18247,11 +18260,28 @@ restoreActiveTab();
     if(opts.onRender) opts.onRender();
     setTimeout(function(){ var f = byId2("m-name") || byId2("m-zone"); if(f && f.focus) f.focus(); }, 30);
   }
-  function closeModal(){ if(modalEl){ modalEl.remove(); modalEl = null; } }
+  function closeModal(){
+    if(modalEl){ modalEl.remove(); modalEl = null; }
+    /* restore focus to the element that opened the modal */
+    if(modalOpener && modalOpener.focus){ modalOpener.focus(); modalOpener = null; }
+  }
 
   document.addEventListener("keydown", function(e){
     if(e.key === "Escape" && modalEl) closeModal();
     if(e.key === "Enter" && modalEl && e.target && e.target.id === "m-name") byId2("m-ok").click();
+    /* focus trap: keep Tab/Shift+Tab cycling inside the open modal */
+    if(modalEl && e.key === "Tab"){
+      var list = Array.prototype.slice.call(modalEl.querySelectorAll(
+        'button:not([disabled]), input:not([disabled]), select:not([disabled]),' +
+        ' textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+      ));
+      if(!list.length) return;
+      var i = list.indexOf(document.activeElement);
+      e.preventDefault();
+      if(i === -1) list[0].focus();
+      else if(e.shiftKey) list[(i - 1 + list.length) % list.length].focus();
+      else list[(i + 1) % list.length].focus();
+    }
   });
 
   /* ---------- boot: edit mode on + place toolbar below the tab bar ---------- */
