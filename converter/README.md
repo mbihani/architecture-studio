@@ -16,14 +16,24 @@ not written as literals).
 
 Two mitigations are in place:
 
-1. **Commit pin** — `parse_industries.py` pins the upstream repo to a specific
-   commit SHA (`PINNED_COMMIT`). On load it verifies the repo HEAD matches
-   the pin and checks out the pinned commit if it doesn't. Update the pin
-   deliberately after reviewing the diff.
-2. **AST safety scan** — before executing each batch file, the converter
-   parses its AST and refuses to run if it imports a dangerous module
-   (`os`, `subprocess`, `socket`, `http`, `urllib`, `ctypes`, `pickle`, …)
-   or calls a dangerous builtin (`exec`, `eval`, `__import__`, `open`, …).
+1. **Commit pin (fail-closed)** — `parse_industries.py` pins the upstream repo
+   to a specific commit SHA (`PINNED_COMMIT`). On load it verifies the repo
+   HEAD matches the pin **and** that the working tree is clean (no modified
+   or untracked files). If either check fails, it prints an error and exits —
+   it never checks out the pin for you or executes code from a dirty or
+   mismatched repo. Update the pin deliberately after reviewing the diff.
+2. **AST safety scan** — before executing any file, the converter scans
+   **every `.py` file** in `tools/industries/` (not just `batch_*.py` —
+   `common.py` and any other helpers are imported and executed too). It
+   refuses to run if a file:
+   - imports a dangerous module (`os`, `subprocess`, `socket`, `http`,
+     `urllib`, `ctypes`, `pickle`, `importlib`, …),
+   - calls a dangerous builtin (`exec`, `eval`, `__import__`, `open`, …),
+   - calls an attribute or subscript ending in `system`/`popen`/`exec`/`eval`
+     (catches aliases like `import os as x; x.system(…)` and dynamic dispatch
+     like `obj["system"](…)`),
+   - uses `getattr(obj, "system")` or `getattr(obj, "modules")`, or
+   - references `<name>.modules` (catches `sys.modules` under any alias).
    This is defense-in-depth on top of the pin.
 
 Do **not** point `--repo` at untrusted Python. The pin and scan reduce risk
@@ -40,8 +50,9 @@ git clone https://github.com/amralieg/interactive-databricks-enterprise-architec
 python3 converter/index.py
 ```
 
-The converter automatically verifies the clone is at the pinned commit
-(`8a5d798`) and checks it out if needed.
+The converter verifies the clone is at the pinned commit (`8a5d798`) and
+that the working tree is clean; if either check fails it prints an error and
+exits — check out the pinned commit deliberately before re-running.
 
 The default output is `converter/sample-output/document.json` (1.9 MB, under
 Lucid's 2 MB limit). To also retain the normalized ArchitectureDoc semantic
