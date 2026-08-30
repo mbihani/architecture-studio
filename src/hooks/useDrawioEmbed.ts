@@ -43,6 +43,7 @@ const ALLOWED_ORIGINS = new Set([
 type DrawioAction =
   | { action: "configure"; config: Record<string, unknown> }
   | { action: "load"; xml: string; autosave?: number }
+  | { action: "fit" }
   | { action: "save" }
   | { action: "export"; format: string; spinKey?: string };
 
@@ -116,7 +117,26 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
     iframeRef.current?.contentWindow?.postMessage(message, DRAWIO_ORIGIN);
   }, []);
 
+  /**
+   * Load the full mxfile XML into the editor, then fit the diagram to the
+   * viewport so every shape is visible. Shared by both sides of the init/API
+   * race (see below): whichever arrives second drives the load, so the XML
+   * is always rendered regardless of ordering. The `fit` is queued by draw.io
+   * right after the `load`, so sending them back-to-back is safe.
+   */
+  const loadXml = useCallback(
+    (xml: string): void => {
+      sendToEditor({ action: "load", xml, autosave: 0 });
+      sendToEditor({ action: "fit" });
+    },
+    [sendToEditor],
+  );
+
   // --- Load the architecture XML on mount --------------------------------
+  // The iframe `init` event and this fetch race: the CDN iframe usually
+  // fires `init` before the (auth-gated) API returns. The init handler loads
+  // the XML when it already has it; this effect loads it when the editor is
+  // already waiting. Whichever arrives second drives the load.
   useEffect(() => {
     let cancelled = false;
     api
@@ -125,6 +145,10 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
         if (cancelled) return;
         setDrawioXml(res.drawioXml);
         xmlRef.current = res.drawioXml;
+        // init fired first → the init handler had no XML to load. Load it now.
+        if (editorReadyRef.current) {
+          loadXml(res.drawioXml);
+        }
       })
       .catch((err: ApiError) => {
         if (!cancelled) setError(err.message);
@@ -135,7 +159,7 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [loadXml]);
 
   // --- Listen for postMessage events from the editor --------------------
   useEffect(() => {
@@ -152,8 +176,10 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
         editorReadyRef.current = true;
         // Configure the editor, then load the full mxfile (all pages as tabs).
         sendToEditor({ action: "configure", config: { format: "xml" } });
+        // API responded first → XML is already here; load it now. Otherwise the
+        // fetch effect above loads it once it arrives (whichever is second wins).
         if (xmlRef.current) {
-          sendToEditor({ action: "load", xml: xmlRef.current, autosave: 0 });
+          loadXml(xmlRef.current);
         }
       } else if (msg.event === "save" && typeof msg.xml === "string") {
         // The editor returned the (possibly edited) full mxfile — persist it.
@@ -192,7 +218,7 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
 
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
-  }, [sendToEditor]);
+  }, [sendToEditor, loadXml]);
 
   // --- Public actions ---------------------------------------------------
 
