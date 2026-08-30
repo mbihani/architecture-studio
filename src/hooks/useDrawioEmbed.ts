@@ -26,7 +26,7 @@ import { api, type ApiError } from "../api/client.ts";
 
 /** The embed URL for the diagrams.net editor (no API key, no OAuth). */
 export const DRAWIO_EMBED_URL =
-  "https://embed.diagrams.net?proto=json&svg=1&splash=0";
+  "https://embed.diagrams.net?proto=json&svg=1&splash=0&zoom=Fit";
 
 /** Origin of the embedded draw.io editor — used as the postMessage target. */
 const DRAWIO_ORIGIN = "https://embed.diagrams.net";
@@ -54,6 +54,17 @@ interface DrawioEvent {
   format?: string;
 }
 
+/**
+ * Coarse lifecycle of the draw.io embed, surfaced for the diagnostic overlay.
+ * Progresses: fetching → (init-waiting | loading-xml) → loaded, or → error.
+ */
+export type DrawioStatus =
+  | "fetching"
+  | "init-waiting"
+  | "loading-xml"
+  | "loaded"
+  | "error";
+
 interface UseDrawioEmbedResult {
   /** Attach to the <iframe> element in EmbedFrame. */
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
@@ -63,6 +74,8 @@ interface UseDrawioEmbedResult {
   loading: boolean;
   /** Error message if the initial fetch failed. */
   error: string | null;
+  /** Coarse embed lifecycle state for the diagnostic overlay. */
+  status: DrawioStatus;
   /** Request the editor to save; resolves with the saved XML. */
   save: () => Promise<string>;
   /** Export the current diagram as PNG; resolves with a PNG data URI. */
@@ -95,11 +108,30 @@ function reorderDiagramFirst(xml: string, id: string): string | null {
   return without.replace(/(<mxfile[^>]*>)/, (openTag) => `${openTag}\n  ${block}`);
 }
 
+/**
+ * Disable the page view on every <mxGraphModel> in the mxfile so the canvas is
+ * infinite and all shapes are visible regardless of page dimensions. draw.io
+ * defaults to a finite page (page="1", or the attribute absent), which on a
+ * very large diagram leaves most shapes off-screen after a load — the editor
+ * opens centered on an empty page corner. Setting page="0" removes the page
+ * boundary entirely, so combined with the `&zoom=Fit` embed parameter the whole
+ * diagram fits the viewport. Idempotent: a model already at page="0" is left
+ * untouched, and one missing the attribute gains page="0".
+ */
+function setInfiniteCanvas(xml: string): string {
+  return xml.replace(/<mxGraphModel\b[^>]*>/g, (tag) => {
+    if (/\spage="1"/.test(tag)) return tag.replace(/\spage="1"/, ' page="0"');
+    if (/\spage="[^"]*"/.test(tag)) return tag; // already non-1 (e.g. page="0")
+    return tag.replace(/>$/, ' page="0">'); // no page attr → force infinite canvas
+  });
+}
+
 export function useDrawioEmbed(): UseDrawioEmbedResult {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [drawioXml, setDrawioXml] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<DrawioStatus>("fetching");
 
   // Refs to avoid stale closures inside the message handler.
   const xmlRef = useRef("");
@@ -118,16 +150,21 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
 
   /**
    * Load the full mxfile XML into the editor and fit the diagram to the
-   * viewport so every shape is visible. The `fit` is sent as a property on
-   * the load action itself, which draw.io applies once the load completes —
-   * guaranteeing the fit happens after rendering (a separate fit message
-   * would race the load). Shared by both sides of the init/API race (see
-   * below): whichever arrives second drives the load, so the XML is always
-   * rendered regardless of ordering.
+   * viewport so every shape is visible. Before sending, the XML is rewritten
+   * to disable the page view on every <mxGraphModel> (see setInfiniteCanvas),
+   * making the canvas infinite so no shapes sit off-page. The `fit` is sent
+   * as a property on the load action itself, which draw.io applies once the
+   * load completes — guaranteeing the fit happens after rendering (a separate
+   * fit message would race the load). Shared by both sides of the init/API
+   * race (see below): whichever arrives second drives the load, so the XML is
+   * always rendered regardless of ordering.
    */
   const loadXml = useCallback(
     (xml: string): void => {
-      sendToEditor({ action: "load", xml, autosave: 0, fit: 1 });
+      setStatus("loading-xml");
+      const infiniteXml = setInfiniteCanvas(xml);
+      sendToEditor({ action: "load", xml: infiniteXml, autosave: 0, fit: 1 });
+      setStatus("loaded");
     },
     [sendToEditor],
   );
@@ -148,10 +185,16 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
         // init fired first → the init handler had no XML to load. Load it now.
         if (editorReadyRef.current) {
           loadXml(res.drawioXml);
+        } else {
+          // Editor still initializing → wait for the init event to drive the load.
+          setStatus("init-waiting");
         }
       })
       .catch((err: ApiError) => {
-        if (!cancelled) setError(err.message);
+        if (!cancelled) {
+          setError(err.message);
+          setStatus("error");
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -199,7 +242,9 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
           if (reordered) {
             xmlRef.current = reordered;
             setDrawioXml(reordered);
-            sendToEditor({ action: "load", xml: reordered, autosave: 0 });
+            // Reload through loadXml so the switched page also gets the
+            // infinite-canvas rewrite + fit (consistent with the initial load).
+            loadXml(reordered);
           }
         }
 
@@ -263,5 +308,5 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
     [sendToEditor],
   );
 
-  return { iframeRef, drawioXml, loading, error, save, exportPng, switchPage };
+  return { iframeRef, drawioXml, loading, error, status, save, exportPng, switchPage };
 }
