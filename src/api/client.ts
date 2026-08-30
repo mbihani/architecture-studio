@@ -105,7 +105,11 @@ export const api = {
     ),
 
   // --- Export -----------------------------------------------------------
-  // Returns the raw Response so the caller can read the blob + filename.
-  exportDocument: (id: string) =>
-    rawRequest(`/export/${encodeURIComponent(id)}`),
+  // Real binary export (PNG/PDF) served by the documents route, which calls
+  // Lucid's async export endpoint. Returns the raw Response so the caller can
+  // read the blob + Content-Disposition filename.
+  exportDocument: (id: string, format: "png" | "pdf" = "png") =>
+    rawRequest(
+      `/documents/${encodeURIComponent(id)}/export?format=${encodeURIComponent(format)}`,
+    ),
 };

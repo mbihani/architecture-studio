@@ -2,8 +2,8 @@
 // useLucidEmbed — requests a short-lived Lucid embed session for a document.
 //
 // The backend (POST /api/embed/session) returns { token, url } where `url` is
-// the full https://lucid.app/embeds?token=...&mode=editor address to load in
-// the iframe. This hook owns that request lifecycle.
+// the full https://lucid.app/embeds?token=... address to load in the iframe.
+// This hook owns that request lifecycle.
 // ---------------------------------------------------------------------------
 
 import { useEffect, useState } from "react";

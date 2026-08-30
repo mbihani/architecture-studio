@@ -1,9 +1,8 @@
 // ---------------------------------------------------------------------------
-// ExportButton — download the current document as ArchitectureDoc JSON.
+// ExportButton — download the current document as a PNG image.
 //
-// Calls GET /api/export/:id (which reads back the Lucid doc, converts it to
-// our ArchitectureDoc JSON, and returns it as a file download) and saves the
-// attachment locally.
+// Calls GET /api/documents/:id/export?format=png (the real Lucid async export
+// proxied by the backend) and saves the returned attachment locally.
 // ---------------------------------------------------------------------------
 
 import { useState } from "react";
@@ -31,11 +30,11 @@ export function ExportButton({ documentId }: ExportButtonProps): React.ReactElem
     setExporting(true);
     setError(null);
     try {
-      const res = await api.exportDocument(documentId);
+      const res = await api.exportDocument(documentId, "png");
       const blob = await res.blob();
       const filename = filenameFromResponse(
         res,
-        `architecture-${documentId}.json`,
+        `architecture-${documentId}.png`,
       );
       // Trigger a browser download for the blob.
       const objectUrl = URL.createObjectURL(blob);
@@ -59,9 +58,9 @@ export function ExportButton({ documentId }: ExportButtonProps): React.ReactElem
       className="export-button"
       onClick={handleExport}
       disabled={!documentId || exporting}
-      title={error ?? "Export architecture as JSON"}
+      title={error ?? "Export diagram as PNG"}
     >
-      {exporting ? "Exporting…" : "Export JSON"}
+      {exporting ? "Exporting…" : "Export PNG"}
       {error && <span className="export-button__error" title={error}> ⚠</span>}
     </button>
   );

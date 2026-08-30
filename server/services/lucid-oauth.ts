@@ -3,8 +3,10 @@
 //
 // Tokens are kept in memory, keyed per session id (issued as an httpOnly
 // cookie by the auth routes — see session.ts). The OAuth state used for CSRF
-// protection is also stored per-request in a Map so concurrent logins don't
-// overwrite each other.
+// protection is bound to that session id: /auth/lucid issues the session
+// cookie and stores the random state against it, then the callback verifies
+// the state Lucid returns matches the state stored for the session cookie
+// presented by the browser (see consumeOAuthState).
 //
 // When LUCID_CLIENT_ID / LUCID_CLIENT_SECRET are not configured the backend
 // operates in "mock mode": synthetic tokens are stored and never truly
@@ -27,9 +29,14 @@ const LUCID_TOKEN_URL = "https://api.lucid.co/oauth2/token";
 // Per-session token storage: sessionId → TokenSet.
 const tokensBySession = new Map<string, TokenSet>();
 
-// Per-request OAuth state values: state → createdAt. Each auth request gets
-// its own random state so concurrent logins don't clobber each other.
-const oauthStates = new Map<string, number>();
+// OAuth state bound to the browser session that initiated the auth flow:
+// sessionId → { state, createdAt }. The session id is issued as an httpOnly
+// cookie at /auth/lucid *before* the redirect to Lucid, so the state is
+// provably tied to the browser that started the login. On the callback we
+// verify the state returned by Lucid matches the state stored for the
+// session cookie presented by that same browser. This prevents a stolen
+// state value from being replayed in a different browser.
+const oauthStates = new Map<string, { state: string; createdAt: number }>();
 const STATE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
 /** Whether real Lucid credentials are configured (mock mode otherwise). */
@@ -37,30 +44,35 @@ export function isMockMode(): boolean {
   return !process.env.LUCID_CLIENT_ID || !process.env.LUCID_CLIENT_SECRET;
 }
 
-/** Generate and remember a per-request OAuth state value. */
-export function createOAuthState(): string {
+/**
+ * Generate and remember a per-session OAuth state value. The session id must
+ * be the one issued (as an httpOnly cookie) at /auth/lucid before redirecting
+ * to Lucid, so the state is bound to that browser session.
+ */
+export function createOAuthState(sessionId: string): string {
   pruneExpiredStates();
   const state = crypto.randomUUID();
-  oauthStates.set(state, Date.now());
+  oauthStates.set(sessionId, { state, createdAt: Date.now() });
   return state;
 }
 
 /**
- * Validate and consume a state value from the OAuth callback.
- * Returns true iff the state was previously issued and is still fresh.
+ * Validate and consume the OAuth state for a session. Returns true iff a
+ * state was previously issued for this session, it matches the state Lucid
+ * returned, and it is still fresh. The state entry is consumed on success.
  */
-export function consumeOAuthState(state: string): boolean {
-  const createdAt = oauthStates.get(state);
-  if (createdAt === undefined) return false;
-  oauthStates.delete(state);
-  return Date.now() - createdAt < STATE_TTL_MS;
+export function consumeOAuthState(sessionId: string, state: string): boolean {
+  const entry = oauthStates.get(sessionId);
+  if (!entry) return false;
+  oauthStates.delete(sessionId);
+  return entry.state === state && Date.now() - entry.createdAt < STATE_TTL_MS;
 }
 
 /** Remove expired state entries to bound the map size. */
 function pruneExpiredStates(): void {
   const now = Date.now();
-  for (const [state, createdAt] of oauthStates) {
-    if (now - createdAt >= STATE_TTL_MS) oauthStates.delete(state);
+  for (const [sessionId, entry] of oauthStates) {
+    if (now - entry.createdAt >= STATE_TTL_MS) oauthStates.delete(sessionId);
   }
 }
 

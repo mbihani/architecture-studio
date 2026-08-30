@@ -6,11 +6,14 @@
 //   GET  /api/auth/status         → is the user authenticated?
 //
 // Token exchange targets https://api.lucid.co/oauth2/token. Tokens are stored
-// per-session (httpOnly cookie) so concurrent logins don't share state, and the
-// OAuth state is generated per-request and validated on the callback. When
-// LUCID_CLIENT_ID is not configured the backend enters mock mode: the auth
-// endpoint issues a synthetic token set so the UI is exercisable without real
-// credentials (a warning is logged).
+// per-session (httpOnly cookie) so concurrent logins don't share state. The
+// OAuth state is bound to the browser session: /auth/lucid issues the session
+// cookie and stores the random state against it, then the callback verifies
+// the state Lucid returns matches the state stored for the session cookie
+// presented by that same browser (proving the callback belongs to the browser
+// that started the login). When LUCID_CLIENT_ID is not configured the backend
+// enters mock mode: the auth endpoint issues a synthetic token set so the UI
+// is exercisable without real credentials (a warning is logged).
 // ---------------------------------------------------------------------------
 
 import { Router } from "express";
@@ -28,13 +31,24 @@ export const authRouter = Router();
 /** Frontend origin to redirect to after the OAuth callback completes. */
 const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:5173";
 
-/** Lucid OAuth scopes (verified against Lucid developer docs). */
-const LUCID_SCOPES =
-  "offline_access documents:read documents:write documents:create users:read";
+/**
+ * Lucid OAuth scopes (verified against Lucid's access-scopes reference).
+ * Lucid uses dot-notation scopes, not the legacy `documents:read/write`
+ * names. These grant: token refresh, full create/read/edit on the user's
+ * Lucidchart documents (create + list + read contents + export), and embed
+ * session tokens for the embed API.
+ *
+ * Ref: https://lucid.readme.io/reference/access-scopes
+ */
+const LUCID_SCOPES = [
+  "offline_access", // refresh tokens (required to renew access off-session)
+  "lucidchart.document.content", // create/view/edit Lucidchart documents
+  "lucidchart.document.app.picker.share.embed", // generate embed session tokens
+].join(" ");
 
-/** Lucid OAuth authorization endpoint. */
+/** Lucid OAuth authorization endpoint. Ref: https://lucid.readme.io/reference/authorization-endpoints */
 const LUCID_AUTHORIZE_URL = "https://lucid.app/oauth2/authorize";
-/** Lucid OAuth token endpoint (exchange + refresh). */
+/** Lucid OAuth token endpoint (exchange + refresh). Ref: https://lucid.readme.io/reference/obtaining-an-access-token */
 const LUCID_TOKEN_URL = "https://api.lucid.co/oauth2/token";
 
 /** Default callback URL (used when LUCID_REDIRECT_URI is unset). */
@@ -63,8 +77,12 @@ authRouter.get("/auth/lucid", (_req, res) => {
     return;
   }
 
-  // Real OAuth: generate a per-request CSRF state.
-  const state = createOAuthState();
+  // Real OAuth: issue the session cookie FIRST so the CSRF state can be bound
+  // to this browser session. The same cookie travels with the callback
+  // redirect (sameSite=lax allows top-level GET navigations), letting us
+  // verify the state belongs to the browser that initiated the login.
+  const sid = issueSession(res);
+  const state = createOAuthState(sid);
   const redirectUri = process.env.LUCID_REDIRECT_URI ?? DEFAULT_REDIRECT_URI;
   const params = new URLSearchParams({
     client_id: clientId,
@@ -80,8 +98,11 @@ authRouter.get("/auth/lucid/callback", async (req, res) => {
   const code = typeof req.query.code === "string" ? req.query.code : "";
   const state = typeof req.query.state === "string" ? req.query.state : "";
 
-  // Validate the per-request CSRF state.
-  if (!state || !consumeOAuthState(state)) {
+  // The session cookie was issued at /auth/lucid; verify the state Lucid
+  // returned matches the state stored for THIS browser session. This proves
+  // the callback belongs to the browser that initiated the auth flow.
+  const sid = getSessionId(req);
+  if (!sid || !state || !consumeOAuthState(sid, state)) {
     res.status(400).json({ error: "Invalid or expired OAuth state" });
     return;
   }
@@ -126,7 +147,8 @@ authRouter.get("/auth/lucid/callback", async (req, res) => {
       token_type?: string;
       scope?: string;
     };
-    const sid = issueSession(res);
+    // Reuse the session issued at /auth/lucid (do not issue a new one): the
+    // state was bound to it, and the browser already holds its cookie.
     storeTokens(sid, {
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token,

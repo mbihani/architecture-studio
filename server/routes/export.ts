@@ -4,29 +4,21 @@
 //   GET /api/export/:id → ArchitectureDoc JSON file download
 //
 // The real implementation reads back the document contents (via the Lucid API
-// service) and converts them into our ArchitectureDoc format. Until the
-// converter is wired in, this returns the mock architecture document as a
-// downloadable JSON file. See TODOs.
+// service) and converts them into our ArchitectureDoc format. That conversion
+// is owned by the converter/ package (another worker) and is not wired in
+// here, so this endpoint returns 501 until the converter is available. The
+// frontend's ExportButton uses the real binary export at
+// GET /api/documents/:id/export (PNG/PDF) instead of this route.
 // ---------------------------------------------------------------------------
 
 import { Router } from "express";
 
-import { mockArchitectureDoc } from "../services/architecture-store.ts";
-
 export const exportRouter = Router();
 
-exportRouter.get("/export/:id", (req, res) => {
-  const id = req.params.id;
-
-  // TODO: const contents = await getDocumentContents(id);
-  //       const doc = convertLucidToArchitectureDoc(contents);
-  // For now we return the mock architecture document.
-  const doc = mockArchitectureDoc;
-
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader(
-    "Content-Disposition",
-    `attachment; filename="architecture-${id}.json"`,
-  );
-  res.json(doc);
+exportRouter.get("/export/:id", (_req, res) => {
+  res.status(501).json({
+    error:
+      "ArchitectureDoc JSON export requires the data converter, which is not yet wired in. " +
+      "Use GET /api/documents/:id/export for the binary (PNG/PDF) export.",
+  });
 });

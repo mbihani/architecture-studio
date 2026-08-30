@@ -6,34 +6,53 @@
 // (mock mode) the functions return clearly-marked MOCK responses so the app
 // shell is fully exercisable end-to-end without real credentials.
 //
-// References:
-//   - Standard Import JSON: https://developer.lucid.co/docs/overview-si
-//   - REST API:             https://developer.lucid.co/docs/
+// API references (Lucid developer docs):
+//   - REST API overview:        https://lucid.readme.io/reference/overview
+//   - Required headers:         https://lucid.readme.io/reference/headers
+//   - Standard Import:          https://lucid.readme.io/docs/overview-si
+//   - Create from SI file:      https://lucid.readme.io/reference/createdocumentwithstandardimport
+//   - Search documents (list):  https://lucid.readme.io/reference/searchdocuments
+//   - Document contents:        https://lucid.readme.io/reference/getdocumentcontent
+//   - Get/Export document:      https://lucid.readme.io/reference/getorexportdocument
+//   - Export async:              https://lucid.readme.io/reference/exportdocumentlongrunning
+//   - Export job status:         https://lucid.readme.io/reference/exportdocumentlongrunningstatus
+//   - Embed session token:       https://lucid.readme.io/reference/documentembedstoken
+//   - OAuth access scopes:       https://lucid.readme.io/reference/access-scopes
 //
-// NOTE: some Lucid API features (e.g. programmatic document creation and the
-// embed-session endpoint) may require a paid Lucid plan. Where that applies
-// the real call is still made and any error is surfaced to the caller; TODOs
-// mark only the spots whose exact request/response shape should be confirmed
-// against live credentials.
+// Lucid requires an Authorization header and a Lucid-Api-Version header on
+// every call. All endpoints here are versioned in the path (/v1/...); the
+// Lucid-Api-Version header is also sent explicitly (value "1") per the
+// headers reference, which notes either the path version or the header
+// satisfies the requirement.
+//
+// NOTE: Lucid may require a paid plan for programmatic document creation and
+// the embed-session endpoint. The real call is still made and any error is
+// surfaced to the caller.
 // ---------------------------------------------------------------------------
 
 import { getValidAccessToken, isMockMode } from "./lucid-oauth.ts";
-import type { LucidImportJson } from "../types.ts";
+import type { LucidImportJson, LucidPage, LucidShape, LucidLine, LucidGroup } from "../types.ts";
 
 const LUCID_API_BASE = "https://api.lucid.co";
 const LUCID_EMBED_BASE = "https://lucid.app/embeds";
+const LUCID_API_VERSION = "1";
+/** Standard Import product we create/export as (architecture diagrams). */
+const LUCID_PRODUCT = "lucidchart";
+/** MIME that marks a .lucid Standard Import archive (per overview-si docs). */
+const STANDARD_IMPORT_MIME = "x-application/vnd.lucid.standardImport";
 
 export interface LucidDocumentRef {
   id: string;
   name: string;
 }
 
-/** Loose shape for a Lucid document reference in list/create responses. */
-interface LucidApiDocument {
-  documentId?: string;
-  id?: string;
-  name?: string;
-  title?: string;
+/** Build the headers required on every Lucid REST call. */
+function apiHeaders(token: string, extra?: Record<string, string>): Record<string, string> {
+  return {
+    Authorization: `Bearer ${token}`,
+    "Lucid-Api-Version": LUCID_API_VERSION,
+    ...(extra ?? {}),
+  };
 }
 
 /** Fetch helper: ensure a usable access token or throw. */
@@ -136,16 +155,119 @@ function buildStoredZip(filename: string, content: Buffer): Buffer {
   return Buffer.concat([localBlob, centralBlob, eocd]);
 }
 
+// --- multipart/form-data builder (no DOM FormData dependency) --------------
+
+interface MultipartField {
+  name: string;
+  /** String value (sent as text) or Buffer (sent as a file part). */
+  value: string | Buffer;
+  /** Filename for Buffer parts. */
+  filename?: string;
+  /** Content-Type for Buffer parts. */
+  contentType?: string;
+}
+
+/**
+ * Build a multipart/form-data body manually. This avoids relying on the DOM
+ * `FormData`/`Blob` globals (the backend TS lib is ES2022, not DOM) while
+ * producing a spec-compliant multipart body for the create-document endpoint.
+ */
+function buildMultipartFormData(fields: MultipartField[]): {
+  body: Buffer;
+  contentType: string;
+} {
+  const boundary = `----LucidStandardImport${crypto.randomUUID().replace(/-/g, "")}`;
+  const parts: Buffer[] = [];
+  const CRLF = "\r\n";
+
+  for (const f of fields) {
+    parts.push(Buffer.from(`--${boundary}${CRLF}`));
+    if (f.filename) {
+      const ct = f.contentType ?? "application/octet-stream";
+      parts.push(
+        Buffer.from(
+          `Content-Disposition: form-data; name="${f.name}"; filename="${f.filename}"${CRLF}` +
+            `Content-Type: ${ct}${CRLF}${CRLF}`,
+        ),
+      );
+    } else {
+      parts.push(
+        Buffer.from(`Content-Disposition: form-data; name="${f.name}"${CRLF}${CRLF}`),
+      );
+    }
+    parts.push(Buffer.isBuffer(f.value) ? f.value : Buffer.from(f.value, "utf8"));
+    parts.push(Buffer.from(CRLF));
+  }
+  parts.push(Buffer.from(`--${boundary}--${CRLF}`));
+
+  return {
+    body: Buffer.concat(parts),
+    contentType: `multipart/form-data; boundary=${boundary}`,
+  };
+}
+
+// --- Lucid response shapes -------------------------------------------------
+
+/** Document resource returned by create/search/get (subset of fields). */
+interface LucidDocumentResource {
+  documentId?: string;
+  title?: string;
+}
+
+/** Shape/line/group item in a contents read-back page. */
+interface LucidContentsShape {
+  id?: string;
+  class?: string;
+}
+interface LucidContentsLine {
+  id?: string;
+  endpoint1?: { id?: string };
+  endpoint2?: { id?: string };
+}
+interface LucidContentsGroup {
+  id?: string;
+  members?: string[];
+}
+interface LucidContentsPage {
+  id?: string;
+  title?: string;
+  index?: number;
+  items?: {
+    shapes?: LucidContentsShape[];
+    lines?: LucidContentsLine[];
+    groups?: LucidContentsGroup[];
+  };
+}
+interface LucidContentsResponse {
+  id?: string;
+  title?: string;
+  pages?: LucidContentsPage[];
+}
+
+/** Async export job creation/status responses. */
+interface LucidExportJobResponse {
+  jobId?: string;
+}
+interface LucidExportJobStatus {
+  status?: string;
+  response?: { downloadUrl?: string };
+}
+
 // --- Document lifecycle ----------------------------------------------------
 
 /**
  * Create a Lucid document from Standard Import JSON.
  *
  * The import JSON is packaged as a .lucid archive (ZIP of document.json) and
- * POSTed to Lucid's document-creation endpoint.
+ * uploaded as multipart/form-data to the documented create endpoint:
+ *   POST /v1/documents/create
+ * with form fields `file` (the .lucid zip), `type` (the Standard Import MIME),
+ * `product` ("lucidchart"), and `title`. Returns the new document id+title.
  *
- * TODO: confirm the exact create endpoint / content-type against live Lucid
- * credentials — Lucid may require a paid plan for programmatic creation.
+ * Requires the `lucidchart.document.content` or `lucidchart.document.app.folder`
+ * OAuth scope (see server/routes/auth.ts).
+ *
+ * Ref: https://lucid.readme.io/reference/createdocumentwithstandardimport
  */
 export async function createDocumentFromImport(
   sessionId: string | undefined,
@@ -164,26 +286,40 @@ export async function createDocumentFromImport(
   const documentJson = Buffer.from(JSON.stringify(importJson), "utf8");
   const archive = buildStoredZip("document.json", documentJson);
 
-  const res = await fetch(`${LUCID_API_BASE}/documents`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/zip",
+  const { body, contentType } = buildMultipartFormData([
+    {
+      name: "file",
+      value: archive,
+      filename: "document.lucid",
+      contentType: STANDARD_IMPORT_MIME,
     },
-    body: archive,
+    { name: "type", value: STANDARD_IMPORT_MIME },
+    { name: "product", value: LUCID_PRODUCT },
+    { name: "title", value: name },
+  ]);
+
+  const res = await fetch(`${LUCID_API_BASE}/v1/documents/create`, {
+    method: "POST",
+    headers: apiHeaders(token, { "Content-Type": contentType }),
+    body,
   });
   if (!res.ok) {
     const detail = await safeErrorText(res);
     throw new Error(`Lucid create document failed (${res.status}): ${detail}`);
   }
-  const doc = (await res.json()) as LucidApiDocument;
-  return { id: doc.documentId ?? doc.id ?? "", name: doc.name ?? doc.title ?? name };
+  const doc = (await res.json()) as LucidDocumentResource;
+  return { id: doc.documentId ?? "", name: doc.title ?? name };
 }
 
 /**
  * List the user's Lucid documents.
  *
- * TODO: confirm the exact list response shape against live credentials.
+ * Lucid has no `GET /documents` list endpoint; listing is done via the
+ * document search endpoint, which returns the user's documents when called
+ * with an (all-optional) empty filter body:
+ *   POST /v1/documents/search  body: {}
+ *
+ * Ref: https://lucid.readme.io/reference/searchdocuments
  */
 export async function listDocuments(
   sessionId: string | undefined,
@@ -194,31 +330,45 @@ export async function listDocuments(
   }
 
   const token = await requireToken(sessionId);
-  const res = await fetch(`${LUCID_API_BASE}/documents`, {
-    headers: { Authorization: `Bearer ${token}` },
+  const res = await fetch(`${LUCID_API_BASE}/v1/documents/search`, {
+    method: "POST",
+    headers: apiHeaders(token, {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    }),
+    body: JSON.stringify({}),
   });
   if (!res.ok) {
     const detail = await safeErrorText(res);
     throw new Error(`Lucid list documents failed (${res.status}): ${detail}`);
   }
-  const data = (await res.json()) as LucidApiDocument[] | { documents?: LucidApiDocument[] };
+  const data = (await res.json()) as
+    | LucidDocumentResource[]
+    | { documents?: LucidDocumentResource[] };
   const items = Array.isArray(data) ? data : (data.documents ?? []);
   return items.map((d) => ({
-    id: d.documentId ?? d.id ?? "",
-    name: d.name ?? d.title ?? "Untitled",
+    id: d.documentId ?? "",
+    name: d.title ?? "Untitled",
   }));
 }
 
 /**
- * Read back a document's contents (pages/shapes/lines).
+ * Read back a document's contents (pages/shapes/lines/groups).
  *
- * TODO: map the exact Lucid contents response to our LucidPage[] shape once
- * verified against live credentials — Lucid's readback shape may differ.
+ *   GET /v1/documents/{id}/contents
+ *
+ * Lucid's read-back page shape (`{ id, title, index, items: { shapes, lines,
+ * groups } }`) differs from our Standard Import `LucidPage` shape. We map it
+ * structurally here so the read-back poll type-checks; the authoritative
+ * Lucid→ArchitectureDoc conversion lives in the converter (out of scope here).
+ *
+ * Ref: https://lucid.readme.io/reference/getdocumentcontent
+ *      https://lucid.readme.io/reference/document-contents-resource
  */
 export async function getDocumentContents(
   sessionId: string | undefined,
   id: string,
-): Promise<{ id: string; pages: LucidImportJson["pages"]; updatedAt?: number }> {
+): Promise<{ id: string; pages: LucidPage[]; updatedAt?: number }> {
   if (isMockMode()) {
     // MOCK: an empty page so the readback poll succeeds.
     return {
@@ -232,22 +382,55 @@ export async function getDocumentContents(
 
   const token = await requireToken(sessionId);
   const res = await fetch(
-    `${LUCID_API_BASE}/documents/${encodeURIComponent(id)}/contents`,
-    { headers: { Authorization: `Bearer ${token}` } },
+    `${LUCID_API_BASE}/v1/documents/${encodeURIComponent(id)}/contents`,
+    { headers: apiHeaders(token, { Accept: "application/json" }) },
   );
   if (!res.ok) {
     const detail = await safeErrorText(res);
     throw new Error(`Lucid readback failed (${res.status}): ${detail}`);
   }
-  const data = (await res.json()) as { pages?: LucidImportJson["pages"] };
-  return { id, pages: data.pages ?? [], updatedAt: Date.now() };
+  const data = (await res.json()) as LucidContentsResponse;
+  const pages: LucidPage[] = (data.pages ?? []).map((p): LucidPage => ({
+    id: p.id ?? "",
+    name: p.title ?? "",
+    shapes: (p.items?.shapes ?? []).map((s): LucidShape => ({
+      id: s.id ?? "",
+      // Lucid uses `class` for the shape type (e.g. "ProcessBlock").
+      type: s.class ?? "shape",
+      // The contents read-back does not expose x/y/width/height in the
+      // documented schema; the converter derives layout where needed.
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+    })),
+    lines: (p.items?.lines ?? []).map((l): LucidLine => ({
+      id: l.id ?? "",
+      sourceId: l.endpoint1?.id ?? "",
+      destinationId: l.endpoint2?.id ?? "",
+    })),
+    groups: (p.items?.groups ?? []).map((g): LucidGroup => ({
+      id: g.id ?? "",
+      children: g.members ?? [],
+    })),
+  }));
+  return { id, pages, updatedAt: Date.now() };
 }
 
 /**
- * Export a document as PNG or PDF.
+ * Export a document as PNG or PDF via Lucid's asynchronous export endpoint.
  *
- * POSTs to Lucid's export endpoint. Lucid may return the binary directly or a
- * JSON envelope containing a download URL; both are handled.
+ *   POST /v1/documents/{id}/export/jobs   (Accept header selects the format)
+ *   GET  /v1/documents/{id}/export/jobs/{jobId}  → { status, response.downloadUrl }
+ *
+ * The synchronous `GET /v1/documents/{id}` export only supports image/png and
+ * image/jpeg; PDF requires the async flow, so the async endpoint is used for
+ * both formats for a single code path. PNG → `image/png`, PDF →
+ * `application/pdf`. When the job succeeds, `response.downloadUrl` is a
+ * temporary (1-hour) URL that is fetched for the binary payload.
+ *
+ * Ref: https://lucid.readme.io/reference/exportdocumentlongrunning
+ *      https://lucid.readme.io/reference/exportdocumentlongrunningstatus
  */
 export async function exportDocument(
   sessionId: string | undefined,
@@ -263,37 +446,57 @@ export async function exportDocument(
   }
 
   const token = await requireToken(sessionId);
-  const res = await fetch(
-    `${LUCID_API_BASE}/documents/${encodeURIComponent(id)}/export`,
+  const acceptMime = format === "pdf" ? "application/pdf" : "image/png";
+
+  // 1. Start the export job (the Accept header selects the output format).
+  const startRes = await fetch(
+    `${LUCID_API_BASE}/v1/documents/${encodeURIComponent(id)}/export/jobs`,
     {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ format }),
+      headers: apiHeaders(token, { Accept: acceptMime }),
     },
   );
-  if (!res.ok) {
-    const detail = await safeErrorText(res);
-    throw new Error(`Lucid export failed (${res.status}): ${detail}`);
+  if (!startRes.ok) {
+    const detail = await safeErrorText(startRes);
+    throw new Error(`Lucid export failed (${startRes.status}): ${detail}`);
   }
-  const contentType = res.headers.get("content-type") ?? "application/octet-stream";
-  // Lucid may return a JSON envelope with a download URL instead of raw bytes.
-  if (contentType.includes("application/json")) {
-    const data = (await res.json()) as { url?: string };
-    if (data.url) {
-      const dl = await fetch(data.url);
+  const job = (await startRes.json()) as LucidExportJobResponse;
+  const jobId = job.jobId;
+  if (!jobId) {
+    throw new Error("Lucid export did not return a jobId");
+  }
+
+  // 2. Poll the job status until it succeeds or fails (bounded).
+  const MAX_ATTEMPTS = 60;
+  const POLL_INTERVAL_MS = 1000;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+    const statusRes = await fetch(
+      `${LUCID_API_BASE}/v1/documents/${encodeURIComponent(id)}/export/jobs/${encodeURIComponent(jobId)}`,
+      { headers: apiHeaders(token) },
+    );
+    if (!statusRes.ok) {
+      const detail = await safeErrorText(statusRes);
+      throw new Error(`Lucid export status failed (${statusRes.status}): ${detail}`);
+    }
+    const status = (await statusRes.json()) as LucidExportJobStatus;
+    if (status.status === "SUCCEEDED" && status.response?.downloadUrl) {
+      // 3. Download the rendered payload from the temporary URL.
+      const dl = await fetch(status.response.downloadUrl);
+      if (!dl.ok) {
+        throw new Error(`Lucid export download failed (${dl.status})`);
+      }
       return {
         buffer: Buffer.from(await dl.arrayBuffer()),
-        contentType: dl.headers.get("content-type") ?? contentType,
+        contentType: dl.headers.get("content-type") ?? acceptMime,
       };
     }
+    if (status.status === "FAILED") {
+      throw new Error("Lucid export job failed");
+    }
+    // PENDING / RUNNING → keep polling.
   }
-  return {
-    buffer: Buffer.from(await res.arrayBuffer()),
-    contentType,
-  };
+  throw new Error("Lucid export job timed out");
 }
 
 // --- Embed -----------------------------------------------------------------
@@ -301,16 +504,27 @@ export async function exportDocument(
 /**
  * Generate a short-lived embed session for a document.
  *
- * Real flow: POST to Lucid's embed endpoint with the access token to obtain an
- * embed token, then build the iframe URL `https://lucid.app/embeds?token=...`.
+ *   POST /v1/embeds/token   body: { origin }
  *
- * Lucid's embed API may require a paid plan — the call is made regardless and
- * any error (e.g. 402/403) is surfaced to the caller so the frontend can show
- * a clear message instead of a broken iframe.
+ * The response body IS the embed session token (a JWT, served as
+ * application/jwt — not a JSON envelope). The embed URL is then
+ * `https://lucid.app/embeds?token=<jwt>`.
+ *
+ * Lucid's token embed is origin-bound and picker-based: the token request
+ * takes the embedding page's `origin` (required) and an optional `embedId`
+ * for a previously-created embed — it is not bound to a document id. The
+ * `documentId` parameter is retained for the /api/embed/session route
+ * contract but is not sent to Lucid.
+ *
+ * Ref: https://lucid.readme.io/reference/documentembedstoken
+ *      https://lucid.readme.io/docs/tutorial-token-embeds
+ *
+ * Requires the `lucidchart.document.app.picker.share.embed` OAuth scope.
  */
 export async function generateEmbedSession(
   sessionId: string | undefined,
-  documentId: string,
+  // Intentionally unused: see the note above on Lucid's origin-bound embed.
+  _documentId: string,
 ): Promise<{ token: string; url: string }> {
   if (isMockMode()) {
     // MOCK: a fake token + valid embed URL format.
@@ -322,28 +536,26 @@ export async function generateEmbedSession(
   }
 
   const token = await requireToken(sessionId);
-  const res = await fetch(
-    `${LUCID_API_BASE}/documents/${encodeURIComponent(documentId)}/embed`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ mode: "editor" }),
-    },
-  );
+  // The origin must match the page that hosts the embed iframe.
+  const frontendOrigin = new URL(
+    process.env.FRONTEND_URL ?? "http://localhost:5173",
+  ).origin;
+
+  const res = await fetch(`${LUCID_API_BASE}/v1/embeds/token`, {
+    method: "POST",
+    headers: apiHeaders(token, {
+      "Content-Type": "application/json",
+      Accept: "application/jwt",
+    }),
+    body: JSON.stringify({ origin: frontendOrigin }),
+  });
   if (!res.ok) {
     const detail = await safeErrorText(res);
     // Graceful: surface a clear message (Lucid embed may need a paid plan).
     throw new Error(`Lucid embed session failed (${res.status}): ${detail}`);
   }
-  const data = (await res.json()) as {
-    token?: string;
-    embedToken?: string;
-    accessToken?: string;
-  };
-  const embedToken = data.token ?? data.embedToken ?? data.accessToken ?? "";
+  // The token is the raw response body (a JWT string), not a JSON field.
+  const embedToken = (await res.text()).trim();
   if (!embedToken) {
     throw new Error("Lucid embed response did not include a token");
   }

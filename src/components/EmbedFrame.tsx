@@ -1,10 +1,10 @@
 // ---------------------------------------------------------------------------
 // EmbedFrame — renders the editable Lucidchart canvas.
 //
-// Lucid's token-based Embed API loads an editable document inside an iframe
-// pointed at https://lucid.app/embeds?token=...&mode=editor. The backend
-// generates a short-lived token (POST /api/embed/session) and hands back the
-// full URL; this component simply hosts the iframe.
+// Lucid's token-based Embed API loads a document inside an iframe pointed at
+// https://lucid.app/embeds?token=... . The backend generates a short-lived
+// token (POST /api/embed/session) and hands back the full URL; this component
+// simply hosts the iframe.
 // ---------------------------------------------------------------------------
 
 interface EmbedFrameProps {

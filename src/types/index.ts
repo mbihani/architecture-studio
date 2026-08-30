@@ -165,7 +165,7 @@ export interface AuthStatus {
 /** Response from POST /api/embed/session. */
 export interface EmbedSessionResponse {
   token: string;
-  /** Full embed URL: https://lucid.app/embeds?token=...&mode=editor */
+  /** Full embed URL: https://lucid.app/embeds?token=... */
   url: string;
 }
 
