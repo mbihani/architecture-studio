@@ -17951,6 +17951,9 @@ restoreActiveTab();
     "  outline:3px solid var(--brand); outline-offset:3px; border-radius:10px; }",
     "body.edit-mode .atom.sel-atom { outline:3px solid var(--brand); outline-offset:2px; z-index:20; }",
     "body.edit-mode .rgroup .rtiles:empty { min-height:18px; border:1px dashed var(--line-strong); border-radius:7px; }",
+    "/* zone (whole column/pocket) selection in edit mode */",
+    "body.edit-mode .col.sel-zone, body.edit-mode .pocket.sel-zone {",
+    "  outline:3px solid var(--brand); outline-offset:2px; border-radius:10px; }",
     "/* toast */",
     "#edit-toast { position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(10px);",
     "  z-index:2100; max-width:80vw; padding:10px 16px; border-radius:9px; background:var(--ink); color:var(--card);",
@@ -18062,11 +18065,15 @@ restoreActiveTab();
   var addCompBtn = byId2("edit-add");
   var deleteBtn  = byId2("edit-delete");
 
-  var selected = null;   /* { type:'atom'|'group'|'cloud', el, zone?, gidx? } */
+  var selected = null;   /* { type:'atom'|'group'|'cloud'|'zone', el?, zone?, gidx? } */
   var drag = null;
 
   function clearSel(){
     if(selected && selected.el) selected.el.classList.remove("sel-group","sel-atom");
+    if(selected && selected.type === "zone" && selected.zone){
+      var zc = document.querySelector(".col." + selected.zone + ", .pocket." + selected.zone);
+      if(zc) zc.classList.remove("sel-zone");
+    }
     selected = null;
     deleteBtn.style.display = "none";
   }
@@ -18084,6 +18091,16 @@ restoreActiveTab();
   }
   function selectGroup(elm, zone, gidx){ clearSel(); selected = { type:"group", el:elm, zone:zone, gidx:gidx }; elm.classList.add("sel-group"); deleteBtn.style.display = "inline-block"; }
   function selectCloud(elm){ clearSel(); selected = { type:"cloud", el:elm }; elm.classList.add("sel-group"); deleteBtn.style.display = "none"; }
+  /* Select a whole zone (all groups in the column/pocket). The container stays in
+     the DOM (it's part of the grid layout) — deleting only empties its groups. */
+  function selectZone(zoneId){
+    clearSel();
+    var zc = document.querySelector(".col." + zoneId + ", .pocket." + zoneId);
+    if(!zc) return;
+    selected = { type:"zone", zone:zoneId };
+    zc.classList.add("sel-zone");
+    deleteBtn.style.display = "inline-block";
+  }
 
   function inUI(target){
     return !!(target.closest && target.closest(
@@ -18095,6 +18112,20 @@ restoreActiveTab();
      click on a component selects the component, not the box around it. */
   document.addEventListener("mousedown", function(e){
     if(!editMode || e.button !== 0 || inUI(e.target)) return;
+    /* zone header (.colhead/.pockhead) → select the whole zone. Checked first
+       since the header is a sibling of the rail, not nested in .rgroup/.atom. */
+    var zhead = e.target.closest && e.target.closest(".colhead, .pockhead");
+    if(zhead){
+      var zcontainer = zhead.closest(".col.src, .pocket.ing, .pocket.ppl, .col.cons");
+      if(zcontainer){
+        var zoneId = zcontainer.classList.contains("src") ? "src" :
+                     zcontainer.classList.contains("ing") ? "ing" :
+                     zcontainer.classList.contains("ppl") ? "ppl" : "cons";
+        e.preventDefault();
+        selectZone(zoneId);
+        return;
+      }
+    }
     var atom = e.target.closest && e.target.closest(".atom");
     if(atom){
       e.preventDefault();
@@ -18148,6 +18179,14 @@ restoreActiveTab();
   /* ---------- delete: writes back to ARCH so it survives build() ---------- */
   deleteBtn.onclick = function(){
     if(!selected) return;
+    if(selected.type === "zone"){
+      var zone = selected.zone;
+      if(ARCH.rails[zone] && Array.isArray(ARCH.rails[zone].groups)){
+        ARCH.rails[zone].groups = [];
+        persistCustom(); clearSel(); build(); fitBoard();
+      }
+      return;
+    }
     if(selected.type === "group"){
       var zone = selected.zone, gidx = selected.gidx;
       if(ARCH.rails[zone] && Array.isArray(ARCH.rails[zone].groups)){
