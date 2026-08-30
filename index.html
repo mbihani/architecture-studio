@@ -17689,9 +17689,20 @@ function seedFromUrl(){
 if(!seedFromUrl()){
   /* A saved industry id must not pin stale rails from an older template: refresh
      the industry overlay on load so new teams land without clearing band edits. */
-  if(ARCH.industry && ARCH.industry !== "generic" && INDUSTRIES[ARCH.industry])
+  if(ARCH.industry && ARCH.industry !== "generic" && INDUSTRIES[ARCH.industry]){
+    /* applyIndustry() rebuilds rails from pristine BASE and clears _deleted, which
+       would discard zone deletions a user saved on a previous load. Snapshot the
+       _deleted flags here and put them back after the rebuild so hideDeletedZones()
+       still sees them when the edit surface re-runs build() below. */
+    var _savedDel = {};
+    RAIL_IDS.forEach(function(rid){
+      if(ARCH.rails[rid] && ARCH.rails[rid]._deleted) _savedDel[rid] = true;
+    });
     applyIndustry(ARCH.industry, false);
-  else
+    RAIL_IDS.forEach(function(rid){
+      if(_savedDel[rid] && ARCH.rails[rid]) ARCH.rails[rid]._deleted = true;
+    });
+  } else
     build();
 }
 fitBoard();
