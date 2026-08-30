@@ -7,3 +7,4 @@ dist/
 .polly/
 converter/tmp/
 *.lucid
+__pycache__/
