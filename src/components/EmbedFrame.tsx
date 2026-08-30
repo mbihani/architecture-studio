@@ -14,11 +14,14 @@ interface EmbedFrameProps {
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
   /** Fired when the iframe's src document finishes loading. */
   onIframeLoad: () => void;
+  /** Fired when the iframe fails to load its src document. */
+  onIframeError: () => void;
 }
 
 export function EmbedFrame({
   iframeRef,
   onIframeLoad,
+  onIframeError,
 }: EmbedFrameProps): React.ReactElement {
   return (
     <div className="embed-frame">
@@ -30,6 +33,7 @@ export function EmbedFrame({
         allow="fullscreen"
         allowFullScreen
         onLoad={onIframeLoad}
+        onError={onIframeError}
       />
     </div>
   );

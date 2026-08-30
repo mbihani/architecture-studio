@@ -152,3 +152,18 @@ body,
   color: #fff;
 }
 
+.status-overlay__retry {
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+  background: transparent;
+  color: #fff;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.status-overlay__retry:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+

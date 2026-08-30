@@ -16,7 +16,7 @@
 // keyless.
 // ---------------------------------------------------------------------------
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { EmbedFrame } from "./components/EmbedFrame.tsx";
 import { ExportButton } from "./components/ExportButton.tsx";
@@ -42,9 +42,15 @@ const STATUS_TEXT: Record<Exclude<DrawioStatus, "error">, string> = {
 interface StatusOverlayProps {
   status: DrawioStatus;
   error: string | null;
+  /** The last non-error status before the failure — shown for diagnostics. */
+  lastStatus: DrawioStatus;
 }
 
-function StatusOverlay({ status, error }: StatusOverlayProps): React.ReactElement | null {
+function StatusOverlay({
+  status,
+  error,
+  lastStatus,
+}: StatusOverlayProps): React.ReactElement | null {
   const [hidden, setHidden] = useState(false);
 
   // Auto-hide 5s after reaching the terminal "loaded" state; re-show on any
@@ -61,7 +67,9 @@ function StatusOverlay({ status, error }: StatusOverlayProps): React.ReactElemen
   if (hidden) return null;
 
   const text =
-    status === "error" ? `Error: ${error ?? "unknown"}` : STATUS_TEXT[status];
+    status === "error"
+      ? `Error: ${error ?? "unknown"} (last state: ${lastStatus})`
+      : STATUS_TEXT[status];
   return (
     <div
       className={
@@ -74,13 +82,42 @@ function StatusOverlay({ status, error }: StatusOverlayProps): React.ReactElemen
       title="click to dismiss"
     >
       {text}
+      {status === "error" && (
+        <button
+          className="status-overlay__retry"
+          onClick={(e) => {
+            e.stopPropagation();
+            window.location.reload();
+          }}
+        >
+          Retry
+        </button>
+      )}
     </div>
   );
 }
 
 export function App(): React.ReactElement {
-  const { iframeRef, loading, error, status, exportPng, switchPage, onIframeLoad } =
-    useDrawioEmbed();
+  const {
+    iframeRef,
+    loading,
+    error,
+    status,
+    exportPng,
+    switchPage,
+    onIframeLoad,
+    onIframeError,
+  } = useDrawioEmbed();
+
+  // Track the last non-error status so the error overlay can show what state
+  // preceded the failure (e.g. "iframe-loading" → the iframe loaded but init
+  // never fired; "fetching" → the iframe never even loaded).
+  const lastStatusRef = useRef<DrawioStatus>("fetching");
+  useEffect(() => {
+    if (status !== "error") {
+      lastStatusRef.current = status;
+    }
+  }, [status]);
 
   return (
     <div className="app">
@@ -106,9 +143,17 @@ export function App(): React.ReactElement {
           </div>
         )}
         {!loading && !error && (
-          <EmbedFrame iframeRef={iframeRef} onIframeLoad={onIframeLoad} />
+          <EmbedFrame
+            iframeRef={iframeRef}
+            onIframeLoad={onIframeLoad}
+            onIframeError={onIframeError}
+          />
         )}
-        <StatusOverlay status={status} error={error} />
+        <StatusOverlay
+          status={status}
+          error={error}
+          lastStatus={lastStatusRef.current}
+        />
       </main>
     </div>
   );
