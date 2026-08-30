@@ -7,7 +7,10 @@ name. We:
     every industry and the platform), so the same product named in two
     industries maps to one component;
   * build an edge table from the name-based references in the source —
-    ``rel`` -> related, ``from`` -> flow, ``feeds`` -> feeds, ``comps`` -> uses;
+    ``rel`` -> related, ``from`` -> flow (via synthetic zone anchors),
+    ``feeds`` -> feeds, ``comps`` -> uses;
+  * track provenance so every ARCH component appears on the platform page
+    regardless of industry membership;
   * build an industry index listing each industry's component IDs, medallion
     and source citations.
 
@@ -38,6 +41,18 @@ ZONE_CATEGORY = {
     "cloud": "cloud",
 }
 
+# A group's ``from`` field is a cloud-provider *role key* (not a component
+# name): the original app injects ``ARCH.cloud.providers[provider][from]``
+# tiles into the group at render time. We model each role as a synthetic
+# zone-anchor component and create ``flow`` edges from the anchor to the
+# group's own tiles, so the dependency is preserved instead of silently
+# dropped. See converter/README.md for the full rationale.
+FROM_ZONE_MAP: dict[str, tuple[str, str]] = {
+    "ingest": ("ing", "Cloud Ingest"),
+    "fed": ("src", "Federation Sources"),
+    "bi": ("cons", "BI Integrations"),
+}
+
 
 def _uuid(kind: str, value: str) -> str:
     return str(uuid.uuid5(NAMESPACE, f"{kind}:{value.strip().casefold()}"))
@@ -51,7 +66,7 @@ def _merge_component(current: dict[str, Any], incoming: dict[str, Any]) -> None:
     field and union the capability lists.
     """
     for field, value in incoming.items():
-        if field in ("id", "name"):
+        if field in ("id", "name", "provenance"):
             continue
         if field == "capabilities":
             current["capabilities"] = list(
@@ -79,6 +94,12 @@ def _component(tile: dict[str, Any], zone: str) -> dict[str, Any]:
         "users": tile.get("users", ""),
         "kpis": copy.deepcopy(tile.get("kpis", [])),
         "teams": copy.deepcopy(tile.get("teams", [])),
+        # Provenance: which page(s) this component belongs on. ``"arch"`` means
+        # it was parsed from the ARCH platform literal; an industry id means it
+        # was parsed from that industry's overlay. A component seen in both
+        # accumulates both, so it appears on the platform page AND the industry
+        # page (fix for platform components being excluded by name-dedup).
+        "provenance": set(),
     }
 
 
@@ -87,6 +108,7 @@ class Normalizer:
         self.components: dict[str, dict[str, Any]] = {}  # casefold name -> component
         self.refs: list[tuple[str, str, str]] = []  # (source name, target name, kind)
         self.memberships: dict[str, set[str]] = defaultdict(set)
+        self.warnings: list[str] = []
 
     # -- component + reference collection --------------------------------
 
@@ -98,23 +120,79 @@ class Normalizer:
             self.components[key] = incoming
         else:
             _merge_component(self.components[key], incoming)
-        if industry_id:
-            self.memberships[industry_id].add(self.components[key]["id"])
+        comp = self.components[key]
+        if industry_id is None:
+            comp["provenance"].add("arch")
+        else:
+            comp["provenance"].add(industry_id)
+            self.memberships[industry_id].add(comp["id"])
         for field, kind in (("rel", "related"), ("feeds", "feeds"), ("comps", "uses")):
             for target in tile.get(field, []) or []:
                 if isinstance(target, str):
                     self.refs.append((name, target, kind))
 
+    def _zone_anchor(
+        self, from_key: str, zone: str, industry_id: str | None
+    ) -> dict[str, Any] | None:
+        """Get or create a synthetic zone-anchor component for a ``from`` role key.
+
+        ``from`` is a cloud-provider role key (ingest/fed/bi): the original app
+        injects ``providers[provider][from]`` tiles into the group. We model the
+        role as a synthetic component so the ``flow`` edges from it to the
+        group's tiles resolve instead of being silently dropped.
+        """
+        mapping = FROM_ZONE_MAP.get(from_key)
+        if mapping is None:
+            self.warnings.append(
+                f"unknown 'from' value '{from_key}' in zone '{zone}' — no zone anchor created"
+            )
+            return None
+        anchor_zone, anchor_name = mapping
+        key = anchor_name.casefold()
+        if key not in self.components:
+            self.components[key] = {
+                "id": _uuid("zone", from_key),
+                "name": anchor_name,
+                "shortName": "",
+                "category": ZONE_CATEGORY.get(anchor_zone, "usecase"),
+                "icon": "",
+                "zone": anchor_zone,
+                "description": f"Synthetic zone anchor for the '{from_key}' cloud-provider role.",
+                "capabilities": [],
+                "relatedIds": [],
+                "dataOut": {},
+                "cite": [],
+                "what": "",
+                "users": "",
+                "kpis": [],
+                "teams": [],
+                "provenance": set(),
+            }
+        anchor = self.components[key]
+        if industry_id is None:
+            anchor["provenance"].add("arch")
+        else:
+            anchor["provenance"].add(industry_id)
+            self.memberships[industry_id].add(anchor["id"])
+        return anchor
+
     def _add_group(self, group: dict[str, Any], zone: str, industry_id: str | None) -> None:
-        """A rail group: a labeled box of tiles, optionally carrying ``from``."""
+        """A rail group: a labeled box of tiles, optionally carrying ``from``.
+
+        ``from`` is a cloud-provider role key (ingest/fed/bi), not a component
+        name. We resolve it to a synthetic zone-anchor component and create
+        ``flow`` edges from the anchor to each of the group's tiles, preserving
+        the dependency instead of silently dropping it.
+        """
         flow_from = group.get("from")
+        anchor: dict[str, Any] | None = None
+        if isinstance(flow_from, str):
+            anchor = self._zone_anchor(flow_from, zone, industry_id)
         for tile in group.get("tiles", []) or []:
             if isinstance(tile.get("n"), str):
                 self._add(tile, zone, industry_id)
-                if isinstance(flow_from, str):
-                    # 'from' names the upstream rail this group pulls from
-                    # (e.g. Cloud ETL -> ingest). Model it as a flow edge.
-                    self.refs.append((flow_from, tile["n"], "flow"))
+                if anchor:
+                    self.refs.append((anchor["name"], tile["n"], "flow"))
 
     # -- platform (ARCH) -------------------------------------------------
 
@@ -172,7 +250,18 @@ class Normalizer:
         for source_name, target_name, kind in self.refs:
             source = by_name.get(source_name.casefold())
             target = by_name.get(target_name.casefold())
-            if not source or not target or source["id"] == target["id"]:
+            if not source:
+                self.warnings.append(
+                    f"unresolved {kind} edge: source '{source_name}' not found"
+                )
+                continue
+            if not target:
+                self.warnings.append(
+                    f"unresolved {kind} edge: target '{target_name}' "
+                    f"(from '{source_name}') not found"
+                )
+                continue
+            if source["id"] == target["id"]:
                 continue
             key = (source["id"], target["id"], kind)
             if key not in edges:
@@ -203,11 +292,15 @@ class Normalizer:
                 }
             )
         components = sorted(self.components.values(), key=lambda c: c["name"].casefold())
+        # Convert provenance sets to sorted lists for JSON serialization.
+        for comp in components:
+            comp["provenance"] = sorted(comp["provenance"])
         return {
             "version": 1,
             "components": components,
             "edges": edges,
             "industries": industries,
+            "warnings": self.warnings,
         }
 
 

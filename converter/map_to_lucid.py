@@ -116,22 +116,21 @@ def _page(
         for i, e in enumerate(page_edges)
     ]
 
-    return {"id": page_id, "title": title, "shapes": shapes, "lines": lines}
+    return {"id": page_id, "title": title, "shapes": shapes, "lines": lines, "groups": []}
 
 
 def map_to_lucid(architecture: dict[str, Any]) -> dict[str, Any]:
     components = {c["id"]: c for c in architecture["components"]}
     edges = architecture["edges"]
 
-    # The platform page shows the generic ARCH components (bands + rails + top
-    # + cloud). Industries overlay those rails, so a component that appears in
-    # any industry is shown on that industry's page instead of the platform's.
-    industry_member_ids: set[str] = set()
-    for ind in architecture["industries"]:
-        industry_member_ids.update(ind["componentIds"])
+    # The platform page shows ALL components parsed from the ARCH literal,
+    # regardless of whether they also appear in an industry. Provenance
+    # tracking (``"arch"`` in the component's provenance list) ensures the
+    # platform page is complete; industry pages show only that industry's
+    # components (from ``componentIds``).
     platform_ids = [
         c["id"] for c in components.values()
-        if c["id"] not in industry_member_ids
+        if "arch" in c.get("provenance", [])
     ]
 
     pages = [_page("p0", "Databricks Platform", platform_ids, components, edges)]

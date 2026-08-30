@@ -33,6 +33,11 @@ def main() -> None:
     shape_count = sum(len(page["shapes"]) for page in document["pages"])
     line_count = sum(len(page["lines"]) for page in document["pages"])
     print(f"Wrote {args.output}: {len(document['pages'])} pages, {shape_count} shapes, {line_count} connectors")
+    warnings = architecture.get("warnings", [])
+    if warnings:
+        print(f"\nWarnings ({len(warnings)}):")
+        for w in warnings:
+            print(f"  - {w}")
 
 
 if __name__ == "__main__":
