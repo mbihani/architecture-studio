@@ -13068,6 +13068,10 @@ function applyIndustry(id, remember){
   const fresh = JSON.parse(JSON.stringify(BASE));
   ARCH.rails = fresh.rails;
   ARCH.top   = fresh.top;
+  /* fresh rails come from pristine BASE, so a zone _deleted in an earlier view is
+     already gone; clear it explicitly so a reload→switch path can never carry a
+     stale hide across an industry change (zones must reappear on switch). */
+  RAIL_IDS.forEach(rid=>{ if(ARCH.rails[rid]) delete ARCH.rails[rid]._deleted; });
   /* Only the medallion stages are restored from BASE, not the whole bands tree:
      the bands carry the platform itself, and a user's own edits to it should
      survive an industry switch because the platform is not what changes. */
@@ -17692,6 +17696,7 @@ if(!seedFromUrl()){
 }
 fitBoard();
 restoreActiveTab();
+console.log("[arch-studio] init complete");
 </script>
 
 
@@ -17895,8 +17900,16 @@ restoreActiveTab();
 
   function maybeAuto(){
     if(lsGet(KEY)) return;
-    /* One shot, after the board has fitted and settled. */
-    setTimeout(start, 900);
+    /* One shot, after the board has fitted and settled. The edit-mode check lives
+       inside the timeout so it sees edit mode even when readyState was already
+       "complete" at parse time (the edit-mode script runs after this one): the
+       full-screen tour spotlight dims the board and reads as "stuck loading" on a
+       first visit, so suppress the auto-open while the editing surface is on.
+       The ◎ Tour button still replays it on demand. */
+    setTimeout(function(){
+      if(document.body.classList.contains("edit-mode")) return;
+      start();
+    }, 900);
   }
   if(document.readyState === "complete") maybeAuto();
   else window.addEventListener("load", maybeAuto);
@@ -18042,9 +18055,36 @@ restoreActiveTab();
 
   /* build() re-renders every container, so a selected atom/group element is
      detached afterwards. Wrap it to drop the selection on every rebuild so a
-     later Delete never acts on a stale byId[id] mapping. */
+     later Delete never acts on a stale byId[id] mapping. hideDeletedZones()
+     runs after every rebuild so a deleted zone's box (header + container) and
+     its associated flow arrows stay hidden via inline display:none, and
+     reappear once an industry switch clears ARCH.rails[zid]._deleted. */
+  function hideDeletedZones(){
+    var zoneMap = { src: '.col.src', ing: '.pocket.ing', ppl: '.pocket.ppl', cons: '.col.cons' };
+    Object.keys(zoneMap).forEach(function(zid){
+      var el = document.querySelector(zoneMap[zid]);
+      if(el){
+        el.style.display = (ARCH.rails[zid] && ARCH.rails[zid]._deleted) ? 'none' : '';
+      }
+    });
+    /* associated flow arrows / gutters that point into a deleted zone. NB: there
+       are two .downflow elements — .downflow.tb is the apps→platform arrow and
+       must NOT vanish when Consumers is deleted, so scope to :not(.tb). */
+    var flowMap = {
+      src:  ['.gutter.g1', '.gutter.g0'],
+      ing:  ['.flow.down.ingdown', '.flow.ingtuck'],
+      ppl:  ['.flow.up.pplup', '.flow.left.ppl.tuck', '.gutter.g2'],
+      cons: ['.gutter.g3', '.downflow:not(.tb)']
+    };
+    Object.keys(flowMap).forEach(function(zid){
+      var hidden = ARCH.rails[zid] && ARCH.rails[zid]._deleted;
+      flowMap[zid].forEach(function(sel){
+        document.querySelectorAll(sel).forEach(function(el){ el.style.display = hidden ? 'none' : ''; });
+      });
+    });
+  }
   var _origBuild = build;
-  build = function(){ _origBuild.apply(this, arguments); clearSel(); };
+  build = function(){ _origBuild.apply(this, arguments); clearSel(); if(typeof hideDeletedZones === 'function') hideDeletedZones(); };
 
   buildIndTabs();
 
@@ -18183,6 +18223,7 @@ restoreActiveTab();
       var zone = selected.zone;
       if(ARCH.rails[zone] && Array.isArray(ARCH.rails[zone].groups)){
         ARCH.rails[zone].groups = [];
+        ARCH.rails[zone]._deleted = true;
         persistCustom(); clearSel(); build(); fitBoard();
       }
       return;
