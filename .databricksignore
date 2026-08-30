@@ -1,0 +1,9 @@
+node_modules/
+.worktrees/
+.git/
+*.log
+.DS_Store
+converter/amr-repo/
+converter/__pycache__/
+converter/output/
+.polly/
