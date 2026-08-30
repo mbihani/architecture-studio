@@ -118,16 +118,28 @@ function reorderDiagramFirst(xml: string, id: string): string | null {
  * defaults to a finite page (page="1", or the attribute absent), which on a
  * very large diagram leaves most shapes off-screen after a load — the editor
  * opens centered on an empty page corner. Setting page="0" removes the page
- * boundary entirely, so combined with the `&zoom=Fit` embed parameter the whole
- * diagram fits the viewport. Idempotent: a model already at page="0" is left
- * untouched, and one missing the attribute gains page="0".
+ * boundary entirely, so combined with the `fit: 1` load property the whole
+ * diagram fits the viewport. Idempotent: setAttribute overwrites any prior
+ * value, so a model already at page="0" is left at page="0".
+ *
+ * Uses DOMParser/XMLSerializer rather than a regex so attribute handling is
+ * robust: the prior regex didn't match single-quoted attributes and could
+ * append a duplicate `page` attribute. The XML DOM APIs sidestep both.
  */
 function setInfiniteCanvas(xml: string): string {
-  return xml.replace(/<mxGraphModel\b[^>]*>/g, (tag) => {
-    if (/\spage="1"/.test(tag)) return tag.replace(/\spage="1"/, ' page="0"');
-    if (/\spage="[^"]*"/.test(tag)) return tag; // already non-1 (e.g. page="0")
-    return tag.replace(/>$/, ' page="0">'); // no page attr → force infinite canvas
-  });
+  const doc = new DOMParser().parseFromString(xml, "text/xml");
+  // Malformed XML → DOMParser returns a <parsererror> document. Fall back to
+  // the original so we never corrupt the editor's payload with an error node.
+  if (doc.getElementsByTagName("parsererror").length > 0) return xml;
+  const models = doc.getElementsByTagName("mxGraphModel");
+  Array.from(models).forEach((model) => model.setAttribute("page", "0"));
+  // XMLSerializer may prepend an <?xml ...?> declaration that wasn't in the
+  // input (draw.io mxfiles have none). Strip any leading declaration so the
+  // serialized form matches the input convention.
+  return new XMLSerializer().serializeToString(doc).replace(
+    /^<\?xml[^>]*\?>\s*/,
+    "",
+  );
 }
 
 export function useDrawioEmbed(): UseDrawioEmbedResult {
@@ -140,6 +152,11 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
   // Refs to avoid stale closures inside the message handler.
   const xmlRef = useRef("");
   const editorReadyRef = useRef(false);
+  // 20s timer started when the iframe's src document loads (onIframeLoad) and
+  // cleared when draw.io fires its `init` event. Started from the iframe load
+  // — not hook mount — so a slow XML fetch can't fire the timeout before the
+  // iframe even exists (the iframe only renders after the fetch resolves).
+  const initTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const exportResolverRef = useRef<((data: string) => void) | null>(null);
   const saveResolverRef = useRef<((xml: string) => void) | null>(null);
   // When set, the next editor "save" event triggers a page switch: the saved
@@ -239,6 +256,12 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
 
       if (msg.event === "init") {
         editorReadyRef.current = true;
+        // The editor initialized — cancel the 20s init timeout started in
+        // onIframeLoad so it can never fire after a successful init.
+        if (initTimeoutRef.current) {
+          clearTimeout(initTimeoutRef.current);
+          initTimeoutRef.current = null;
+        }
         // Configure the editor, then load the full mxfile (all pages as tabs).
         sendToEditor({ action: "configure", config: { format: "xml" } });
         // API responded first → XML is already here; load it now. Otherwise the
@@ -287,24 +310,18 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
     return () => window.removeEventListener("message", handler);
   }, [sendToEditor, loadXml]);
 
-  // --- Init timeout ----------------------------------------------------
-  // If the editor never fires its `init` event — e.g. embed.diagrams.net is
-  // unreachable, or the embed URL is malformed enough to break its JS — the
-  // overlay would otherwise hang on "Editor initializing…" forever. Surface
-  // a clear error after 20s instead. A pre-existing error (e.g. a failed
-  // fetch) is preserved rather than overwritten with this generic message.
+  // --- Init timeout cleanup --------------------------------------------
+  // The 20s init timeout is started in onIframeLoad (when the iframe's src
+  // document actually loads — NOT on hook mount) and cleared in the `init`
+  // handler when the editor signals readiness. This effect only clears any
+  // pending timer on unmount so it can't fire setState after teardown.
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (editorReadyRef.current) return;
-      setStatus("error");
-      setError((prev) =>
-        prev
-          ? prev
-          : "draw.io editor failed to initialize within 20 seconds. " +
-            "Check your network connection to embed.diagrams.net.",
-      );
-    }, 20000);
-    return () => clearTimeout(timer);
+    return () => {
+      if (initTimeoutRef.current) {
+        clearTimeout(initTimeoutRef.current);
+        initTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   // --- Public actions ---------------------------------------------------
@@ -352,14 +369,35 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
 
   /**
    * Called by EmbedFrame when the iframe's src document finishes loading. We
-   * move to the "iframe-loading" state (the embed HTML is ready; now we wait
-   * for draw.io's `init` postMessage). Guarded so it never regresses a
-   * terminal state: if `init` already fired (editorReady) the editor is past
-   * this point, and an existing error is preserved.
+   * start the 20s init timeout here — the iframe now exists, so the timer
+   * measures draw.io's init latency rather than time since hook mount, which a
+   * slow XML fetch would exhaust before the iframe even renders. We move to
+   * the "iframe-loading" state unless the fetch has already advanced us
+   * further: `init-waiting` (fetch done, awaiting init) and `loading-xml` are
+   * preserved so a late iframe onLoad can't regress progress, alongside the
+   * existing `error` guard. If `init` already fired (editorReady) the editor
+   * is past this point entirely.
    */
   const onIframeLoad = useCallback((): void => {
     if (editorReadyRef.current) return;
-    setStatus((prev) => (prev === "error" ? prev : "iframe-loading"));
+    setStatus((prev) =>
+      prev === "error" || prev === "init-waiting" || prev === "loading-xml"
+        ? prev
+        : "iframe-loading",
+    );
+    // (Re)start the init timeout. Clear any prior timer first so an iframe
+    // reload can't stack timers; the `init` handler clears it on success.
+    if (initTimeoutRef.current) clearTimeout(initTimeoutRef.current);
+    initTimeoutRef.current = setTimeout(() => {
+      if (editorReadyRef.current) return;
+      setStatus("error");
+      setError((prev) =>
+        prev
+          ? prev
+          : "draw.io editor failed to initialize within 20 seconds. " +
+            "Check your network connection to embed.diagrams.net.",
+      );
+    }, 20000);
   }, []);
 
   return {
