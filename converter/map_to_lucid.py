@@ -1,4 +1,11 @@
-"""Map ArchitectureDoc v1 to Lucid Standard Import document JSON."""
+"""Map ArchitectureDoc v1 to a Lucid Standard Import document.
+
+The output is ``document.json`` — the JSON payload inside a ``.lucid`` archive
+(https://developer.lucid.co/docs/overview-si). Each industry (and the
+platform itself) becomes a Lucid page; components become rectangle shapes
+coloured by category and laid out in columns by zone; edges become elbow
+lines connecting the shapes by stable ID.
+"""
 
 from __future__ import annotations
 
@@ -7,48 +14,135 @@ from html import escape
 from typing import Any
 
 
-COLORS = {
-    "platform": "#1B75BB", "source": "#E8F1FB", "ingestion": "#DDF4EE",
-    "consumer": "#FFF1D6", "usecase": "#FDE2E2", "cloud": "#ECE5F7",
+# Fill colours per component category (light, readable on a white canvas).
+CATEGORY_COLORS: dict[str, str] = {
+    "platform": "#1B75BB",  # Databricks blue
+    "source": "#E8F1FB",    # pale blue
+    "ingestion": "#DDF4EE",  # pale teal
+    "consumer": "#FFF1D6",  # pale amber
+    "usecase": "#FDE2E2",    # pale red
+    "cloud": "#ECE5F7",      # pale violet
 }
-ZONE_ORDER = {"src": 0, "ing": 1, "ppl": 2, "cons": 3, "top": 4, "platform": 5, "cloud": 6}
+
+# Stroke colours per edge kind.
+EDGE_COLORS: dict[str, str] = {
+    "related": "#9CA3AF",
+    "flow": "#1B75BB",
+    "feeds": "#10B981",
+    "uses": "#6366F1",
+}
+
+# Column order left-to-right, mirroring the reference architecture's layout.
+ZONE_ORDER: dict[str, int] = {
+    "src": 0, "ing": 1, "ppl": 2, "cons": 3, "top": 4,
+    "platform": 5, "cloud": 6,
+}
+
+SHAPE_W = 220
+SHAPE_H = 72
+COL_GAP = 260   # column pitch (x)
+ROW_GAP = 100    # row pitch (y)
+MARGIN_X = 80
+MARGIN_Y = 100
 
 
-def _page(industry: dict[str, Any], components: dict[str, dict[str, Any]], edges: list[dict[str, Any]]) -> dict[str, Any]:
-    ids = set(industry["componentIds"])
-    selected = [components[item] for item in ids if item in components]
+def _text_html(component: dict[str, Any]) -> str:
+    """Build the shape's text as a styled HTML span (Lucid accepts HTML)."""
+    name = escape(component["name"])
+    return f"<span style='font-size: 11pt; font-weight: 600; color: #172033;'>{name}</span>"
+
+
+def _shape(component: dict[str, Any], shape_id: str, x: int, y: int) -> dict[str, Any]:
+    colour = CATEGORY_COLORS.get(component["category"], "#F3F4F6")
+    return {
+        "id": shape_id,
+        "type": "rectangle",
+        "boundingBox": {"x": x, "y": y, "w": SHAPE_W, "h": SHAPE_H},
+        "text": {"text": _text_html(component)},
+        "style": {
+            "fill": {"type": "color", "color": colour},
+            "stroke": {"color": "#475569", "width": 1, "style": "solid"},
+            "rounding": 6,
+            "textColor": "#172033",
+        },
+    }
+
+
+def _line(line_id: str, edge: dict[str, Any], shape_ids: dict[str, str]) -> dict[str, Any]:
+    src = shape_ids.get(edge["sourceId"])
+    dst = shape_ids.get(edge["targetId"])
+    if not src or not dst:
+        raise ValueError(f"edge {edge['id']} references a shape not on this page")
+    return {
+        "id": line_id,
+        "lineType": "elbow",
+        "endpoint1": {"type": "shapeEndpoint", "style": "none", "shapeId": src},
+        "endpoint2": {"type": "shapeEndpoint", "style": "arrow", "shapeId": dst},
+        "stroke": {"color": EDGE_COLORS.get(edge["kind"], "#6B7280"), "width": 1, "style": "solid"},
+    }
+
+
+def _page(
+    page_id: str,
+    title: str,
+    component_ids: list[str],
+    components: dict[str, dict[str, Any]],
+    edges: list[dict[str, Any]],
+) -> dict[str, Any]:
+    selected = [components[cid] for cid in component_ids if cid in components]
     selected.sort(key=lambda c: (ZONE_ORDER.get(c["zone"], 9), c["name"].casefold()))
-    counters: dict[str, int] = defaultdict(int)
-    shapes = []
-    # Page prefix + UUID prefix stays globally unique while keeping the import
-    # below Lucid's 2 MB document.json limit.
-    shape_ids = {component["id"]: f"{industry['id']}-s-{component['id'][:12]}" for component in selected}
+
+    # Short, page-scoped sequential IDs keep document.json well under Lucid's
+    # 2 MB limit while staying unique across the document (page_id is unique).
+    shape_ids = {c["id"]: f"{page_id}-s{i}" for i, c in enumerate(selected)}
+
+    # Lay shapes out in columns by zone.
+    row_counters: dict[str, int] = defaultdict(int)
+    shapes: list[dict[str, Any]] = []
     for component in selected:
         zone = component["zone"]
-        index = counters[zone]
-        counters[zone] += 1
-        column = ZONE_ORDER.get(zone, 7)
-        shapes.append({
-            "id": shape_ids[component["id"]], "type": "rectangle",
-            "boundingBox": {"x": 80 + column * 260, "y": 100 + index * 105, "w": 220, "h": 72},
-            "text": f"<span style='font-size: 10pt; color: #172033;'>{escape(component['name'])}</span>",
-            "style": {"fill": {"color": COLORS.get(component["category"], COLORS.get(zone, "#F3F4F6"))}},
-        })
+        col = ZONE_ORDER.get(zone, 7)
+        row = row_counters[zone]
+        row_counters[zone] += 1
+        x = MARGIN_X + col * COL_GAP
+        y = MARGIN_Y + row * ROW_GAP
+        shapes.append(_shape(component, shape_ids[component["id"]], x, y))
+
+    # Only edges whose both endpoints are on this page.
+    ids = set(component_ids)
+    page_edges = [e for e in edges if e["sourceId"] in ids and e["targetId"] in ids]
     lines = [
-        {"id": f"{industry['id']}-l-{edge['id'][:12]}", "lineType": "elbow",
-         "endpoint1": {"type": "shapeEndpoint", "style": "none", "shapeId": shape_ids[edge["sourceId"]]},
-         "endpoint2": {"type": "shapeEndpoint", "style": "arrow", "shapeId": shape_ids[edge["targetId"]]}}
-        for edge in edges if edge["sourceId"] in ids and edge["targetId"] in ids
+        _line(f"{page_id}-l{i}", e, shape_ids)
+        for i, e in enumerate(page_edges)
     ]
-    return {"id": f"industry-{industry['id']}", "title": industry["label"], "shapes": shapes, "lines": lines}
+
+    return {"id": page_id, "title": title, "shapes": shapes, "lines": lines}
 
 
 def map_to_lucid(architecture: dict[str, Any]) -> dict[str, Any]:
-    components = {item["id"]: item for item in architecture["components"]}
-    platform = {
-        "id": "platform", "label": "Databricks Platform",
-        "componentIds": [item["id"] for item in components.values() if item["zone"] == "platform"],
-    }
-    pages = [_page(platform, components, architecture["edges"])]
-    pages.extend(_page(item, components, architecture["edges"]) for item in architecture["industries"])
+    components = {c["id"]: c for c in architecture["components"]}
+    edges = architecture["edges"]
+
+    # The platform page shows the generic ARCH components (bands + rails + top
+    # + cloud). Industries overlay those rails, so a component that appears in
+    # any industry is shown on that industry's page instead of the platform's.
+    industry_member_ids: set[str] = set()
+    for ind in architecture["industries"]:
+        industry_member_ids.update(ind["componentIds"])
+    platform_ids = [
+        c["id"] for c in components.values()
+        if c["id"] not in industry_member_ids
+    ]
+
+    pages = [_page("p0", "Databricks Platform", platform_ids, components, edges)]
+    for i, ind in enumerate(architecture["industries"], start=1):
+        pages.append(
+            _page(
+                f"p{i}",
+                ind["label"],
+                ind["componentIds"],
+                components,
+                edges,
+            )
+        )
     return {"version": 1, "pages": pages}

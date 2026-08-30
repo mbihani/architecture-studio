@@ -262,6 +262,7 @@ def _cloud(arch: dict[str, Any]) -> dict[str, Any]:
     return {
         "name": cloud.get("name", "Cloud Services & Integrations"),
         "ic": cloud.get("ic", ""),
+        "provider": cloud.get("provider", ""),
         "extras": cloud.get("extras", []),
         "providers": cloud.get("providers", {}),
     }
