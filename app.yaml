@@ -1,0 +1,4 @@
+command: ["bash", "run.sh"]
+env:
+  - name: NODE_ENV
+    value: production

@@ -1,11 +1,14 @@
 // ---------------------------------------------------------------------------
 // Architecture Studio backend — Express server entry point.
 //
-// Runs on port 3001. Serves the JSON API consumed by the React frontend
-// (proxied via Vite in dev). All routes are mounted under /api.
+// Runs on port 8080 by default (overridable via the PORT env var). Serves the
+// JSON API consumed by the React frontend (proxied via Vite in dev) and, in
+// production, the built frontend from dist/. API routes live under /api.
 // ---------------------------------------------------------------------------
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import cors from "cors";
 import express from "express";
@@ -16,7 +19,7 @@ import { embedRouter } from "./routes/embed.ts";
 import { exportRouter } from "./routes/export.ts";
 import { industriesRouter } from "./routes/industries.ts";
 
-const PORT = Number(process.env.PORT ?? 3001);
+const PORT = Number(process.env.PORT ?? 8080);
 
 /**
  * Best-effort .env loader so the backend works locally without an external
@@ -63,6 +66,24 @@ app.use("/api", exportRouter);
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, port: PORT });
 });
+
+// --- Production static serving ---------------------------------------------
+// After `vite build` emits dist/, serve the built React frontend from this
+// same Express server so the app ships as a single origin. In dev dist/ is
+// absent — Vite serves the frontend and proxies /api here — so this block
+// stays inert and the dev workflow is unchanged.
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const distPath = path.resolve(__dirname, "..", "dist");
+
+if (existsSync(distPath)) {
+  app.use(express.static(distPath));
+  // SPA fallback: any non-/api GET returns index.html so client-side routes
+  // (e.g. /documents/<id>) resolve without a server round-trip.
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api/")) return next();
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Architecture Studio backend listening on http://localhost:${PORT}`);
