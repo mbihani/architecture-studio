@@ -1,9 +1,9 @@
 # Architecture data converter
 
 Converts Amr Alieg's Databricks reference-architecture data — the hand-authored
-`ARCH` platform literal and 62 Python-authored industry overlays — into Lucid
-Standard Import JSON (`document.json`), the payload inside a `.lucid` archive
-that Lucidchart imports as a multi-page diagram.
+`ARCH` platform literal and 62 Python-authored industry overlays — into draw.io
+mxGraph XML (`architecture.drawio`) that draw.io imports as a multi-page
+diagram.
 
 ## ⚠️ Security: executing third-party Python
 
@@ -54,9 +54,8 @@ The converter verifies the clone is at the pinned commit (`8a5d798`) and
 that the working tree is clean; if either check fails it prints an error and
 exits — check out the pinned commit deliberately before re-running.
 
-The default output is `converter/sample-output/document.json` (1.9 MB, under
-Lucid's 2 MB limit). To also retain the normalized ArchitectureDoc semantic
-model:
+The default output is `converter/sample-output/architecture.drawio`. To also
+retain the normalized ArchitectureDoc semantic model:
 
 ```bash
 python3 converter/index.py --architecture-output converter/sample-output/architecture.json
@@ -90,13 +89,13 @@ parse_arch.py          parse_industries.py
    build industry index
                     │
                     ▼
-            map_to_lucid.py
+            map_to_drawio.py
    components → shapes (by zone/category)
-   edges → lines (elbow, arrow)
+   edges → mxCell connectors
    industries → pages
                     │
                     ▼
-          document.json (Lucid SI)
+       architecture.drawio (mxGraph XML)
 ```
 
 ### parse_arch.py — pure-Python JS literal parser
@@ -140,16 +139,15 @@ active provider's fed/ingest/bi/identity tiles).
 - **Industry index**: each industry lists its component IDs, medallion
   (Bronze/Silver/Gold), and source citations.
 
-### map_to_lucid.py — Lucid Standard Import JSON
+### map_to_drawio.py — draw.io mxGraph XML
 
-Maps to the [Lucid SI format](https://developer.lucid.co/docs/overview-si)
-(field names match the official spec):
+Maps ArchitectureDoc to draw.io's editable mxGraph XML format:
 
-| ArchitectureDoc | Lucid SI |
-|-----------------|----------|
-| Component | `rectangle` shape (`boundingBox` with x/y/w/h, `text`, `style` with `fill`/`stroke`/`rounding`) |
-| Edge | `elbow` line (`endpoint1`/`endpoint2` as `shapeEndpoint`, colored `stroke` by kind) |
-| Industry | `page` (with `title`, `shapes`, `lines`, `groups`) |
+| ArchitectureDoc | mxGraph XML |
+|-----------------|-------------|
+| Component | vertex `mxCell` with geometry, label, and style |
+| Edge | edge `mxCell` with source/target references and kind-based color |
+| Industry | named `diagram` page |
 
 Shapes are positioned in columns by zone (src → ing → ppl → cons → top →
 platform → cloud) and colored by category. Lines connect shapes by stable ID
@@ -161,7 +159,7 @@ each industry gets one page (that industry's components only).
 ```bash
 python3 -m py_compile converter/*.py
 python3 converter/index.py
-python3 -m json.tool converter/sample-output/document.json >/dev/null
+python3 -c "import xml.etree.ElementTree as ET; ET.parse('converter/sample-output/architecture.drawio')"
 ```
 
 ## Output stats (from Amr's real data)
@@ -169,5 +167,5 @@ python3 -m json.tool converter/sample-output/document.json >/dev/null
 - **63 pages** (1 platform + 62 industries)
 - **4,306 shapes** (min 60 per page, all ≥ 20)
 - **2,517 connectors** (min 29 per page, all ≥ 10)
-- **1.9 MB** document.json (under Lucid's 2 MB limit)
+- **architecture.drawio** editable draw.io mxGraph XML
 - **432 warnings** for unresolved name-based references (printed to stdout)
