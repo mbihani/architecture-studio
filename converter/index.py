@@ -30,12 +30,9 @@ def main() -> None:
         args.architecture_output.parent.mkdir(parents=True, exist_ok=True)
         args.architecture_output.write_text(json.dumps(architecture, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     page_count = 1 + len(architecture["industries"])
-    shape_count = len(architecture["components"]) + sum(len(industry["componentIds"]) for industry in architecture["industries"])
-    component_ids = {component["id"] for component in architecture["components"]}
-    line_count = sum(
-        1 for edge in architecture["edges"]
-        if edge["sourceId"] in component_ids and edge["targetId"] in component_ids
-    )
+    arch_ids = {c["id"] for c in architecture["components"] if "arch" in c.get("provenance", [])}
+    shape_count = len(arch_ids) + sum(len(industry["componentIds"]) for industry in architecture["industries"])
+    line_count = sum(1 for edge in architecture["edges"] if edge["sourceId"] in arch_ids and edge["targetId"] in arch_ids)
     for industry in architecture["industries"]:
         ids = set(industry["componentIds"])
         line_count += sum(1 for edge in architecture["edges"] if edge["sourceId"] in ids and edge["targetId"] in ids)

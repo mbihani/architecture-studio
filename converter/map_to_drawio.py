@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from html import escape
 from typing import Any
 import xml.etree.ElementTree as ET
 
@@ -75,7 +76,7 @@ def _page(
             "mxCell",
             {
                 "id": shape_ids[component["id"]],
-                "value": component["name"],
+                "value": escape(component["name"]),
                 "style": (
                     "rounded=1;whiteSpace=wrap;html=1;"
                     f"fillColor={fill};strokeColor=#475569;fontSize=11;fontColor=#172033;"
@@ -117,7 +118,8 @@ def map_to_drawio(architecture: dict[str, Any]) -> str:
     edges = architecture["edges"]
     mxfile = ET.Element("mxfile", {"host": "architecture-studio", "type": "device"})
 
-    _page(mxfile, "platform", "Platform", list(components), components, edges)
+    platform_ids = [cid for cid, c in components.items() if "arch" in c.get("provenance", [])]
+    _page(mxfile, "platform", "Platform", platform_ids, components, edges)
     for industry in architecture["industries"]:
         _page(
             mxfile,
