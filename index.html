@@ -17294,7 +17294,7 @@ function openEdit(id){
     `</div>`;
   const save = ()=>{
     const nm = document.getElementById("ed-name").value.trim();
-    if(!nm){ document.getElementById("ed-name").focus(); return; }
+    if(!nm){ if(typeof window.toast === "function") window.toast("Component name cannot be empty."); document.getElementById("ed-name").focus(); return; }
     t.n = nm;
     const sv = document.getElementById("ed-sub").value.trim();
     if(t.desc !== undefined) t.desc = sv; else t.s = sv;
@@ -17982,6 +17982,8 @@ console.log("[arch-studio] init complete");
     "#edit-tools button.on { background:#7c3aed; border-color:#7c3aed; color:white; }",
     "#multi-count { align-self:center; min-width:68px; color:#7c3aed; font-weight:750; text-align:center; }",
     "body.edit-mode .rgroup .rtiles:empty { min-height:18px; border:1px dashed var(--line-strong); border-radius:7px; }",
+    "body.edit-mode .rgroup .rtiles:empty::after { content:\"Empty box — use Add Component\"; display:block; padding:4px 8px; color:var(--muted); font:11px/1.3 system-ui,sans-serif; text-align:center; }",
+    ".zone-empty { padding:10px 14px; color:var(--muted); font:italic 12px/1.3 system-ui,sans-serif; }",
     "body.edit-mode .rgroup.sel-group { position:relative; }",
     ".resize-handle { position:absolute; width:12px; height:12px; right:-7px; bottom:-7px; z-index:30;",
     "  border:2px solid var(--card); border-radius:3px; background:var(--brand); cursor:nwse-resize; box-shadow:0 1px 4px #0004; }",
@@ -18032,11 +18034,12 @@ console.log("[arch-studio] init complete");
   function byId2(s){ return document.getElementById(s); }
   function toast(msg){
     var t = byId2("edit-toast");
-    if(!t){ t = document.createElement("div"); t.id = "edit-toast"; document.body.appendChild(t); }
+    if(!t){ t = document.createElement("div"); t.id = "edit-toast"; t.setAttribute("role","alert"); document.body.appendChild(t); }
     t.textContent = msg; t.classList.add("show");
     clearTimeout(toast._t);
     toast._t = setTimeout(function(){ t.classList.remove("show"); }, 2800);
   }
+  window.toast = toast;   /* expose so the native edit drawer (openEdit) can surface errors too */
 
   /* ============================================================
      1. INDUSTRY TAB BAR — primary selector (dropdown stays as fallback)
@@ -18129,6 +18132,21 @@ console.log("[arch-studio] init complete");
       });
     });
   }
+  /* Show a helpful placeholder when a visible zone has lost all its boxes (e.g.
+     after the last group in a zone is deleted). A zone that is _deleted is hidden
+     wholesale by hideDeletedZones, so it never reaches here. */
+  function updateEmptyStates(){
+    var zoneMap = { src:'.col.src', ing:'.pocket.ing', ppl:'.pocket.ppl', cons:'.col.cons' };
+    Object.keys(zoneMap).forEach(function(zid){
+      var el = document.querySelector(zoneMap[zid]); if(!el) return;
+      var rail = ARCH.rails[zid];
+      var empty = !rail._deleted && (!rail.groups || rail.groups.length === 0);
+      var ph = el.querySelector(".zone-empty");
+      if(empty && !ph){ ph = document.createElement("div"); ph.className = "zone-empty";
+        ph.textContent = "No boxes in this zone — use “New Box” to add one."; el.appendChild(ph); }
+      else if(!empty && ph){ ph.remove(); }
+    });
+  }
   var _origBuild = build;
   build = function(){
     try{
@@ -18143,6 +18161,7 @@ console.log("[arch-studio] init complete");
         });
       });
       if(typeof hideDeletedZones === 'function') hideDeletedZones();
+      if(typeof updateEmptyStates === 'function') updateEmptyStates();
       if(flowSvg) requestAnimationFrame(renderCustomFlows);
     }catch(err){ console.error("Architecture build failed", err); if(typeof toast === "function") toast("The canvas could not be rendered."); }
   };
@@ -18154,19 +18173,21 @@ console.log("[arch-studio] init complete");
      ============================================================ */
   var tools = document.createElement("div");
   tools.id = "edit-tools";
+  tools.setAttribute("role","toolbar");
+  tools.setAttribute("aria-label","Architecture editor controls");
   tools.innerHTML =
-    '<button id="edit-toggle" type="button">Edit Mode: ON</button>' +
-    '<button id="edit-reset" type="button">Reset to Reference</button>' +
-    '<button id="edit-duplicate" type="button">Duplicate Canvas</button>' +
-    '<button id="edit-multi" type="button">Multi-Select</button>' +
+    '<button id="edit-toggle" type="button" aria-label="Toggle edit mode">Edit Mode: ON</button>' +
+    '<button id="edit-reset" type="button" aria-label="Reset canvas to the reference architecture">Reset to Reference</button>' +
+    '<button id="edit-duplicate" type="button" aria-label="Duplicate this canvas into a new tab">Duplicate Canvas</button>' +
+    '<button id="edit-multi" type="button" aria-pressed="false" aria-label="Toggle multi-select mode">Multi-Select</button>' +
     '<span id="multi-count" role="status" aria-live="polite">0 selected</span>' +
-    '<button id="edit-connect" type="button">Connect</button>' +
-    '<button id="edit-export" type="button">Export</button>' +
-    '<button id="edit-import" type="button">Import</button>' +
+    '<button id="edit-connect" type="button" aria-pressed="false" aria-label="Toggle connection mode to draw custom flows">Connect</button>' +
+    '<button id="edit-export" type="button" aria-label="Export the current canvas as a JSON file">Export</button>' +
+    '<button id="edit-import" type="button" aria-label="Import a canvas from a JSON file">Import</button>' +
     '<input id="edit-import-file" type="file" accept="application/json,.json" hidden>' +
-    '<button id="edit-newbox" type="button">New Box</button>' +
-    '<button id="edit-add" type="button">Add Component</button>' +
-    '<button id="edit-delete" type="button">Delete</button>';
+    '<button id="edit-newbox" type="button" aria-label="Create a new empty box in a zone">New Box</button>' +
+    '<button id="edit-add" type="button" aria-label="Add a component to the selected box">Add Component</button>' +
+    '<button id="edit-delete" type="button" aria-label="Delete the selected item or items">Delete</button>';
   document.body.appendChild(tools);
 
   var toggleBtn  = byId2("edit-toggle");
@@ -18190,11 +18211,20 @@ console.log("[arch-studio] init complete");
   var rangeAnchor = null;
   var connectMode = false;
   var connectStart = null;
-  var undoSnapshot = null;
-  function rememberUndo(){ try{ undoSnapshot = boardSnapshot(); }catch(err){ console.error("Unable to capture undo state", err); } }
+  /* Snapshot-based undo stack: rememberUndo() pushes a pre-mutation snapshot
+     before any destructive action; Ctrl+Z pops the most recent one. Capped so
+     a long session can't grow the stack without bound. Cleared on an industry
+     switch, since switching discards all edits and undoing across a switch
+     would restore an incoherent board. */
+  var undoStack = [];
+  var UNDO_LIMIT = 50;
+  function rememberUndo(){ try{
+    undoStack.push(boardSnapshot());
+    if(undoStack.length > UNDO_LIMIT) undoStack.shift();
+  }catch(err){ console.error("Unable to capture undo state", err); } }
   function undoOnce(){
-    if(!undoSnapshot){ toast("Nothing to undo."); return; }
-    var current = boardSnapshot(), prior = undoSnapshot; undoSnapshot = current;
+    if(!undoStack.length){ toast("Nothing to undo."); return; }
+    var prior = undoStack.pop();
     loadBoardSnap(prior); persistCustom(); build(); fitBoard(); toast("Last change undone.");
   }
   function safeName(value){ return String(value || "").replace(/[\u0000-\u001f\u007f<>]/g, "").trim().slice(0, 120); }
@@ -18301,6 +18331,7 @@ console.log("[arch-studio] init complete");
     bypassSwitchConfirm = true;
     try { _editApplyIndustry(id, true); ARCH._customFlows = []; persistCustom(); }
     finally { bypassSwitchConfirm = false; }
+    undoStack.length = 0;   /* switching discards edits; undo across a switch is incoherent */
     activeBoard = "reference";
     updateCanvasStatus();
   }
@@ -18500,7 +18531,7 @@ console.log("[arch-studio] init complete");
   };
 
   /* ---------- delete: writes back to ARCH so it survives build() ---------- */
-  deleteBtn.onclick = function(){
+  deleteBtn.onclick = function(){ try{
     if(multiMode && multiSelection.size){
       rememberUndo();
       var groups = [], atoms = [];
@@ -18543,6 +18574,7 @@ console.log("[arch-studio] init complete");
     if(selected.type === "cloud"){
       toast("Cloud and Use-Case sections can't be deleted as a group — delete individual components instead.");
     }
+  }catch(err){ console.error("Delete failed", err); toast("Delete failed: " + (err && err.message ? err.message : "error")); }
   };
 
   /* ---------- New Box modal ---------- */
@@ -18561,12 +18593,16 @@ console.log("[arch-studio] init complete");
            '<div><label>Zone</label><select id="m-zone">' + zoneOptions("src") + '</select></div>',
       okText:"Create",
       onOk:function(){
-        var name = safeName(byId2("m-name").value);
-        if(!name){ byId2("m-name").focus(); return false; }
-        var zone = byId2("m-zone").value;
-        rememberUndo(); ARCH.rails[zone].groups.push({ box:name, ic:"folder", tiles:[] });
-        persistCustom(); build(); fitBoard();
-        return true;
+        try{
+          var name = safeName(byId2("m-name").value);
+          if(!name){ toast("Box name cannot be empty."); byId2("m-name").focus(); return false; }
+          var zone = byId2("m-zone").value;
+          var dup = (ARCH.rails[zone].groups || []).some(function(g){ return g.box === name; });
+          if(dup){ toast("A box named \"" + name + "\" already exists in this zone."); byId2("m-name").focus(); return false; }
+          rememberUndo(); ARCH.rails[zone].groups.push({ box:name, ic:"folder", tiles:[] });
+          persistCustom(); build(); fitBoard(); toast("Box \"" + name + "\" added.");
+          return true;
+        }catch(err){ console.error("New box failed", err); toast("Could not create box."); return false; }
       }
     });
   };
@@ -18644,6 +18680,7 @@ console.log("[arch-studio] init complete");
   document.addEventListener("keydown", function(e){
     if(e.key === "Escape" && modalEl) closeModal();
     else if(e.key === "Escape" && multiSelection.size) clearMulti();
+    else if(e.key === "Escape" && editMode && selected) clearSel();
     if(e.key === "Enter" && modalEl && e.target && e.target.id === "m-name") byId2("m-ok").click();
     /* focus trap: keep Tab/Shift+Tab cycling inside the open modal */
     if(modalEl && e.key === "Tab"){
@@ -18670,10 +18707,11 @@ console.log("[arch-studio] init complete");
       zone = zone || coreVisibleZone();
       multiMode = true; clearSel(); clearMulti();
       document.querySelectorAll('.rgroup[data-zone="' + zone + '"]').forEach(function(g){
-        var atoms = g.querySelectorAll(".atom");
-        if(!atoms.length) toggleMultiItem({key:"group:"+zone+":"+g.dataset.gidx,type:"group",el:g,zone:zone,gidx:+g.dataset.gidx});
+        var gi = +g.dataset.gidx, atoms = g.querySelectorAll(".atom");
+        if(!atoms.length) toggleMultiItem({key:"group:"+zone+":"+gi,type:"group",el:g,zone:zone,gidx:gi});
         atoms.forEach(function(a){ var item=atomMultiItem(a); if(item) toggleMultiItem(item); });
       });
+      if(!multiSelection.size) toast("Nothing to select.");
       updateMultiUI();
     }
   });
