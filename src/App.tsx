@@ -33,6 +33,7 @@ import { useDrawioEmbed, type DrawioStatus } from "./hooks/useDrawioEmbed.ts";
 
 const STATUS_TEXT: Record<Exclude<DrawioStatus, "error">, string> = {
   fetching: "Fetching architecture…",
+  "iframe-loading": "Editor iframe loaded, waiting for init…",
   "init-waiting": "Editor initializing…",
   "loading-xml": "Editor ready, loading XML…",
   loaded: "XML loaded ✓",
@@ -78,7 +79,7 @@ function StatusOverlay({ status, error }: StatusOverlayProps): React.ReactElemen
 }
 
 export function App(): React.ReactElement {
-  const { iframeRef, loading, error, status, exportPng, switchPage } =
+  const { iframeRef, loading, error, status, exportPng, switchPage, onIframeLoad } =
     useDrawioEmbed();
 
   return (
@@ -104,7 +105,9 @@ export function App(): React.ReactElement {
             </p>
           </div>
         )}
-        {!loading && !error && <EmbedFrame iframeRef={iframeRef} />}
+        {!loading && !error && (
+          <EmbedFrame iframeRef={iframeRef} onIframeLoad={onIframeLoad} />
+        )}
         <StatusOverlay status={status} error={error} />
       </main>
     </div>

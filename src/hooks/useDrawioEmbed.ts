@@ -26,7 +26,7 @@ import { api, type ApiError } from "../api/client.ts";
 
 /** The embed URL for the diagrams.net editor (no API key, no OAuth). */
 export const DRAWIO_EMBED_URL =
-  "https://embed.diagrams.net?proto=json&svg=1&splash=0&zoom=Fit";
+  "https://embed.diagrams.net?proto=json&svg=1&splash=0";
 
 /** Origin of the embedded draw.io editor — used as the postMessage target. */
 const DRAWIO_ORIGIN = "https://embed.diagrams.net";
@@ -56,10 +56,12 @@ interface DrawioEvent {
 
 /**
  * Coarse lifecycle of the draw.io embed, surfaced for the diagnostic overlay.
- * Progresses: fetching → (init-waiting | loading-xml) → loaded, or → error.
+ * Progresses: fetching → iframe-loading → (init-waiting | loading-xml) →
+ * loaded, or → error.
  */
 export type DrawioStatus =
   | "fetching"
+  | "iframe-loading"
   | "init-waiting"
   | "loading-xml"
   | "loaded"
@@ -76,6 +78,8 @@ interface UseDrawioEmbedResult {
   error: string | null;
   /** Coarse embed lifecycle state for the diagnostic overlay. */
   status: DrawioStatus;
+  /** Called when the editor iframe finishes loading its src document. */
+  onIframeLoad: () => void;
   /** Request the editor to save; resolves with the saved XML. */
   save: () => Promise<string>;
   /** Export the current diagram as PNG; resolves with a PNG data URI. */
@@ -207,12 +211,30 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
   // --- Listen for postMessage events from the editor --------------------
   useEffect(() => {
     function handler(event: MessageEvent): void {
+      // Diagnostic: log EVERY postMessage event before the origin/source
+      // filter. When the `init` event never arrives, this shows whether
+      // draw.io is sending anything at all, and from which origin — the
+      // existing filter would otherwise silently drop those messages.
+      const raw = event.data;
+      const eventName =
+        typeof raw === "object" &&
+        raw !== null &&
+        typeof (raw as DrawioEvent).event === "string"
+          ? (raw as DrawioEvent).event
+          : "(non-drawio)";
+      const iframe = iframeRef.current;
+      const sourceOk = !!iframe && event.source === iframe.contentWindow;
+      const originOk = ALLOWED_ORIGINS.has(event.origin);
+      console.log(
+        `[drawio] postMessage origin=${event.origin} event=${eventName} ` +
+          `sourceCheck=${sourceOk} originCheck=${originOk}`,
+      );
+
       // Only accept messages from our draw.io iframe, and only from the
       // embed origin (defends against any other frame posting to us).
-      const iframe = iframeRef.current;
-      if (!iframe || event.source !== iframe.contentWindow) return;
-      if (!ALLOWED_ORIGINS.has(event.origin)) return;
-      const msg = event.data as DrawioEvent | null;
+      if (!sourceOk) return;
+      if (!originOk) return;
+      const msg = raw as DrawioEvent | null;
       if (typeof msg !== "object" || msg === null) return;
 
       if (msg.event === "init") {
@@ -265,6 +287,26 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
     return () => window.removeEventListener("message", handler);
   }, [sendToEditor, loadXml]);
 
+  // --- Init timeout ----------------------------------------------------
+  // If the editor never fires its `init` event — e.g. embed.diagrams.net is
+  // unreachable, or the embed URL is malformed enough to break its JS — the
+  // overlay would otherwise hang on "Editor initializing…" forever. Surface
+  // a clear error after 20s instead. A pre-existing error (e.g. a failed
+  // fetch) is preserved rather than overwritten with this generic message.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (editorReadyRef.current) return;
+      setStatus("error");
+      setError((prev) =>
+        prev
+          ? prev
+          : "draw.io editor failed to initialize within 20 seconds. " +
+            "Check your network connection to embed.diagrams.net.",
+      );
+    }, 20000);
+    return () => clearTimeout(timer);
+  }, []);
+
   // --- Public actions ---------------------------------------------------
 
   /** Request the editor to save; resolves with the saved XML. */
@@ -308,5 +350,27 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
     [sendToEditor],
   );
 
-  return { iframeRef, drawioXml, loading, error, status, save, exportPng, switchPage };
+  /**
+   * Called by EmbedFrame when the iframe's src document finishes loading. We
+   * move to the "iframe-loading" state (the embed HTML is ready; now we wait
+   * for draw.io's `init` postMessage). Guarded so it never regresses a
+   * terminal state: if `init` already fired (editorReady) the editor is past
+   * this point, and an existing error is preserved.
+   */
+  const onIframeLoad = useCallback((): void => {
+    if (editorReadyRef.current) return;
+    setStatus((prev) => (prev === "error" ? prev : "iframe-loading"));
+  }, []);
+
+  return {
+    iframeRef,
+    drawioXml,
+    loading,
+    error,
+    status,
+    onIframeLoad,
+    save,
+    exportPng,
+    switchPage,
+  };
 }
