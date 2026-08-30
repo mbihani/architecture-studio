@@ -17943,10 +17943,10 @@ console.log("[arch-studio] init complete");
   var style = document.createElement("style");
   style.textContent = [
     "/* industry tab bar */",
-    "#ind-tabs { position:relative; z-index:30; display:flex; align-items:center; gap:8px;",
+    "#ind-tabs { position:relative; z-index:31; display:flex; align-items:center; gap:8px; min-width:0;",
     "  padding:7px 14px; background:var(--card); border-bottom:1px solid var(--line-strong);",
     "  font:12px/1.2 system-ui,sans-serif; }",
-    "#ind-tabs .ind-tabs-scroll { display:flex; gap:5px; flex:1 1 auto; overflow-x:auto;",
+    "#ind-tabs .ind-tabs-scroll { display:flex; gap:5px; flex:1 1 0; min-width:80px; overflow-x:auto;",
     "  scroll-behavior:smooth; padding:2px 2px 5px; -ms-overflow-style:none; scrollbar-width:thin; }",
     "#ind-tabs .ind-tabs-scroll::-webkit-scrollbar { height:6px; }",
     "#ind-tabs .ind-tabs-scroll::-webkit-scrollbar-thumb { background:var(--line-strong); border-radius:3px; }",
@@ -17956,17 +17956,18 @@ console.log("[arch-studio] init complete");
     "#ind-tabs .ind-tab:hover { border-color:var(--brand); color:var(--brand); }",
     "#ind-tabs .ind-tab.on { background:var(--brand); border-color:var(--brand); color:var(--on-accent); }",
     "#ind-tabs .ind-tab.soon { opacity:.42; cursor:not-allowed; text-decoration:line-through; }",
-    "#ind-tabs .ind-filter { flex:0 0 150px; border:1px solid var(--line-strong); border-radius:7px;",
+    "#ind-tabs .ind-filter { flex:0 0 min(150px,24vw); min-width:90px; border:1px solid var(--line-strong); border-radius:7px;",
     "  padding:5px 9px; background:var(--well); color:var(--ink); font:inherit; }",
     "@media print { #ind-tabs { display:none !important; } }",
     "#canvas-status { flex:0 0 auto; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;",
     "  padding:6px 10px; border-radius:999px; background:color-mix(in srgb,var(--brand) 12%,var(--card));",
     "  color:var(--brand); font-weight:750; }",
     "/* edit toolbar */",
-    "#edit-tools { position:fixed; top:108px; right:16px; z-index:1000; display:flex; gap:8px;",
+    "#edit-tools { position:fixed; top:108px; right:16px; z-index:1000; display:flex; flex-wrap:wrap; gap:8px;",
+    "  max-width:min(760px,calc(100vw - 32px)); max-height:calc(100vh - 130px); overflow:auto; box-sizing:border-box;",
     "  padding:8px; border:1px solid var(--line-strong); border-radius:10px; background:var(--card);",
     "  box-shadow:var(--shadow-lg); font:12px/1.2 system-ui,sans-serif; }",
-    "#edit-tools button { border:1px solid var(--line-strong); border-radius:7px; padding:7px 10px;",
+    "#edit-tools button { flex:0 0 auto; min-height:32px; border:1px solid var(--line-strong); border-radius:7px; padding:7px 10px;",
     "  background:var(--card); color:var(--ink); cursor:pointer; font:inherit; }",
     "#edit-tools button:hover { border-color:var(--brand); color:var(--brand); }",
     "#edit-tools #edit-delete { display:none; color:var(--danger); }",
@@ -17985,13 +17986,13 @@ console.log("[arch-studio] init complete");
     "body.edit-mode .col.sel-zone, body.edit-mode .pocket.sel-zone {",
     "  outline:3px solid var(--brand); outline-offset:2px; border-radius:10px; }",
     "/* toast */",
-    "#edit-toast { position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(10px);",
-    "  z-index:2100; max-width:80vw; padding:10px 16px; border-radius:9px; background:var(--ink); color:var(--card);",
+    "#edit-toast { position:fixed; left:50%; bottom:max(26px,env(safe-area-inset-bottom)); transform:translateX(-50%) translateY(10px);",
+    "  z-index:6500; max-width:min(80vw,620px); padding:10px 16px; border-radius:9px; background:var(--ink); color:var(--card);",
     "  font:600 13px/1.3 system-ui,sans-serif; box-shadow:var(--shadow-lg); opacity:0; pointer-events:none;",
     "  transition:.2s; }",
     "#edit-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }",
     "/* modal */",
-    ".modal-overlay { position:fixed; inset:0; z-index:2000; background:var(--scrim);",
+    ".modal-overlay { position:fixed; inset:0; z-index:7000; background:var(--scrim);",
     "  display:flex; align-items:center; justify-content:center; }",
     ".modal-overlay[hidden] { display:none; }",
     ".modal { background:var(--card); border:1px solid var(--line-strong); border-radius:12px;",
@@ -18005,7 +18006,13 @@ console.log("[arch-studio] init complete");
     ".modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:20px; }",
     ".modal-actions button { border:1px solid var(--line-strong); border-radius:7px; padding:8px 15px;",
     "  background:var(--card); color:var(--ink); cursor:pointer; font:inherit; font-weight:650; }",
-    ".modal-actions .primary { background:var(--brand); border-color:var(--brand); color:var(--on-accent); }"
+    ".modal-actions .primary { background:var(--brand); border-color:var(--brand); color:var(--on-accent); }",
+    ".atom, .atom *, .rgroup-t, .rg-label, .ctile, .ct-name, .ct-sub { min-width:0; }",
+    ".atom .nm, .rg-label, .ct-name, .ct-sub { overflow:hidden; text-overflow:ellipsis; }",
+    ".rg-label, .ct-name { white-space:nowrap; }",
+    "@media (max-width:720px){ #canvas-status{display:none} #ind-tabs{padding-inline:8px;gap:5px}",
+    "  #edit-tools{right:8px;max-width:calc(100vw - 16px)} #edit-tools button{padding:6px 8px}",
+    "  #edit-toast{bottom:14px;max-width:calc(100vw - 28px)} }"
   ].join("\n");
   document.head.appendChild(style);
 
@@ -18310,6 +18317,10 @@ console.log("[arch-studio] init complete");
     if(!drag.moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
     drag.moved = true;
     e.preventDefault();
+    var host = drag.el.closest(".rtiles,.cloud-body,.band-body") || drag.el.parentElement;
+    var hr = host.getBoundingClientRect(), er = drag.el.getBoundingClientRect();
+    dx = Math.max(hr.left - er.left + dx, Math.min(dx, hr.right - er.right + dx));
+    dy = Math.max(hr.top - er.top + dy, Math.min(dy, hr.bottom - er.bottom + dy));
     drag.el.style.position = "relative";
     drag.el.style.left = (drag.left + dx) + "px";
     drag.el.style.top  = (drag.top + dy) + "px";
@@ -18496,8 +18507,11 @@ console.log("[arch-studio] init complete");
 
   /* ---------- boot: edit mode on + place toolbar below the tab bar ---------- */
   function placeTools(){
-    var bottom = indTabs.getBoundingClientRect().bottom;
-    if(bottom) tools.style.top = (bottom + 6) + "px";
+    var header = document.getElementsByTagName("header")[0];
+    var tabRect = indTabs.getBoundingClientRect();
+    var headerBottom = header ? header.getBoundingClientRect().bottom : 0;
+    var bottom = Math.max(headerBottom, tabRect.bottom > 0 ? tabRect.bottom : 0);
+    tools.style.top = Math.max(8, bottom + 6) + "px";
   }
   setEditMode(true);
   toggleBtn.textContent = "Edit Mode: ON";
