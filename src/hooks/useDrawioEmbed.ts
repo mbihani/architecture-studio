@@ -42,8 +42,7 @@ const ALLOWED_ORIGINS = new Set([
 /** Messages sent TO the draw.io editor iframe (actions). */
 type DrawioAction =
   | { action: "configure"; config: Record<string, unknown> }
-  | { action: "load"; xml: string; autosave?: number }
-  | { action: "fit" }
+  | { action: "load"; xml: string; autosave?: number; fit?: number }
   | { action: "save" }
   | { action: "export"; format: string; spinKey?: string };
 
@@ -118,16 +117,17 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
   }, []);
 
   /**
-   * Load the full mxfile XML into the editor, then fit the diagram to the
-   * viewport so every shape is visible. Shared by both sides of the init/API
-   * race (see below): whichever arrives second drives the load, so the XML
-   * is always rendered regardless of ordering. The `fit` is queued by draw.io
-   * right after the `load`, so sending them back-to-back is safe.
+   * Load the full mxfile XML into the editor and fit the diagram to the
+   * viewport so every shape is visible. The `fit` is sent as a property on
+   * the load action itself, which draw.io applies once the load completes —
+   * guaranteeing the fit happens after rendering (a separate fit message
+   * would race the load). Shared by both sides of the init/API race (see
+   * below): whichever arrives second drives the load, so the XML is always
+   * rendered regardless of ordering.
    */
   const loadXml = useCallback(
     (xml: string): void => {
-      sendToEditor({ action: "load", xml, autosave: 0 });
-      sendToEditor({ action: "fit" });
+      sendToEditor({ action: "load", xml, autosave: 0, fit: 1 });
     },
     [sendToEditor],
   );
