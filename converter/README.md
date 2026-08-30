@@ -4,7 +4,7 @@ Converts Amr Alieg's Databricks platform `ARCH` and 62 Python-authored industry 
 
 ## Run
 
-Python 3.10+ and Node.js are required; there are no pip dependencies.
+Python 3.10+ is required; there are no third-party dependencies.
 
 ```bash
 git clone https://github.com/amralieg/interactive-databricks-enterprise-architecture.git converter/tmp/amr-repo

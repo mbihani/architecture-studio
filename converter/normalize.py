@@ -51,7 +51,7 @@ def _component(tile: dict[str, Any], zone: str) -> dict[str, Any]:
     }
 
 
-def normalize(bands: list[dict[str, Any]], raw_industries: dict[str, dict[str, Any]]) -> dict[str, Any]:
+def normalize(arch: dict[str, Any] | list[dict[str, Any]], raw_industries: dict[str, dict[str, Any]]) -> dict[str, Any]:
     components: dict[str, dict[str, Any]] = {}
     refs: list[tuple[str, str, str]] = []
     memberships: dict[str, set[str]] = defaultdict(set)
@@ -75,9 +75,17 @@ def normalize(bands: list[dict[str, Any]], raw_industries: dict[str, dict[str, A
                 if isinstance(target, str):
                     refs.append((name, target, kind))
 
+    bands = arch.get("bands", []) if isinstance(arch, dict) else arch
     for band in bands:
         for tile in band["products"]:
             add(tile, "platform")
+    if isinstance(arch, dict):
+        for tile, zone in _walk_tiles(arch.get("rails", {}), "cloud"):
+            add(tile, zone)
+        for tile, zone in _walk_tiles(arch.get("top", {}), "top"):
+            add(tile, zone)
+        for tile, zone in _walk_tiles(arch.get("cloud", {}), "cloud"):
+            add(tile, zone)
 
     def add_industry_tree(value: Any, zone: str, industry_id: str, inherited_from: str | None = None) -> None:
         if isinstance(value, dict):
