@@ -1,46 +1,47 @@
-# Architecture Studio
+# architecture-studio-poc-rf
 
-An editable visual interface for Databricks enterprise reference architectures. Built on top of [Amr Alieg's interactive architecture viewer](https://github.com/amralieg/interactive-databricks-enterprise-architecture), this app embeds an **editable Lucidchart canvas** (via Lucid's Embed API) so users can add, remove, update, and reposition architectural components in a native diagramming UI.
+A standalone single-page React + Vite + TypeScript app that renders the
+Databricks architecture (139 components, 153 edges) as an interactive,
+editable node/edge graph using **[@xyflow/react](https://reactflow.dev)**
+(React Flow v12) and **dagre** for initial auto-layout.
 
-## Architecture
+This is a POC that replaces the previous draw.io embed: **no iframe, no
+external runtime dependency, no embed.diagrams.net** — everything is bundled
+JS served same-origin from `dist/`.
 
-- **Frontend**: React + TypeScript + Vite — app shell surrounding a Lucidchart embed iframe
-- **Backend**: Express + TypeScript — OAuth token management, Lucid document lifecycle, readback sync
-- **Data converter**: Python/TS pipeline — converts Amr's `ARCH` + `INDUSTRIES` data into Lucid Standard Import JSON
-- **Lucid integration**: Token-based Embed API (`mode=editor`) for the editable canvas
+## Data
 
-## Getting started
+`public/architecture.json` — components (`id`, `name`, `category`, `zone`,
+`description`, `icon`) and edges (`id`, `sourceId`, `targetId`, `kind`). Loaded
+at runtime via a same-origin fetch.
 
-```bash
-npm install
-npm run dev
+## Features
+
+- Custom React Flow nodes: cards coloured by category
+  (source=blue, ingestion=purple, platform=green, consumer=orange, cloud=gray,
+  usecase=red), showing the icon badge, name, and a category·icon caption.
+- Edges with arrows, coloured by kind (flow=blue, feeds=green, related=gray,
+  uses=orange).
+- Dagre-driven initial layout grouped by zone: `src` left → `ing` → `platform`
+  (centre) → `cons` → `ppl`, with `top` lifted above platform and `cloud` laid
+  across the bottom.
+- Pan, zoom, node dragging, and edge/node selection.
+- Sidebar: category dropdown + name search to filter nodes (edges hide
+  automatically when their endpoints are filtered out).
+- **Add Component** — drops a new blank node at the viewport centre.
+- **Delete Selected** — removes selected nodes/edges (and edges attached to
+  deleted nodes).
+- **Export PNG** — renders the fitted graph to a PNG download
+  (`html-to-image`).
+
+## Scripts
+
+```sh
+npm install            # uses the npmmirror registry via .npmrc
+npm run dev            # vite dev server
+npm run build          # vite build -> dist/
+npm run preview        # serve the built dist/
 ```
 
-Frontend runs on `localhost:5173`, backend on `localhost:3001`.
-
-## Data flow
-
-```
-Amr's batch_*.py + ARCH (HTML)
-    → Data converter → Lucid Standard Import JSON
-    → POST to Lucid create-document API
-    → Editable Lucidchart iframe (user edits here)
-    → Poll GET /documents/{id}/contents
-    → ArchitectureDoc JSON (our semantic format)
-    → Export
-```
-
-## License
-
-MIT
-
-## ⚠️ Data converter security
-
-The data converter (`converter/`) executes third-party Python from
-[Amr Alieg's repo](https://github.com/amralieg/interactive-databricks-enterprise-architecture)
-to parse industry overlays — the `batch_*.py` files use helper functions that
-build the data dicts at import time, so static parsing alone is not practical.
-The converter mitigates this by (1) pinning to a specific commit SHA and (2)
-AST-scanning each file for dangerous imports/calls before executing it. See
-[`converter/README.md`](converter/README.md#security-executing-third-party-python)
-for details. Do not point `--repo` at untrusted Python.
+> This Mac blocks npmjs.org; `.npmrc` pins the registry to
+> `https://registry.npmmirror.com` so all installs work locally.

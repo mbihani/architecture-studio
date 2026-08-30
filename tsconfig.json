@@ -1,15 +1,18 @@
 {
-  // Solution-style root config: it owns no files of its own and merely
-  // references the frontend (tsconfig.app.json) and backend (server/tsconfig.json)
-  // projects. This is the standard Vite monorepo layout.
-  //
-  // Type-checking both projects is done in build mode:
-  //   `npm run typecheck`  ->  `tsc -b --noEmit`  (checks BOTH referenced projects)
-  // A bare `npx tsc --noEmit` is a no-op on this solution config (exit 0); use
-  // `npm run typecheck` for the real check.
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./server/tsconfig.json" }
-  ]
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true
+  },
+  "include": ["src"]
 }

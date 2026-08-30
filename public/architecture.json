@@ -1,0 +1,5872 @@
+{
+  "components": [
+    {
+      "id": "833b6b4e-a7c7-56d5-a877-1c80f8a988e1",
+      "name": "3rd Party CDPs",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "custlake",
+      "zone": "cons",
+      "description": "Customer data platforms that compose on top of the lakehouse instead of holding their own copy: Hightouch, Census, RudderStack and similar read governed profiles and segments in place and activate them to campaign and service channels, so the warehouse stays the single source of customer truth. The Databricks-native path for the same job is CustomerLake.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "2e48fa91-c26b-5aa8-bca8-35b3e4970521",
+      "name": "3rd-Party Marketplaces",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "share",
+      "zone": "cons",
+      "description": "External data and model marketplaces your products are listed on, and third-party listings consumed back into the lakehouse, exchanged over Open Sharing with no copy.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "83fb62d2-199a-5e35-8b0e-15c9aef8b916",
+      "name": "3rd-Party SaaS Apps",
+      "shortName": "CRM, ERP, ITSM",
+      "category": "consumer",
+      "icon": "saas",
+      "zone": "cons",
+      "description": "Packaged applications that both feed the platform and consume its outputs, connected through Lakeflow Connect inbound and Reverse ETL outbound.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "72e910d6-5174-5a7b-90a7-7ecea96d9c89",
+      "name": "Activation Channels",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "reverse",
+      "zone": "cons",
+      "description": "Campaign, service and commerce channels activated from governed segments.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "03a4485e-099f-5f4c-b619-df8a0c69c119",
+      "name": "ADLS Gen2",
+      "shortName": "Object storage",
+      "category": "cloud",
+      "icon": "storage",
+      "zone": "cloud",
+      "description": "Azure Data Lake Storage Gen2 holds the open-format lake. Databricks reads and writes in place; you keep the data.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "name": "Agent Bricks",
+      "shortName": "",
+      "category": "platform",
+      "icon": "bricks",
+      "zone": "platform",
+      "description": "The enterprise agent platform, with 100k+ agents built. DAIS 2026 expanded it to multi-harness: added Kimi (Moonshot AI) and Grok (xAI), managed memory, Document Intelligence and the Databricks Sandbox.",
+      "capabilities": [
+        "Managed memory",
+        "Document Intelligence",
+        "Databricks Sandbox",
+        "Kimi + Grok"
+      ],
+      "relatedIds": [
+        "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+        "74fa31f9-5075-516f-9edc-a21a28576ccf"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "f49cecca-1696-5b36-952f-452d2864a0cb",
+      "name": "Agentic Dev",
+      "shortName": "Develop and deploy agents, apps, and models",
+      "category": "platform",
+      "icon": "dev",
+      "zone": "platform",
+      "description": "The developer surface of the platform: notebooks, IDE integrations, MLflow, AI Runtime serverless GPU compute and Databricks Asset Bundles for shipping agents, apps and models to production.",
+      "capabilities": [
+        "MLflow",
+        "AI Runtime (serverless GPU)",
+        "Asset Bundles",
+        "IDE + notebooks"
+      ],
+      "relatedIds": [
+        "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+        "7be1fe38-aaa7-515f-a952-2cdaa7c50015"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "f5b28d6a-7066-5919-aa95-f222a27a04de",
+      "name": "AI Search",
+      "shortName": "Retrieval",
+      "category": "platform",
+      "icon": "ucat",
+      "zone": "platform",
+      "description": "Formerly Databricks Vector Search. Managed vector indexes kept in sync with governed tables, so retrieval for agents and search inherits the same permissions as the source data.",
+      "capabilities": [],
+      "relatedIds": [
+        "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "name": "AI/BI",
+      "shortName": "Business Intelligence",
+      "category": "platform",
+      "icon": "aibi",
+      "zone": "platform",
+      "description": "Governed dashboards and natural-language analytics built directly on lakehouse tables, with Genie behind the ask-a-question experience.",
+      "capabilities": [
+        "AI/BI Dashboards",
+        "AI/BI Genie"
+      ],
+      "relatedIds": [
+        "e7505105-4da3-541a-bfd0-a4a2e554598b",
+        "7946bd83-806b-5103-aa59-222c47cf5494"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "cb0d9613-828f-50e2-807a-d33d8a759f5a",
+      "name": "Analytics Engineers",
+      "shortName": "Unity Catalog",
+      "category": "consumer",
+      "icon": "",
+      "zone": "ppl",
+      "description": "The layer between engineering and analysis. They model raw tables into tested, documented marts and own what the business words actually mean.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch",
+        "software_technology"
+      ]
+    },
+    {
+      "id": "0611ad72-8bed-5c3d-aabd-bb0a5c96d129",
+      "name": "Anthropic/OpenAI",
+      "shortName": "Model providers",
+      "category": "cloud",
+      "icon": "aisvc",
+      "zone": "cloud",
+      "description": "Anthropic Claude and OpenAI GPT models called through Unity Gateway, with the same spend caps, tracing and policy as any other model.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "stream": {
+          "types": [
+            "unstructured"
+          ],
+          "vol": "prompt + completion tokens per call",
+          "interval": "On demand (synchronous)"
+        }
+      },
+      "cite": [],
+      "what": "Frontier commercial LLMs reached as governed model-serving endpoints: Anthropic Claude and OpenAI GPT are registered in Unity Gateway and called from notebooks, agents and Genie exactly like a Databricks-hosted model.",
+      "users": "Data scientists and ML engineers building agents and GenAI features, and the platform team setting per-employee and per-agent spend caps.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "734a143f-27c0-5867-9f84-c7bfe5d485b3",
+      "name": "Any MCP Harness",
+      "shortName": "Cursor, IDEs, frameworks",
+      "category": "consumer",
+      "icon": "mcp",
+      "zone": "cons",
+      "description": "Cursor and other IDE agents, LangGraph and CrewAI frameworks, and any other harness that speaks MCP. The MCP server registry in Unity Gateway is the single place a new one is admitted, scoped and traced.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "aerospace_space",
+        "agriculture",
+        "agtech",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "capital_markets",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "crypto_digital_assets",
+        "cybersecurity",
+        "data_centers",
+        "diagnostics_labs",
+        "digital_health",
+        "ecommerce",
+        "edtech",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "insurance_pandc",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "market_data_exchanges",
+        "media_broadcasting",
+        "medical_devices",
+        "mining",
+        "mortgage_lending",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "pharmacy_pbm",
+        "professional_services",
+        "public_safety",
+        "public_sector",
+        "rail_transit",
+        "real_estate",
+        "renewables",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "software_technology",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wealth_management",
+        "wholesale_distribution"
+      ]
+    },
+    {
+      "id": "a358df43-cb72-5d82-9663-de704c8e04e8",
+      "name": "Apache Iceberg",
+      "shortName": "",
+      "category": "platform",
+      "icon": "iceberg",
+      "zone": "platform",
+      "description": "Managed Iceberg tables went GA in Databricks Runtime at DAIS 2026 with Iceberg v3, unifying data files across Delta and Iceberg at the storage layer for true cross-engine interoperability.",
+      "capabilities": [
+        "Iceberg v3",
+        "Managed tables"
+      ],
+      "relatedIds": [
+        "7946bd83-806b-5103-aa59-222c47cf5494"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "e91c47e2-d2bb-59be-8200-cdd360c5ca73",
+      "name": "Apache Spark",
+      "shortName": "",
+      "category": "platform",
+      "icon": "spark",
+      "zone": "platform",
+      "description": "The distributed engine Databricks was founded on and still leads. Photon accelerates the same Spark API, and Spark Declarative Pipelines (donated from Delta Live Tables) landed in Spark 4.1.",
+      "capabilities": [
+        "Photon",
+        "Spark Declarative Pipelines",
+        "Spark Connect"
+      ],
+      "relatedIds": [
+        "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+        "7946bd83-806b-5103-aa59-222c47cf5494"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "793d7e48-2e98-5dfb-8588-d383af1bc478",
+      "name": "APIs & Webhooks",
+      "shortName": "",
+      "category": "source",
+      "icon": "api",
+      "zone": "src",
+      "description": "REST, GraphQL and webhook payloads pulled on schedule or pushed on event.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "stream": {
+          "types": [
+            "semi-structured"
+          ],
+          "vol": "variable, event-driven",
+          "interval": "On event / scheduled poll"
+        }
+      },
+      "cite": [],
+      "what": "REST, GraphQL and webhook payloads from internal and partner services, pulled on schedule or pushed on event.",
+      "users": "Integration engineers and product teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "1d043480-bfb8-503d-9df1-dc1a51d43512",
+      "name": "App Developers",
+      "shortName": "Apps",
+      "category": "consumer",
+      "icon": "",
+      "zone": "ppl",
+      "description": "The team building the applications and agents the business works in, rather than another dashboard for it to read.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "agriculture",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "ecommerce",
+        "edtech",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "market_data_exchanges",
+        "media_broadcasting",
+        "mining",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "public_safety",
+        "rail_transit",
+        "real_estate",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wealth_management"
+      ]
+    },
+    {
+      "id": "69867329-3c22-5796-8df0-951ea1c10320",
+      "name": "Apps",
+      "shortName": "Custom Apps",
+      "category": "platform",
+      "icon": "apps",
+      "zone": "platform",
+      "description": "Build and host interactive data and AI applications next to governed data. DAIS 2026 added App Spaces for enterprise app governance and Serverless Micro Apps for lightweight deployment.",
+      "capabilities": [
+        "App Spaces",
+        "Serverless Micro Apps"
+      ],
+      "relatedIds": [
+        "6fa03c3d-267b-5b76-9b2a-2e5017556c32",
+        "e6a21e3f-4336-5608-9ca4-ec2ffbc5f4db"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "bb37a30b-c151-5c1c-a9d8-2ebfbf472ccb",
+      "name": "Audio & Speech",
+      "shortName": "",
+      "category": "source",
+      "icon": "audio",
+      "zone": "src",
+      "description": "Call recordings, voice notes and meeting audio transcribed and indexed for retrieval.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "unstructured"
+          ],
+          "vol": "1000s of hours of audio",
+          "interval": "After each call / session"
+        }
+      },
+      "cite": [],
+      "what": "Call recordings, voice notes and meeting audio transcribed and indexed so speech becomes searchable, analyzable text.",
+      "users": "Contact-center, compliance and customer-experience analytics teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "f9a7b4ff-630b-5f50-a3ca-726e6cc67bae",
+      "name": "Auto Loader",
+      "shortName": "Files as they land",
+      "category": "platform",
+      "icon": "autoload",
+      "zone": "platform",
+      "description": "Incrementally and idempotently ingests new files as they land in cloud object storage, without listing the whole bucket.",
+      "capabilities": [],
+      "relatedIds": [
+        "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+        "4455c8af-8d07-551f-b659-367efc542db7"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "d2dcfa41-3a06-5ba6-9914-0d8d3eb02ca7",
+      "name": "Azure Data Factory",
+      "shortName": "",
+      "category": "cloud",
+      "icon": "etl",
+      "zone": "cloud",
+      "description": "Existing ADF pipelines keep landing data; Databricks activities run notebooks and jobs inside the same orchestration.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "eaeceba4-ba0b-5a1b-ad20-475169504ec7",
+      "name": "Azure DevOps",
+      "shortName": "CI/CD",
+      "category": "cloud",
+      "icon": "cicd",
+      "zone": "cloud",
+      "description": "Pipelines deploying Databricks Asset Bundles across dev, test and production workspaces.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "54bcfd71-1621-54bb-94f1-dd61b7a13aed",
+      "name": "Azure Event Hubs",
+      "shortName": "",
+      "category": "cloud",
+      "icon": "eventbus",
+      "zone": "cloud",
+      "description": "Kafka-compatible event ingress consumed by Lakeflow streaming pipelines and Zerobus.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "9ebb87eb-f60f-530b-bd72-40f09dbcc243",
+      "name": "Azure IoT Hub",
+      "shortName": "",
+      "category": "cloud",
+      "icon": "iot",
+      "zone": "cloud",
+      "description": "Device telemetry and bi-directional device messaging feeding real-time pipelines.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "83c2c5db-446d-5a63-8d5b-477a0a36c6b9",
+      "name": "Azure Key Vault",
+      "shortName": "Keys & secrets",
+      "category": "cloud",
+      "icon": "key",
+      "zone": "cloud",
+      "description": "Customer-managed keys and secret scopes.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "784f8021-435a-5898-aeb9-210791bd55d8",
+      "name": "Azure Monitor",
+      "shortName": "Observability",
+      "category": "cloud",
+      "icon": "observ",
+      "zone": "cloud",
+      "description": "Platform logs, metrics and diagnostics forwarded to Azure Monitor and Log Analytics.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "28748838-2b13-541a-9699-1b39219d7ec9",
+      "name": "Azure SQL Database",
+      "shortName": "",
+      "category": "cloud",
+      "icon": "fed",
+      "zone": "cloud",
+      "description": "Federated OLTP source, joined with lakehouse tables without moving the data.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "structured"
+          ],
+          "vol": "operational tables",
+          "interval": "Query-time federation (no copy)"
+        }
+      },
+      "cite": [],
+      "what": "Azure SQL operational tables joined with lakehouse data in place, without moving or copying the source.",
+      "users": "Application and analytics teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "922aae1d-8ef0-5a59-a368-a2ab06f8cecf",
+      "name": "Azure Synapse",
+      "shortName": "",
+      "category": "cloud",
+      "icon": "fed",
+      "zone": "cloud",
+      "description": "Queried in place through Lakehouse Federation. No copy, and Unity Catalog governance applies at query time.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "structured"
+          ],
+          "vol": "TB-scale warehouse tables",
+          "interval": "Query-time federation (no copy)"
+        }
+      },
+      "cite": [],
+      "what": "Synapse dedicated SQL pool tables read in place through Lakehouse Federation during migration, with Unity Catalog governance applied at query time.",
+      "users": "BI and data-warehouse migration teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "9d530ce0-2cc0-5bd2-97ba-747f70eaeae0",
+      "name": "BI Integrations",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "",
+      "zone": "cons",
+      "description": "Synthetic zone anchor for the 'bi' cloud-provider role.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "aerospace_space",
+        "agriculture",
+        "agtech",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "crypto_digital_assets",
+        "cybersecurity",
+        "data_centers",
+        "diagnostics_labs",
+        "digital_health",
+        "ecommerce",
+        "edtech",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "insurance_pandc",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "media_broadcasting",
+        "medical_devices",
+        "mining",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "pharmacy_pbm",
+        "professional_services",
+        "public_safety",
+        "public_sector",
+        "rail_transit",
+        "real_estate",
+        "renewables",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "software_technology",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wholesale_distribution"
+      ]
+    },
+    {
+      "id": "2099904d-e247-5fec-8269-c601a1d1a8f0",
+      "name": "Bronze",
+      "shortName": "Raw data ingestion",
+      "category": "platform",
+      "icon": "cyl",
+      "zone": "platform",
+      "description": "Raw landing zone: source data captured as it arrived, append-only and replayable, so any downstream mistake can be rebuilt rather than re-ingested.",
+      "capabilities": [],
+      "relatedIds": [
+        "f3ec1959-a3f8-5c9a-b7ab-7b96ebd3c862",
+        "f9a7b4ff-630b-5f50-a3ca-726e6cc67bae"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "ea5df0e4-ca32-5c07-b3b6-eeffd3e2a1d7",
+      "name": "Business Applications",
+      "shortName": "",
+      "category": "source",
+      "icon": "erp",
+      "zone": "src",
+      "description": "Systems of record for finance, supply chain, HR and customers. Ingested with Lakeflow Connect or federated in place.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "structured"
+          ],
+          "vol": "GBs/day of transactions + master data",
+          "interval": "Nightly extract + intraday deltas"
+        },
+        "stream": {
+          "types": [
+            "semi-structured"
+          ],
+          "vol": "change events on key entities",
+          "interval": "Continuous CDC where available"
+        }
+      },
+      "cite": [],
+      "what": "Packaged systems of record (ERP, WMS, HRIS, CRM) that hold master data and the day-to-day transactions the business runs on, ingested with Lakeflow Connect or read in place with federation.",
+      "users": "Finance, supply chain, HR and sales-operations teams, and the data engineers who model their extracts.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "238b3379-90b8-5a6d-b289-df59cfd3f03e",
+      "name": "Business Apps",
+      "shortName": "Built in-house",
+      "category": "consumer",
+      "icon": "apps",
+      "zone": "cons",
+      "description": "Line-of-business applications your teams build on Databricks Apps over Lakebase, reading governed data and calling platform endpoints rather than holding their own copy.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "e88c67c4-2ffe-5917-867f-bc442a23932d",
+      "name": "Business Teams",
+      "shortName": "Genie",
+      "category": "consumer",
+      "icon": "",
+      "zone": "ppl",
+      "description": "Finance, marketing, sales, service and operations. The largest population on the platform, with no SQL between them and the answer, and the group most exposed to a wrong number.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "cd978dbc-b452-5bdd-a47a-90d429d94b58",
+      "name": "Change Data Capture",
+      "shortName": "",
+      "category": "source",
+      "icon": "cdc",
+      "zone": "src",
+      "description": "Row-level change streams from operational databases, applied continuously to lakehouse tables.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "stream": {
+          "types": [
+            "structured"
+          ],
+          "vol": "100s-1000s of changes/sec",
+          "interval": "Continuous"
+        }
+      },
+      "cite": [],
+      "what": "Row-level insert/update/delete streams from operational databases, applied continuously so lakehouse tables track the source.",
+      "users": "Data-engineering teams keeping the lakehouse in sync with production.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "27ed933c-5db9-543a-8b27-673ae8d4eaaa",
+      "name": "Churn & Retention",
+      "shortName": "Predictive",
+      "category": "usecase",
+      "icon": "chart",
+      "zone": "top",
+      "description": "Propensity and churn models trained on governed features, served as endpoints and pushed back into the channels that act on them.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "10d4ba70-acd4-502f-b996-709d4e243aa7",
+      "name": "Classic & Serverless Compute",
+      "shortName": "VNet & Private Link",
+      "category": "cloud",
+      "icon": "network",
+      "zone": "cloud",
+      "description": "Both compute planes run against your own network: classic compute through VNet injection in your subscription, and serverless compute reaching your data over Private Link with no public egress.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "0dbd2cca-9a98-56d8-b98a-004bfb2b3b64",
+      "name": "Claude Code",
+      "shortName": "3rd-party harness",
+      "category": "consumer",
+      "icon": "code",
+      "zone": "cons",
+      "description": "Anthropic's coding harness working against the platform through MCP. Its spend, routing and policy are governed by Unity Gateway like any other agent.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "aerospace_space",
+        "agriculture",
+        "agtech",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "capital_markets",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "crypto_digital_assets",
+        "cybersecurity",
+        "data_centers",
+        "diagnostics_labs",
+        "digital_health",
+        "ecommerce",
+        "edtech",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "insurance_pandc",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "market_data_exchanges",
+        "media_broadcasting",
+        "medical_devices",
+        "mining",
+        "mortgage_lending",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "pharmacy_pbm",
+        "professional_services",
+        "public_safety",
+        "public_sector",
+        "rail_transit",
+        "real_estate",
+        "renewables",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "software_technology",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wealth_management",
+        "wholesale_distribution"
+      ]
+    },
+    {
+      "id": "2fc5feda-1e4c-5522-93aa-3fe8b9bbaa5f",
+      "name": "Cloud Ingest",
+      "shortName": "",
+      "category": "ingestion",
+      "icon": "",
+      "zone": "ing",
+      "description": "Synthetic zone anchor for the 'ingest' cloud-provider role.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "aerospace_space",
+        "agriculture",
+        "agtech",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "capital_markets",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "crypto_digital_assets",
+        "cybersecurity",
+        "data_centers",
+        "diagnostics_labs",
+        "digital_health",
+        "ecommerce",
+        "edtech",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "insurance_pandc",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "market_data_exchanges",
+        "media_broadcasting",
+        "medical_devices",
+        "mining",
+        "mortgage_lending",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "pharmacy_pbm",
+        "professional_services",
+        "public_safety",
+        "public_sector",
+        "rail_transit",
+        "real_estate",
+        "renewables",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "software_technology",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wealth_management",
+        "wholesale_distribution"
+      ]
+    },
+    {
+      "id": "32b4936d-1def-521e-8620-307e4bf4829c",
+      "name": "Custom ETL Tool",
+      "shortName": "",
+      "category": "ingestion",
+      "icon": "etl",
+      "zone": "ing",
+      "description": "Incumbent ETL estates (Informatica, Talend, DataStage and similar) that keep writing to the lakehouse during a migration, typically assessed and converted with Lakebridge.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "a8ceaf29-ecf9-5cfd-a5ae-483f27204852",
+      "name": "Customer & Revenue Agent",
+      "shortName": "",
+      "category": "usecase",
+      "icon": "genie",
+      "zone": "top",
+      "description": "Ask about customers, segments and revenue in plain language across the governed customer estate.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [
+        "Business Teams",
+        "BI Analysts",
+        "Data Scientists"
+      ],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "8bbade27-268f-53e9-b7c7-94b33ffafb85",
+      "name": "Customer Segmentation",
+      "shortName": "Customer 360",
+      "category": "usecase",
+      "icon": "custlake",
+      "zone": "top",
+      "description": "Unified customer profiles built on the lakehouse, segmented and activated through CustomerLake without copying data into a separate CDP.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "516c705c-5ef4-59d2-a993-8113ab598789",
+      "name": "Customer Service Agents",
+      "shortName": "Agentic",
+      "category": "usecase",
+      "icon": "agents",
+      "zone": "top",
+      "description": "Genie Agents and Agent Bricks agents grounded in documents, tickets and transactions, taking action in business tools rather than only answering.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "7019877b-b6c2-53c4-a8ca-c534487a93e2",
+      "name": "CustomerLake",
+      "shortName": "Agentic Marketing",
+      "category": "platform",
+      "icon": "custlake",
+      "zone": "platform",
+      "description": "Agentic customer data platform built natively on the lakehouse: unified customer profiles, segments and campaign activation without copying data into a separate CDP.",
+      "capabilities": [
+        "Unified profiles",
+        "Segmentation",
+        "Campaign activation"
+      ],
+      "relatedIds": [
+        "a2d7394c-ea44-5e53-85f4-43223e5e3bd2",
+        "7946bd83-806b-5103-aa59-222c47cf5494"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "7c6c9889-baf9-54d7-b205-ce8f1b59d276",
+      "name": "Data Analysts",
+      "shortName": "AI/BI",
+      "category": "consumer",
+      "icon": "",
+      "zone": "ppl",
+      "description": "The team that answers what the business cannot answer for itself, and usually the first to notice that a definition has drifted.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "0833fbe4-604a-50b0-bcab-b1ad60c689d0",
+      "name": "Data Engineers",
+      "shortName": "Lakeflow",
+      "category": "consumer",
+      "icon": "",
+      "zone": "ppl",
+      "description": "The team that owns ingestion and the Bronze to Silver path, and carries the pager for it. Everything else on this rail depends on their tables being correct and on time.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "agriculture",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "ecommerce",
+        "edtech",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "media_broadcasting",
+        "mining",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "public_safety",
+        "rail_transit",
+        "real_estate",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wealth_management"
+      ]
+    },
+    {
+      "id": "c1124bec-5c23-51f6-b040-d70a1786f6a7",
+      "name": "Data Partners",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "partner",
+      "zone": "cons",
+      "description": "Partners consuming governed products over Open Sharing, Marketplace or Clean Rooms.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "b53dc430-4aab-5675-9aac-b3ce141b2833",
+      "name": "Data Products",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "product",
+      "zone": "cons",
+      "description": "Published, contracted data products discoverable in Unity Catalog Domains and shared over Open Sharing.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "agriculture",
+        "agtech",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "capital_markets",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "crypto_digital_assets",
+        "cybersecurity",
+        "data_centers",
+        "diagnostics_labs",
+        "digital_health",
+        "ecommerce",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "insurance_pandc",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "market_data_exchanges",
+        "media_broadcasting",
+        "medical_devices",
+        "mining",
+        "mortgage_lending",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "pharmacy_pbm",
+        "professional_services",
+        "public_safety",
+        "public_sector",
+        "rail_transit",
+        "real_estate",
+        "renewables",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wealth_management",
+        "wholesale_distribution"
+      ]
+    },
+    {
+      "id": "eb9aa146-d4f7-559e-a633-33c35222784a",
+      "name": "Data Scientists",
+      "shortName": "MLflow",
+      "category": "consumer",
+      "icon": "",
+      "zone": "ppl",
+      "description": "The team building the forecasting, propensity, risk and pricing models, and the one accountable for whether a model still holds six months after it shipped.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "agriculture",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "ecommerce",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "media_broadcasting",
+        "mining",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "rail_transit",
+        "real_estate",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wealth_management"
+      ]
+    },
+    {
+      "id": "ada73b1e-5dd8-5c34-8e33-898a519cd360",
+      "name": "Data Warehouses",
+      "shortName": "",
+      "category": "source",
+      "icon": "db",
+      "zone": "src",
+      "description": "Existing warehouses migrated with Lakebridge or federated through Lakehouse Federation.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "structured"
+          ],
+          "vol": "TB-scale historical marts",
+          "interval": "Bulk migration, then queried on demand"
+        }
+      },
+      "cite": [],
+      "what": "Incumbent enterprise warehouses holding historical marts and conformed dimensions, migrated with Lakebridge or read in place through Lakehouse Federation.",
+      "users": "BI, finance and analytics teams during and after migration.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "b85d0933-c8e2-5cda-9470-ac8d29afeaa8",
+      "name": "dbt & External Engines",
+      "shortName": "Transformation",
+      "category": "cloud",
+      "icon": "etl",
+      "zone": "cloud",
+      "description": "dbt projects and other external transformation engines running their models on Databricks SQL warehouses, so the transformation layer a team already owns keeps its tests and its lineage while the compute and governance move to Unity Catalog.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "25266905-adff-5cab-a3c4-4fca1ddeb830",
+      "name": "Delta Lake",
+      "shortName": "",
+      "category": "platform",
+      "icon": "delta",
+      "zone": "platform",
+      "description": "Open storage format with ACID transactions, time travel and schema evolution. The default table format of the lakehouse.",
+      "capabilities": [],
+      "relatedIds": [
+        "7946bd83-806b-5103-aa59-222c47cf5494"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "ed5df8a3-0dc9-57e3-90cc-ad8f71b06ab5",
+      "name": "Demand Forecasting",
+      "shortName": "Planning",
+      "category": "usecase",
+      "icon": "market",
+      "zone": "top",
+      "description": "Hierarchical forecasting across products, locations and channels, reading conformed Silver tables and publishing Gold planning products.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch",
+        "consumer_goods",
+        "food_beverage",
+        "grocery",
+        "restaurants",
+        "retail",
+        "water_utilities",
+        "wholesale_distribution"
+      ]
+    },
+    {
+      "id": "16c7c5ac-a2c5-56c9-8459-8510e3d68b92",
+      "name": "Device & Sensor Data",
+      "shortName": "",
+      "category": "source",
+      "icon": "iot",
+      "zone": "src",
+      "description": "Machine, vehicle and sensor telemetry arriving through an IoT gateway or pushed directly with Zerobus.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "stream": {
+          "types": [
+            "semi-structured"
+          ],
+          "vol": "high-frequency sensor readings",
+          "interval": "Continuous (sub-second to seconds)"
+        }
+      },
+      "cite": [],
+      "what": "Machine, vehicle and sensor telemetry arriving through an IoT gateway or pushed straight to the lakehouse with Zerobus.",
+      "users": "IoT, manufacturing and connected-product teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "129f85f0-1557-5995-bf71-203da64b8d4d",
+      "name": "Document Intelligence",
+      "shortName": "Unstructured",
+      "category": "usecase",
+      "icon": "docs",
+      "zone": "top",
+      "description": "Contracts, claims, statements and correspondence parsed into governed tables with AI Functions and Agent Bricks, so the value locked in unstructured files joins the same models and dashboards the structured estate feeds.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch",
+        "mortgage_lending"
+      ]
+    },
+    {
+      "id": "31fe87d8-3dc0-583a-9c0d-748bd40093ad",
+      "name": "Document Parsing",
+      "shortName": "",
+      "category": "platform",
+      "icon": "sheet",
+      "zone": "platform",
+      "description": "Agent Bricks document parsing (ai_parse_document and Information Extraction): turns PDFs, forms and other unstructured files into governed, structured tables ready for analytics and agents.",
+      "capabilities": [
+        "ai_parse_document",
+        "Information Extraction",
+        "Governed output"
+      ],
+      "relatedIds": [
+        "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "6b2f29e3-4714-58d0-b9c2-321b95c14d03",
+      "name": "Documents & Contracts",
+      "shortName": "",
+      "category": "source",
+      "icon": "docs",
+      "zone": "src",
+      "description": "PDFs, contracts, forms and email parsed with Document Intelligence for agent grounding.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "unstructured"
+          ],
+          "vol": "1000s-millions of documents",
+          "interval": "On ingest + ongoing drops"
+        }
+      },
+      "cite": [],
+      "what": "PDFs, contracts, forms and email parsed with Document Intelligence into text and structure so agents and search can ground on them.",
+      "users": "Legal, operations and GenAI teams building retrieval and extraction.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "96120620-3084-5199-b9b9-c578d5721396",
+      "name": "Embedded Analytics",
+      "shortName": "In-product dashboards",
+      "category": "consumer",
+      "icon": "aibi",
+      "zone": "cons",
+      "description": "Dashboards and metrics surfaced inside your own product or portal, served by SQL warehouses with end-user permissions enforced by Unity Catalog.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch",
+        "edtech",
+        "software_technology"
+      ]
+    },
+    {
+      "id": "6b665929-0b2b-5e2e-a7c2-10d5e3ae2c8f",
+      "name": "ERP & Core Systems",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "db",
+      "zone": "cons",
+      "description": "Decisions and scores written back into the systems of record that run the business.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "c564158b-f5c2-598d-94a6-39bc80182212",
+      "name": "Event Streams",
+      "shortName": "",
+      "category": "source",
+      "icon": "stream",
+      "zone": "src",
+      "description": "Kafka, Event Hubs, Kinesis and Pub/Sub topics consumed by Lakeflow streaming pipelines.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "stream": {
+          "types": [
+            "semi-structured"
+          ],
+          "vol": "1000s-100k events/sec",
+          "interval": "Continuous"
+        }
+      },
+      "cite": [],
+      "what": "Kafka, Event Hubs, Kinesis and Pub/Sub topics consumed directly by Lakeflow streaming pipelines for real-time processing.",
+      "users": "Streaming-platform and real-time analytics teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "0c9aaf35-0d3c-50ff-a354-a0da39d2ce74",
+      "name": "Excel Add-in",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "sheet",
+      "zone": "cons",
+      "description": "Driverless analytics directly inside Excel with write-back support (Public preview).",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "bbf3a006-20e9-5b24-b14d-e334e35a84e8",
+      "name": "Executives",
+      "shortName": "Genie One",
+      "category": "consumer",
+      "icon": "",
+      "zone": "ppl",
+      "description": "The leadership accountable for growth, margin, cost to serve and the risk position. They read the platform rather than build on it, so what matters to them is that a number means the same thing in every meeting it is quoted in.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "9fe769d0-5bff-5ca4-8988-4a9e3971837c",
+      "name": "External Agents (MCP)",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "mcp",
+      "zone": "cons",
+      "description": "Third-party and vendor agents connecting through the MCP server registry, governed by Unity Gateway.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "9f5d3cfb-0217-58e0-aa4b-8bb434392584",
+      "name": "External Orchestrator",
+      "shortName": "Airflow / Dagster",
+      "category": "cloud",
+      "icon": "orch",
+      "zone": "cloud",
+      "description": "Airflow, Dagster or an enterprise scheduler driving Lakeflow Jobs through the SDK or Terraform provider.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "13b6c9a2-444d-504e-833c-5c5fd1729b18",
+      "name": "Fabric Data Factory",
+      "shortName": "",
+      "category": "cloud",
+      "icon": "etl",
+      "zone": "cloud",
+      "description": "Fabric-era pipelines landing data into ADLS Gen2 for Auto Loader and Lakeflow to pick up.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "7c9906c8-da9d-5999-ac74-007db4f1786c",
+      "name": "Federation Sources",
+      "shortName": "",
+      "category": "source",
+      "icon": "",
+      "zone": "src",
+      "description": "Synthetic zone anchor for the 'fed' cloud-provider role.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "aerospace_space",
+        "agriculture",
+        "agtech",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "capital_markets",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "crypto_digital_assets",
+        "cybersecurity",
+        "data_centers",
+        "diagnostics_labs",
+        "digital_health",
+        "ecommerce",
+        "edtech",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "insurance_pandc",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "market_data_exchanges",
+        "media_broadcasting",
+        "medical_devices",
+        "mining",
+        "mortgage_lending",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "pharmacy_pbm",
+        "professional_services",
+        "public_safety",
+        "public_sector",
+        "rail_transit",
+        "real_estate",
+        "renewables",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "software_technology",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wealth_management",
+        "wholesale_distribution"
+      ]
+    },
+    {
+      "id": "4455c8af-8d07-551f-b659-367efc542db7",
+      "name": "Files & Object Stores",
+      "shortName": "",
+      "category": "source",
+      "icon": "file",
+      "zone": "src",
+      "description": "CSV, JSON, Parquet and archive files landed in cloud object storage and ingested with Auto Loader.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "semi-structured"
+          ],
+          "vol": "MBs-TBs per landing",
+          "interval": "On arrival (event-driven)"
+        }
+      },
+      "cite": [],
+      "what": "Structured-ish files (CSV, JSON, Parquet, archives) dropped into cloud object storage and picked up incrementally by Auto Loader as they arrive.",
+      "users": "Data-engineering teams and partners exchanging file drops.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "3ae4f5db-2e2d-5a83-a526-3f51a43a6b80",
+      "name": "Finance & Cost",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "aibi",
+      "zone": "cons",
+      "description": "Margin, spend and forecast against certified financial definitions.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [
+        "Gross margin",
+        "Spend vs budget",
+        "Forecast accuracy",
+        "Cash conversion",
+        "Unit cost"
+      ],
+      "teams": [
+        "Business Teams",
+        "BI Analysts",
+        "Executive Team"
+      ],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "5f1de1f8-f496-53c8-a9cd-32927c41aadd",
+      "name": "Finance & Margin Agent",
+      "shortName": "",
+      "category": "usecase",
+      "icon": "genie",
+      "zone": "top",
+      "description": "Ask about cost, margin and forecast against certified financial definitions.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [
+        "Business Teams",
+        "BI Analysts",
+        "Analytics Engineers"
+      ],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "9a0c787e-bc50-519a-a509-52a612562d78",
+      "name": "Fraud & Financial Crime",
+      "shortName": "Real time",
+      "category": "usecase",
+      "icon": "gavel",
+      "zone": "top",
+      "description": "Streaming detection on Zerobus or Lakeflow streaming pipelines, with Lakehouse//RT for millisecond-latency lookups and full lineage for investigators.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [
+        "Risk & Compliance",
+        "Head of Fraud",
+        "AML Investigators"
+      ],
+      "provenance": [
+        "arch",
+        "banking"
+      ]
+    },
+    {
+      "id": "418ef296-2461-5da3-8036-b2729c55dd11",
+      "name": "Genie",
+      "shortName": "",
+      "category": "platform",
+      "icon": "genie",
+      "zone": "platform",
+      "description": "The Genie family turns Databricks into a data-smart coworker: conversational and agentic experiences for business users, builders and engineers, all grounded in Genie Ontology.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "a2d7394c-ea44-5e53-85f4-43223e5e3bd2",
+      "name": "Genie Agents",
+      "shortName": "",
+      "category": "platform",
+      "icon": "agents",
+      "zone": "platform",
+      "description": "Turn any Genie One conversation into a reusable, shareable agent. The evolution of Genie Spaces into curated, domain-scoped agents that reason over structured and unstructured data and take action in business tools.",
+      "capabilities": [
+        "From Genie Spaces",
+        "Shareable",
+        "Takes action"
+      ],
+      "relatedIds": [
+        "fcced2b5-6f90-5106-a380-725438ff396a",
+        "70fb90b9-bbc7-5dbe-bac0-4772c7c04155"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "e6a21e3f-4336-5608-9ca4-ec2ffbc5f4db",
+      "name": "Genie App Builder",
+      "shortName": "",
+      "category": "platform",
+      "icon": "appbuilder",
+      "zone": "platform",
+      "description": "AI-powered application builder that uses Genie context and inherits Unity Catalog governance, so generated apps are governed by construction.",
+      "capabilities": [],
+      "relatedIds": [
+        "69867329-3c22-5796-8df0-951ea1c10320",
+        "fcced2b5-6f90-5106-a380-725438ff396a"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "f053f070-4012-5e9f-8042-33582113f78a",
+      "name": "Genie Code",
+      "shortName": "",
+      "category": "platform",
+      "icon": "code",
+      "zone": "platform",
+      "description": "AI coding agent built for data engineering and ML workflows, trained on Databricks platform context. A Genie Code for ML variant integrates with MLflow, Model Serving and Unity Catalog.",
+      "capabilities": [
+        "Data engineering",
+        "Genie Code for ML"
+      ],
+      "relatedIds": [
+        "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+        "9406330b-ec6d-5f3b-b677-f9416eae79c1"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "e7505105-4da3-541a-bfd0-a4a2e554598b",
+      "name": "Genie One",
+      "shortName": "",
+      "category": "platform",
+      "icon": "genie",
+      "zone": "platform",
+      "description": "The data-smart AI coworker for business users. Goes beyond conversational analytics with agentic actions, skills and integrations across Slack, Microsoft Teams, mobile and MCP-based assistants. Connected to 50+ enterprise apps.",
+      "capabilities": [
+        "Slack & Teams",
+        "Mobile",
+        "MCP assistants",
+        "50+ app connections"
+      ],
+      "relatedIds": [
+        "fcced2b5-6f90-5106-a380-725438ff396a",
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "fcced2b5-6f90-5106-a380-725438ff396a",
+      "name": "Genie Ontology",
+      "shortName": "",
+      "category": "platform",
+      "icon": "ontology",
+      "zone": "platform",
+      "description": "The live, self-improving context layer beneath every Genie and agent. Extracts knowledge snippets from tables, queries, dashboards, pipelines and connected apps into a living graph of how the company works, and ranks authority with OntoRank (a PageRank-inspired algorithm scoring usage, recency and source credibility). Lifted agent answer accuracy from ~50% to 84.5% on the Summit benchmark.",
+      "capabilities": [
+        "OntoRank",
+        "Living knowledge graph",
+        "50+ connected apps",
+        "Unity Catalog Semantics upload"
+      ],
+      "relatedIds": [
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+        "e7505105-4da3-541a-bfd0-a4a2e554598b",
+        "a2d7394c-ea44-5e53-85f4-43223e5e3bd2"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "9406330b-ec6d-5f3b-b677-f9416eae79c1",
+      "name": "Genie ZeroOps",
+      "shortName": "",
+      "category": "platform",
+      "icon": "zeroops",
+      "zone": "platform",
+      "description": "Autonomous background agent that monitors pipelines, detects failures, investigates root causes and proposes fixes. A ZeroOps for ML variant monitors and remediates production ML systems.",
+      "capabilities": [],
+      "relatedIds": [
+        "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+        "f053f070-4012-5e9f-8042-33582113f78a"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "7a663a2e-fd4e-5f45-b107-99889627d3ba",
+      "name": "Gold",
+      "shortName": "Business-level data",
+      "category": "platform",
+      "icon": "cyl",
+      "zone": "platform",
+      "description": "Aggregated, contracted data products and metrics that dashboards, Genie and published data products read. Governed by Unity Catalog Domains, Metrics and the Business Glossary.",
+      "capabilities": [],
+      "relatedIds": [
+        "7946bd83-806b-5103-aa59-222c47cf5494",
+        "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+        "b53dc430-4aab-5675-9aac-b3ce141b2833"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "8c58aff3-001c-5c56-9981-d00f53826afa",
+      "name": "Hive Metastore",
+      "shortName": "",
+      "category": "cloud",
+      "icon": "fed",
+      "zone": "cloud",
+      "description": "Legacy HMS federated into Unity Catalog so existing tables stay queryable during migration.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "structured"
+          ],
+          "vol": "existing HMS tables",
+          "interval": "Query-time federation (no copy)"
+        }
+      },
+      "cite": [],
+      "what": "Legacy Hive Metastore tables federated into Unity Catalog so they stay queryable during migration to a governed catalog.",
+      "users": "Platform and migration teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "e74bd4c9-7470-50f4-b4d0-b6f28fd85228",
+      "name": "Images & Video",
+      "shortName": "",
+      "category": "source",
+      "icon": "media",
+      "zone": "src",
+      "description": "Inspection images, scans, video and geospatial rasters held as Unity Catalog volumes.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "unstructured"
+          ],
+          "vol": "GBs-TBs of media",
+          "interval": "On capture / upload"
+        }
+      },
+      "cite": [],
+      "what": "Inspection images, scans, video and geospatial rasters held as Unity Catalog volumes for computer vision and review.",
+      "users": "Quality, field-operations and computer-vision teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "da8c24ce-ffc8-5373-875b-d95d31b5050a",
+      "name": "Internal Copilots",
+      "shortName": "Agent assistants",
+      "category": "consumer",
+      "icon": "agents",
+      "zone": "cons",
+      "description": "Assistants for staff rather than for customers: the agent a case handler, planner or engineer asks before deciding, grounded in the organisation's own documents and tables through Agent Bricks and governed by Unity Gateway.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "9b627822-fc68-5b25-901e-3a3effbe36b7",
+      "name": "Knowledge Assistant",
+      "shortName": "GenAI on deliverables",
+      "category": "platform",
+      "icon": "ontology",
+      "zone": "platform",
+      "description": "Agent Bricks Knowledge Assistant: a managed agent that answers questions grounded in your governed documents and tables, returning cited answers without hand-building a RAG stack.",
+      "capabilities": [
+        "Grounded answers",
+        "Citations",
+        "No RAG plumbing"
+      ],
+      "relatedIds": [
+        "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+        "fcced2b5-6f90-5106-a380-725438ff396a"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch",
+        "professional_services"
+      ]
+    },
+    {
+      "id": "6fa03c3d-267b-5b76-9b2a-2e5017556c32",
+      "name": "Lakebase",
+      "shortName": "Operational reads",
+      "category": "platform",
+      "icon": "lakebase",
+      "zone": "platform",
+      "description": "Serverless Postgres serving the applications and agents that need single-row reads and writes at transactional latency, on the same governed data the analytical estate reads. Unity Catalog governs analytical access while Postgres GRANT governs the transactional path.",
+      "capabilities": [
+        "Serverless Postgres"
+      ],
+      "relatedIds": [
+        "69867329-3c22-5796-8df0-951ea1c10320",
+        "54d9a9ee-9ba3-54e1-ade4-3053f82ac24d",
+        "32c8b73b-03f9-58cc-9564-e8b4f29d02e6"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "fdb2fb11-e1b8-587e-9223-c232f3353273",
+      "name": "Lakebridge",
+      "shortName": "Migration",
+      "category": "platform",
+      "icon": "cdc",
+      "zone": "platform",
+      "description": "Assesses and converts legacy warehouse and ETL estates (schemas, SQL and jobs) onto the lakehouse.",
+      "capabilities": [],
+      "relatedIds": [
+        "ada73b1e-5dd8-5c34-8e33-898a519cd360",
+        "7946bd83-806b-5103-aa59-222c47cf5494"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "name": "Lakeflow",
+      "shortName": "",
+      "category": "platform",
+      "icon": "flow",
+      "zone": "platform",
+      "description": "Unified data engineering in one product: Lakeflow Connect for managed ingestion, Declarative Pipelines for transformation with built-in expectations, and Jobs for orchestration, so Bronze-to-Gold runs on governed, observable pipelines instead of stitched-together tools.",
+      "capabilities": [
+        "Ingest \u2022 Transform \u2022 Orchestrate",
+        "Lakeflow Connect",
+        "Declarative Pipelines",
+        "Jobs"
+      ],
+      "relatedIds": [
+        "7946bd83-806b-5103-aa59-222c47cf5494",
+        "10bf30ce-1ce2-572c-adfc-d99ba3fcbc2f",
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "f3ec1959-a3f8-5c9a-b7ab-7b96ebd3c862",
+      "name": "Lakeflow Connect",
+      "shortName": "Managed connectors",
+      "category": "platform",
+      "icon": "connect",
+      "zone": "platform",
+      "description": "Managed connectors for 100+ enterprise sources (SaaS, databases, file stores and applications) with schema evolution and CDC handled for you.",
+      "capabilities": [
+        "100+ connectors",
+        "CDC",
+        "Schema evolution"
+      ],
+      "relatedIds": [
+        "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+        "ea5df0e4-ca32-5c07-b3b6-eeffd3e2a1d7"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "10bf30ce-1ce2-572c-adfc-d99ba3fcbc2f",
+      "name": "Lakeflow Designer",
+      "shortName": "",
+      "category": "platform",
+      "icon": "flow",
+      "zone": "platform",
+      "description": "No-code, Genie-powered data preparation that generates Spark Declarative Pipelines, so business users build pipelines that engineers can own.",
+      "capabilities": [],
+      "relatedIds": [
+        "6ff224cd-114b-5707-a7c4-9b0ed7c7677f"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "name": "Lakehouse",
+      "shortName": "",
+      "category": "platform",
+      "icon": "lakehouse",
+      "zone": "platform",
+      "description": "Serverless SQL warehousing on open formats with the medallion architecture. DAIS 2026 added Lakehouse//RT, a new warehouse type for millisecond-latency analytics directly on Delta and Iceberg, powered by the new Reyden engine (Beta).",
+      "capabilities": [
+        "SQL Data Warehousing",
+        "Medallion: bronze / silver / gold"
+      ],
+      "relatedIds": [
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+        "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+        "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+        "25266905-adff-5cab-a3c4-4fca1ddeb830",
+        "a358df43-cb72-5d82-9663-de704c8e04e8"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+      "name": "Lakehouse//RT",
+      "shortName": "Millisecond reads",
+      "category": "platform",
+      "icon": "gauge",
+      "zone": "platform",
+      "description": "A read-only serverless warehouse type for low-latency, high-concurrency serving, powered by the Reyden engine. It answers SELECT queries in about 10 ms on smaller datasets and under 100 ms on larger ones, holding sub-100 ms at 12,000 queries per second and tens of thousands of concurrent users and agents. It reads governed Delta and Iceberg managed tables, materialized views, streaming tables and metric views directly in Unity Catalog, so operational analytics, customer-facing apps and agent serving no longer need a separate real-time database with its own CDC pipelines and permissions.",
+      "capabilities": [
+        "Reyden engine",
+        "SELECT only",
+        "10-100 ms",
+        "12k QPS at sub-100 ms"
+      ],
+      "relatedIds": [
+        "7946bd83-806b-5103-aa59-222c47cf5494",
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+        "25266905-adff-5cab-a3c4-4fca1ddeb830",
+        "a358df43-cb72-5d82-9663-de704c8e04e8"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "94afbb82-9875-56df-9185-b7b2d66d3a98",
+      "name": "Lakewatch",
+      "shortName": "Agentic Security",
+      "category": "platform",
+      "icon": "watch",
+      "zone": "platform",
+      "description": "Agentic SIEM on the security lakehouse: ingests high-volume security telemetry, triages alerts autonomously and drives SOC investigation, keeping the telemetry in your own object storage rather than a vendor-held index.",
+      "capabilities": [
+        "Agentic SIEM",
+        "Detection-as-code",
+        "AI SOC"
+      ],
+      "relatedIds": [
+        "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "b0ac06e8-8ab4-5955-a5d4-bd0cd1cc772a",
+      "name": "Logs & Telemetry",
+      "shortName": "",
+      "category": "source",
+      "icon": "observ",
+      "zone": "src",
+      "description": "Application, infrastructure, network and security logs feeding the lakehouse and Lakewatch.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "stream": {
+          "types": [
+            "semi-structured"
+          ],
+          "vol": "1000s of log events/sec",
+          "interval": "Continuous"
+        }
+      },
+      "cite": [],
+      "what": "Application, infrastructure, network and security logs streamed into the lakehouse for observability, security analytics and Lakewatch.",
+      "users": "Platform, SRE and security-operations teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "54d9a9ee-9ba3-54e1-ade4-3053f82ac24d",
+      "name": "LTAP",
+      "shortName": "",
+      "category": "platform",
+      "icon": "anydata",
+      "zone": "platform",
+      "description": "Lake Transactional Analytical Processing: a single copy of data serving both OLTP and OLAP on open formats, removing the copy between operational and analytical estates.",
+      "capabilities": [],
+      "relatedIds": [
+        "6fa03c3d-267b-5b76-9b2a-2e5017556c32",
+        "7946bd83-806b-5103-aa59-222c47cf5494"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "119dd94d-8d9c-5799-af6d-90561b17c9bd",
+      "name": "Mainframe & Legacy",
+      "shortName": "",
+      "category": "source",
+      "icon": "mainframe",
+      "zone": "src",
+      "description": "Mainframe and legacy extracts, batch-landed then normalised in Lakeflow pipelines.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "structured",
+            "semi-structured"
+          ],
+          "vol": "GBs/day fixed-width + VSAM extracts",
+          "interval": "Nightly batch windows"
+        }
+      },
+      "cite": [],
+      "what": "Mainframe and legacy systems (core banking, claims, billing) whose fixed-width and EBCDIC extracts are batch-landed and normalised in Lakeflow pipelines.",
+      "users": "Core operations, back-office and modernization teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "906ea064-5f4f-55fe-80b1-c937eb2ef25c",
+      "name": "Managed ELT",
+      "shortName": "",
+      "category": "ingestion",
+      "icon": "etl",
+      "zone": "ing",
+      "description": "Third-party managed connectors (Fivetran, Airbyte and similar) landing SaaS and database sources into the lakehouse, used where a source is not yet covered by Lakeflow Connect.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "9c8c4c5c-70ea-50e3-aed7-79b77e93955d",
+      "name": "Market & Reference Data",
+      "shortName": "",
+      "category": "source",
+      "icon": "market",
+      "zone": "src",
+      "description": "Pricing, benchmark and reference feeds from external providers.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "structured"
+          ],
+          "vol": "MBs-GBs/day",
+          "interval": "Scheduled (intraday to daily)"
+        }
+      },
+      "cite": [],
+      "what": "Pricing, benchmark and reference feeds bought from external data providers to enrich internal analytics.",
+      "users": "Trading, risk, finance and analytics teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "6e56e15d-2be8-578c-bf9a-2bc543e3de60",
+      "name": "Marketplace Listings",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "share",
+      "zone": "cons",
+      "description": "Data, models and agents offered to other organisations through Databricks Marketplace.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [
+        "amazon-sc"
+      ],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch",
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "409f430f-c591-53a2-904a-8cadb74f6ffc",
+      "name": "Microsoft Entra ID",
+      "shortName": "Identity & SSO",
+      "category": "cloud",
+      "icon": "identity",
+      "zone": "cloud",
+      "description": "SSO and SCIM provisioning; identity federation and managed identities into Unity Catalog.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "stream": {
+          "types": [
+            "semi-structured"
+          ],
+          "vol": "100s-1000s of events/sec",
+          "interval": "Continuous"
+        }
+      },
+      "cite": [
+        "entra"
+      ],
+      "what": "Directory, conditional-access and sign-in logs with risk detections; the identity graph UEBA and lateral-movement detections join to.",
+      "users": "Identity, SOC and GRC teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch",
+        "cybersecurity"
+      ]
+    },
+    {
+      "id": "107dabcd-d9f7-5d23-8af1-24c35cd6133e",
+      "name": "Microsoft Foundry",
+      "shortName": "Model provider",
+      "category": "cloud",
+      "icon": "aisvc",
+      "zone": "cloud",
+      "description": "Foundry model endpoints (the platform formerly called Azure OpenAI and Azure AI Foundry) registered in Unity Gateway alongside Databricks-hosted models, so they inherit the same spend caps, tracing and policy.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "3424686b-86f8-51e2-91d2-70ce1e1063c2",
+      "name": "Microsoft Purview",
+      "shortName": "Catalog of Catalogs",
+      "category": "cloud",
+      "icon": "govcat",
+      "zone": "cloud",
+      "description": "Enterprise catalog scanning Unity Catalog metadata so lakehouse assets appear in the corporate data map.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "structured",
+            "semi-structured"
+          ],
+          "vol": "1-8 GB/day classification + labels",
+          "interval": "Nightly batch"
+        }
+      },
+      "cite": [
+        "purview"
+      ],
+      "what": "Classifies records, applies retention labels and manages legal hold across the M365 estate.",
+      "users": "Records, compliance and information governance teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch",
+        "legal"
+      ]
+    },
+    {
+      "id": "a1aa7aec-ab34-5f79-86cc-9888c179d66a",
+      "name": "MLflow",
+      "shortName": "",
+      "category": "platform",
+      "icon": "mlflow",
+      "zone": "platform",
+      "description": "The open standard for the model and agent lifecycle: tracking, evaluation, prompt registry and tracing. MLflow 3 added GenAI evaluation and agent observability, wired into Unity Gateway traces.",
+      "capabilities": [
+        "Tracking",
+        "Evaluation",
+        "Tracing",
+        "Model registry"
+      ],
+      "relatedIds": [
+        "f49cecca-1696-5b36-952f-452d2864a0cb",
+        "7be1fe38-aaa7-515f-a952-2cdaa7c50015"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "3853020d-0800-5448-9929-1f3e12f01039",
+      "name": "Model Serving",
+      "shortName": "Real-time endpoints",
+      "category": "platform",
+      "icon": "model",
+      "zone": "platform",
+      "description": "Managed endpoints for models and agents, scaled to zero when idle, traced through MLflow and governed by Unity Gateway.",
+      "capabilities": [],
+      "relatedIds": [
+        "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+        "a1aa7aec-ab34-5f79-86cc-9888c179d66a"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "26687463-3aa7-587d-8322-4e3550d67f64",
+      "name": "Notebooks & IDEs",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "notebook",
+      "zone": "cons",
+      "description": "Notebooks, VS Code and JetBrains against governed data and Genie Code.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "aerospace_space",
+        "agriculture",
+        "agtech",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "capital_markets",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "crypto_digital_assets",
+        "cybersecurity",
+        "data_centers",
+        "diagnostics_labs",
+        "digital_health",
+        "ecommerce",
+        "edtech",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "insurance_pandc",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "market_data_exchanges",
+        "media_broadcasting",
+        "medical_devices",
+        "mining",
+        "mortgage_lending",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "pharmacy_pbm",
+        "professional_services",
+        "public_safety",
+        "public_sector",
+        "rail_transit",
+        "real_estate",
+        "renewables",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "software_technology",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wealth_management",
+        "wholesale_distribution"
+      ]
+    },
+    {
+      "id": "74fa31f9-5075-516f-9edc-a21a28576ccf",
+      "name": "Omnigent",
+      "shortName": "",
+      "category": "platform",
+      "icon": "omni",
+      "zone": "platform",
+      "description": "Open-source meta-harness above existing agent frameworks: agent composition, collaboration and centralised governance from one interface. A managed Beta is available.",
+      "capabilities": [
+        "Build",
+        "Deploy",
+        "Optimize",
+        "Govern"
+      ],
+      "relatedIds": [
+        "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+        "7be1fe38-aaa7-515f-a952-2cdaa7c50015"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "0b242530-0450-57b6-91a1-f6bda26b8bf2",
+      "name": "Omnigent OSS",
+      "shortName": "Databricks, open source",
+      "category": "consumer",
+      "icon": "omni",
+      "zone": "cons",
+      "description": "Open-source meta-harness that sits above existing agent frameworks (LangGraph, CrewAI and others), enabling agent composition, collaboration and centralised governance from one interface. A managed Beta is available.",
+      "capabilities": [
+        "Build",
+        "Deploy",
+        "Optimize",
+        "Govern"
+      ],
+      "relatedIds": [
+        "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+        "7be1fe38-aaa7-515f-a952-2cdaa7c50015"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "aerospace_space",
+        "agriculture",
+        "agtech",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "capital_markets",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "crypto_digital_assets",
+        "cybersecurity",
+        "data_centers",
+        "diagnostics_labs",
+        "digital_health",
+        "ecommerce",
+        "edtech",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "insurance_pandc",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "market_data_exchanges",
+        "media_broadcasting",
+        "medical_devices",
+        "mining",
+        "mortgage_lending",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "pharmacy_pbm",
+        "professional_services",
+        "public_safety",
+        "public_sector",
+        "rail_transit",
+        "real_estate",
+        "renewables",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "software_technology",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wealth_management",
+        "wholesale_distribution"
+      ]
+    },
+    {
+      "id": "eb62cf6a-4415-5fc7-8b3c-1d6ea7fd8a9f",
+      "name": "Open Sharing",
+      "shortName": "",
+      "category": "platform",
+      "icon": "share",
+      "zone": "platform",
+      "description": "The successor branding to Delta Sharing, and the same open protocol: share live tables, volumes, models and notebooks across clouds, engines and organisations with no copy and no vendor lock-in. DAIS 2026 extended it beyond tables to AI assets (agents, models and skills) and to on-premises storage, with Marketplace and Clean Rooms on top for monetisation and privacy-preserving collaboration.",
+      "capabilities": [
+        "Open protocol",
+        "No copy",
+        "Cross-cloud",
+        "AI assets",
+        "Marketplace",
+        "Clean Rooms",
+        "On-prem"
+      ],
+      "relatedIds": [
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+        "5304e13a-1ff1-5ce8-9dac-c7ea181cabdd",
+        "c1124bec-5c23-51f6-b040-d70a1786f6a7"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "7847db50-9126-5bf6-a66b-4d273813cba7",
+      "name": "OpenAI Codex",
+      "shortName": "3rd-party harness",
+      "category": "consumer",
+      "icon": "code",
+      "zone": "cons",
+      "description": "OpenAI's coding harness connected over MCP, governed at runtime by Unity Gateway rather than trusted by configuration.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "aerospace_space",
+        "agriculture",
+        "agtech",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "capital_markets",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "crypto_digital_assets",
+        "cybersecurity",
+        "data_centers",
+        "diagnostics_labs",
+        "digital_health",
+        "ecommerce",
+        "edtech",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "insurance_pandc",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "market_data_exchanges",
+        "media_broadcasting",
+        "medical_devices",
+        "mining",
+        "mortgage_lending",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "pharmacy_pbm",
+        "professional_services",
+        "public_safety",
+        "public_sector",
+        "rail_transit",
+        "real_estate",
+        "renewables",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "software_technology",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wealth_management",
+        "wholesale_distribution"
+      ]
+    },
+    {
+      "id": "ee643f3e-a3c1-57cd-b0d3-d6b28e0394a1",
+      "name": "Operational APIs",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "api",
+      "zone": "cons",
+      "description": "Low-latency APIs and model endpoints serving decisions back into operational systems.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "435b6aa9-2678-5ef8-affe-c8b573ba95b6",
+      "name": "Operational Databases",
+      "shortName": "",
+      "category": "source",
+      "icon": "db",
+      "zone": "src",
+      "description": "OLTP databases captured with CDC through Lakeflow Connect.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "stream": {
+          "types": [
+            "structured"
+          ],
+          "vol": "100s-1000s of row changes/sec",
+          "interval": "Continuous CDC (near real-time)"
+        }
+      },
+      "cite": [],
+      "what": "The OLTP databases behind live applications, captured row-by-row so the lakehouse mirrors production without loading the source system.",
+      "users": "Application and platform-engineering teams, and analysts who need current operational data.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "55320150-b090-54d5-b864-7bac0b79848b",
+      "name": "Operations & Service",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "aibi",
+      "zone": "cons",
+      "description": "Throughput, utilisation and service levels across the operation.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [
+        "On-time performance",
+        "Utilisation",
+        "Service level",
+        "Backlog",
+        "Cost to serve"
+      ],
+      "teams": [
+        "Business Teams",
+        "Analytics Engineers"
+      ],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "c23f9210-181b-5e3f-b0e4-c52476a2c41c",
+      "name": "Operations & Supply Agent",
+      "shortName": "",
+      "category": "usecase",
+      "icon": "genie",
+      "zone": "top",
+      "description": "Explore demand, supply and service performance on live operational data.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [
+        "Business Teams",
+        "Analytics Engineers",
+        "Data Scientists"
+      ],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "790dd6ec-6076-5950-8a61-ccc4719eaff8",
+      "name": "Operations Consoles",
+      "shortName": "Run the day",
+      "category": "consumer",
+      "icon": "gauge",
+      "zone": "cons",
+      "description": "The screen an operations, service or control team runs the working day from: current state, the exception queue and the action taken, on live data rather than on last night's extract. Built on Databricks Apps with Lakebase behind it for the writes.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "0fac2261-a537-5f6b-8ac7-a5f2b41e9362",
+      "name": "Other",
+      "shortName": "",
+      "category": "source",
+      "icon": "fed",
+      "zone": "src",
+      "description": "Any other warehouse, database or catalog Lakehouse Federation can reach: Snowflake, BigQuery, Postgres, MySQL, Teradata, Oracle, SQL Server and more. Queried in place under Unity Catalog, with no copy.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "structured"
+          ],
+          "vol": "queried in place, no copy",
+          "interval": "Query-time federation"
+        }
+      },
+      "cite": [],
+      "what": "Any other warehouse, database or catalog Lakehouse Federation can reach (Snowflake, BigQuery, Postgres, MySQL, Teradata, Oracle, SQL Server), queried in place under Unity Catalog with no copy.",
+      "users": "BI and analytics teams spanning heterogeneous systems.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "5d17b743-55fa-5d9e-9c8b-54c4818c12e0",
+      "name": "Other Binary Files",
+      "shortName": "",
+      "category": "source",
+      "icon": "file",
+      "zone": "src",
+      "description": "Any other binary payload the business keeps: archives, logs, CAD and design files, firmware dumps, scientific and proprietary formats. Landed as Unity Catalog volumes so the files carry the same permissions, lineage and audit as tables, and are parsed on demand.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "unstructured"
+          ],
+          "vol": "varies by payload",
+          "interval": "On ingest"
+        }
+      },
+      "cite": [],
+      "what": "Any other binary payload the business keeps (archives, CAD and design files, firmware dumps, scientific and proprietary formats), landed as Unity Catalog volumes and parsed on demand.",
+      "users": "Engineering, R&D and specialist domain teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "95bf6ed4-f8b1-595f-837c-d45fdd79f77c",
+      "name": "Other Sinks",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "export",
+      "zone": "cons",
+      "description": "Any other destination a published product has to land in: object storage drops, SFTP and file exchanges, external warehouses, message queues and regulatory submission channels. Written from governed tables, so the export inherits the same permissions and lineage as the product itself.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "90fb07ae-5c36-5d0f-a6fb-762c1c555140",
+      "name": "Partner Feeds",
+      "shortName": "",
+      "category": "source",
+      "icon": "partner",
+      "zone": "src",
+      "description": "Partner and supplier data received over Delta Sharing or Open Sharing.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "structured",
+            "semi-structured"
+          ],
+          "vol": "varies by partner",
+          "interval": "Shared / scheduled"
+        }
+      },
+      "cite": [],
+      "what": "Partner and supplier datasets received over Delta Sharing or Open Sharing, with no copy for Delta recipients.",
+      "users": "Supply-chain, partnerships and B2B analytics teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "c0fcae00-27b2-5c30-aed6-5e0001ec1671",
+      "name": "Partner Portals",
+      "shortName": "External-facing",
+      "category": "consumer",
+      "icon": "globe",
+      "zone": "cons",
+      "description": "Partner, supplier and customer portals served by Databricks Apps, reading the same governed products as internal users instead of a private extract.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "631f46b3-6613-5787-9952-af633d6d9b7f",
+      "name": "Personalisation",
+      "shortName": "Recommendations",
+      "category": "usecase",
+      "icon": "model",
+      "zone": "top",
+      "description": "Retrieval and ranking over governed data via AI Search and Model Serving, served to customer-facing apps at low latency.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch",
+        "retail"
+      ]
+    },
+    {
+      "id": "496d05cb-c6bd-582c-afb2-f113b7f2c5ec",
+      "name": "Power BI + Copilot",
+      "shortName": "",
+      "category": "cloud",
+      "icon": "bitool",
+      "zone": "cloud",
+      "description": "Publish to Power BI from Databricks with Entra ID pass-through, so Unity Catalog permissions and lineage follow the report.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "0d6cb3af-60e9-5f1f-848a-23e65a2de310",
+      "name": "Power Platform",
+      "shortName": "",
+      "category": "cloud",
+      "icon": "apps",
+      "zone": "cloud",
+      "description": "Certified Power Apps and Power Automate connectors reading and writing Databricks through Entra ID, so low-code business apps run on governed lakehouse data.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "6383eea0-98e2-5187-948e-69eaee553206",
+      "name": "Predictive Maintenance",
+      "shortName": "Asset health",
+      "category": "usecase",
+      "icon": "gauge",
+      "zone": "top",
+      "description": "Sensor and telemetry history joined to work orders and parts, predicting the failure early enough to plan the intervention rather than absorb the outage.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "aerospace_space",
+        "arch",
+        "chemical_mfg",
+        "data_centers",
+        "manufacturing",
+        "mining",
+        "paper_packaging",
+        "rail_transit",
+        "renewables",
+        "semiconductors"
+      ]
+    },
+    {
+      "id": "6426d556-1c7e-52e3-bc54-637af27cdbc2",
+      "name": "Public & Open Data",
+      "shortName": "",
+      "category": "source",
+      "icon": "globe",
+      "zone": "src",
+      "description": "Open government, geospatial and demographic datasets.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "structured",
+            "semi-structured"
+          ],
+          "vol": "MBs-GBs per dataset",
+          "interval": "Periodic refresh"
+        }
+      },
+      "cite": [],
+      "what": "Open government, geospatial and demographic datasets blended with internal data for context.",
+      "users": "Data-science, policy and market-analytics teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "292b869a-c82e-51c8-965e-023b9844f667",
+      "name": "Regulatory Reporting",
+      "shortName": "Risk & compliance",
+      "category": "usecase",
+      "icon": "gavel",
+      "zone": "top",
+      "description": "Regulatory and risk submissions produced from governed tables with lineage back to source, so a challenge from a regulator is answered from the platform rather than from a spreadsheet trail.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch",
+        "banking",
+        "capital_markets",
+        "market_data_exchanges",
+        "mortgage_lending"
+      ]
+    },
+    {
+      "id": "884375df-3b01-5fd3-a90f-b7377d7d5409",
+      "name": "Revenue & Growth",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "aibi",
+      "zone": "cons",
+      "description": "Revenue, growth and segment performance on certified commercial Metric Views.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [
+        "Revenue vs plan",
+        "Growth rate",
+        "Customer lifetime value",
+        "Win rate",
+        "Marketing ROI"
+      ],
+      "teams": [
+        "Business Teams",
+        "BI Analysts",
+        "Executive Team"
+      ],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "2d58b41b-2bec-5c0b-8fe7-f58b308dd4dd",
+      "name": "Reverse ETL",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "reverse",
+      "zone": "cons",
+      "description": "Curated segments and scores pushed back to SaaS and activation channels, the CustomerLake path.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "56455be1-a3df-55e3-93c8-98c7afc22253",
+      "name": "Risk & Compliance",
+      "shortName": "Unity Catalog",
+      "category": "consumer",
+      "icon": "aibi",
+      "zone": "ppl",
+      "description": "Risk, audit, data protection and the regulatory reporting function. They are not asking the platform for insight so much as for evidence: who touched what, where a number came from, and whether the control actually held.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [
+        "Open conflicts hits",
+        "Screening coverage",
+        "Active legal holds",
+        "Retention exceptions",
+        "Intake cycle time"
+      ],
+      "teams": [
+        "Compliance",
+        "Conflicts Counsel",
+        "Ethics & Risk"
+      ],
+      "provenance": [
+        "arch",
+        "banking",
+        "gaming",
+        "legal",
+        "wealth_management"
+      ]
+    },
+    {
+      "id": "7be8026c-58d7-59d8-9519-bdd97068eeae",
+      "name": "Risk & Compliance Agent",
+      "shortName": "",
+      "category": "usecase",
+      "icon": "genie",
+      "zone": "top",
+      "description": "Answer fraud, risk and control questions with full lineage back to the source.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [
+        "Risk & Compliance",
+        "Data Scientists",
+        "BI Analysts"
+      ],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "d2184f5c-247a-549e-9547-4c333967cf31",
+      "name": "Risk & Controls",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "aibi",
+      "zone": "cons",
+      "description": "Fraud, exposure and control health with lineage to the source.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [
+        "Fraud rate",
+        "Open alerts",
+        "Exposure vs limit",
+        "Control pass rate",
+        "Loss vs forecast"
+      ],
+      "teams": [
+        "Risk & Compliance",
+        "BI Analysts"
+      ],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "3ffa25ae-608e-5dd7-978d-0c444bee81bb",
+      "name": "SaaS Applications",
+      "shortName": "",
+      "category": "source",
+      "icon": "saas",
+      "zone": "src",
+      "description": "SaaS platforms ingested through the 100+ managed Lakeflow connectors.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {
+        "batch": {
+          "types": [
+            "semi-structured",
+            "structured"
+          ],
+          "vol": "MBs-GBs/day via API",
+          "interval": "Scheduled connector syncs"
+        }
+      },
+      "cite": [],
+      "what": "Cloud SaaS platforms (marketing, support, finance, product) pulled through the 100+ managed Lakeflow connectors on a schedule.",
+      "users": "Revenue, marketing, support and finance analytics teams.",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "5304e13a-1ff1-5ce8-9dac-c7ea181cabdd",
+      "name": "Sharing Recipients",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "share",
+      "zone": "cons",
+      "description": "Recipients reading live tables, volumes and models over Open Sharing with no copy and no egress duplication.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "advertising",
+        "agriculture",
+        "agtech",
+        "apparel_fashion",
+        "arch",
+        "automotive",
+        "banking",
+        "capital_markets",
+        "chemical_mfg",
+        "clinical_trials",
+        "construction",
+        "consumer_goods",
+        "crypto_digital_assets",
+        "cybersecurity",
+        "data_centers",
+        "diagnostics_labs",
+        "digital_health",
+        "ecommerce",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "insurance_pandc",
+        "legal",
+        "life_insurance",
+        "manufacturing",
+        "market_data_exchanges",
+        "media_broadcasting",
+        "medical_devices",
+        "mining",
+        "mortgage_lending",
+        "ngo",
+        "oil_gas",
+        "paper_packaging",
+        "payments_fintech",
+        "pharmaceuticals",
+        "pharmacy_pbm",
+        "professional_services",
+        "public_safety",
+        "public_sector",
+        "rail_transit",
+        "real_estate",
+        "renewables",
+        "restaurants",
+        "retail",
+        "semiconductors",
+        "shipping_ports",
+        "sports_entertainment",
+        "staffing_hr",
+        "telecommunication",
+        "transport_shipping",
+        "travel_hospitality",
+        "waste_management",
+        "water_utilities",
+        "wealth_management",
+        "wholesale_distribution"
+      ]
+    },
+    {
+      "id": "62e9e176-52d4-5f7d-90f6-0c273d01762b",
+      "name": "Silver",
+      "shortName": "Filtered, cleaned, augmented",
+      "category": "platform",
+      "icon": "cyl",
+      "zone": "platform",
+      "description": "Validated, de-duplicated and conformed tables with enforced expectations and business keys resolved. The layer most pipelines and agents actually join against.",
+      "capabilities": [],
+      "relatedIds": [
+        "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "ef86068a-bb4a-5863-880d-519c279c4b9c",
+      "name": "SQL DB / Cosmos DB",
+      "shortName": "Operational stores",
+      "category": "cloud",
+      "icon": "opdb",
+      "zone": "cloud",
+      "description": "Existing operational databases that Databricks serves scores and features into, alongside Lakebase.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "8a73a7db-381f-5fb1-9476-3018dcf8506f",
+      "name": "SQL Warehouses",
+      "shortName": "Serverless SQL",
+      "category": "platform",
+      "icon": "lakehouse",
+      "zone": "platform",
+      "description": "Serverless SQL compute behind every dashboard, BI tool and SQL client, with Unity Catalog permissions enforced on the same tables the pipelines write.",
+      "capabilities": [],
+      "relatedIds": [
+        "7946bd83-806b-5103-aa59-222c47cf5494",
+        "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "dd27daa5-a177-5ad7-9195-5f5d5ca6c66c",
+      "name": "Streaming Brokers",
+      "shortName": "",
+      "category": "ingestion",
+      "icon": "stream",
+      "zone": "ing",
+      "description": "Kafka, Confluent, MSK and equivalent brokers already in place, consumed by Lakeflow streaming pipelines or replaced by Zerobus for new producers.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "28f16c42-117c-5003-8be2-9dfab06fb442",
+      "name": "Supply Chain Visibility",
+      "shortName": "End to end",
+      "category": "usecase",
+      "icon": "stream",
+      "zone": "top",
+      "description": "Suppliers, inventory positions, shipments and demand signals conformed into one view, with simulation on top of it so a disruption can be answered rather than only reported.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "b56d41f4-fcc4-5da2-830c-132abc8d78b9",
+      "name": "Tableau / Qlik / ThoughtSpot",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "chart",
+      "zone": "cons",
+      "description": "External BI tools connected to serverless SQL warehouses with Unity Catalog permissions enforced end to end.",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch",
+        "education",
+        "energy_utilities",
+        "food_beverage",
+        "gaming",
+        "genomics_biotech",
+        "grocery",
+        "health_insurance",
+        "healthcare",
+        "manufacturing",
+        "media_broadcasting",
+        "mining",
+        "ngo",
+        "oil_gas",
+        "payments_fintech",
+        "pharmaceuticals",
+        "real_estate",
+        "restaurants",
+        "retail",
+        "semiconductors"
+      ]
+    },
+    {
+      "id": "de49d962-a2c6-5750-bfc5-b6a0f2e978ca",
+      "name": "Teams & M365 Copilot",
+      "shortName": "",
+      "category": "consumer",
+      "icon": "chat",
+      "zone": "cons",
+      "description": "Tag Genie in a Teams thread for Unity Catalog-governed answers from the lakehouse (Beta).",
+      "capabilities": [],
+      "relatedIds": [],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "0a57384b-4460-55d3-a715-5f65d6847cfb",
+      "name": "Text Classification",
+      "shortName": "",
+      "category": "platform",
+      "icon": "aisvc",
+      "zone": "platform",
+      "description": "Agent Bricks / AI Functions text classification (ai_classify): sorts unstructured text into governed labels \u2014 intent, sentiment, topic, routing \u2014 directly in SQL and pipelines with no model to train.",
+      "capabilities": [
+        "ai_classify",
+        "Zero-shot labels",
+        "In-SQL"
+      ],
+      "relatedIds": [
+        "70fb90b9-bbc7-5dbe-bac0-4772c7c04155"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "name": "Unity Catalog",
+      "shortName": "",
+      "category": "platform",
+      "icon": "ucat",
+      "zone": "platform",
+      "description": "One governance model for data and AI: permissions and ABAC, column-level lineage, quality, discovery and classification. DAIS 2026 added three business-semantics capabilities for defining and governing shared business knowledge.",
+      "capabilities": [
+        "Access",
+        "Semantics",
+        "Lineage",
+        "Observability",
+        "Business Glossary",
+        "Domains",
+        "Metrics"
+      ],
+      "relatedIds": [
+        "fcced2b5-6f90-5106-a380-725438ff396a",
+        "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+        "eb62cf6a-4415-5fc7-8b3c-1d6ea7fd8a9f"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "d3aa3727-ab64-51d4-8698-5ab1992edaaa",
+      "name": "Unity Catalog OSS",
+      "shortName": "",
+      "category": "platform",
+      "icon": "ucat",
+      "zone": "platform",
+      "description": "The open-sourced governance catalog with an open API and REST spec, so tables, volumes, models and functions stay readable by engines outside Databricks.",
+      "capabilities": [],
+      "relatedIds": [
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+      "name": "Unity Gateway",
+      "shortName": "",
+      "category": "platform",
+      "icon": "gateway",
+      "zone": "platform",
+      "description": "Runtime governance for all AI, including agents running on other vendors' platforms and third-party coding tools: spend caps per employee and per agent, smart routing with fallback, contextual security policies, an MCP server registry and agent tracing via MLflow.",
+      "capabilities": [
+        "Models",
+        "Security",
+        "Cost Optimization"
+      ],
+      "relatedIds": [
+        "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+        "74fa31f9-5075-516f-9edc-a21a28576ccf",
+        "bbf8c12d-b6b1-57c2-a72e-87404e536a7c"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    },
+    {
+      "id": "68bc3caa-a554-5c69-bf6d-5584539eb7fb",
+      "name": "Zerobus",
+      "shortName": "Direct push",
+      "category": "platform",
+      "icon": "eventbus",
+      "zone": "platform",
+      "description": "Direct push ingestion into the lakehouse at 10+ GB/s with no Kafka or Event Hubs cluster in between, for event and telemetry producers that can write straight to Databricks.",
+      "capabilities": [],
+      "relatedIds": [
+        "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+        "c564158b-f5c2-598d-94a6-39bc80182212"
+      ],
+      "dataOut": {},
+      "cite": [],
+      "what": "",
+      "users": "",
+      "kpis": [],
+      "teams": [],
+      "provenance": [
+        "arch"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "025c3cbd-517b-5b62-81cb-b9793c99d904",
+      "sourceId": "292b869a-c82e-51c8-965e-023b9844f667",
+      "targetId": "25266905-adff-5cab-a3c4-4fca1ddeb830",
+      "kind": "uses"
+    },
+    {
+      "id": "032c8938-1199-5f9e-b45b-abe9ef833d12",
+      "sourceId": "a1aa7aec-ab34-5f79-86cc-9888c179d66a",
+      "targetId": "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+      "kind": "related"
+    },
+    {
+      "id": "0370d6cd-b964-5c14-8678-6097d731d6db",
+      "sourceId": "28f16c42-117c-5003-8be2-9dfab06fb442",
+      "targetId": "b53dc430-4aab-5675-9aac-b3ce141b2833",
+      "kind": "uses"
+    },
+    {
+      "id": "05e57b84-c52a-5877-851e-96db6cd7b05f",
+      "sourceId": "e7505105-4da3-541a-bfd0-a4a2e554598b",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "08212d88-b82d-5476-9046-4d1f9d1c81bf",
+      "sourceId": "f3ec1959-a3f8-5c9a-b7ab-7b96ebd3c862",
+      "targetId": "ea5df0e4-ca32-5c07-b3b6-eeffd3e2a1d7",
+      "kind": "related"
+    },
+    {
+      "id": "08b62a4d-1e73-5078-8f3d-536a83532c47",
+      "sourceId": "27ed933c-5db9-543a-8b27-673ae8d4eaaa",
+      "targetId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "kind": "uses"
+    },
+    {
+      "id": "092ae53b-b7c4-5e7f-9dd5-f61b71d0c3b0",
+      "sourceId": "0b242530-0450-57b6-91a1-f6bda26b8bf2",
+      "targetId": "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+      "kind": "related"
+    },
+    {
+      "id": "0b51722f-d57a-5bf4-a3eb-0a3d5f7048c9",
+      "sourceId": "631f46b3-6613-5787-9952-af633d6d9b7f",
+      "targetId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "kind": "uses"
+    },
+    {
+      "id": "0dbb6083-c139-5723-b78d-4e8223e6f1dc",
+      "sourceId": "68bc3caa-a554-5c69-bf6d-5584539eb7fb",
+      "targetId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "kind": "related"
+    },
+    {
+      "id": "0dff9621-dc63-51e2-a6b4-0e77c4c6300c",
+      "sourceId": "9a0c787e-bc50-519a-a509-52a612562d78",
+      "targetId": "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+      "kind": "uses"
+    },
+    {
+      "id": "0e0eb14f-ba3f-5b48-9028-523c259fecb4",
+      "sourceId": "8bbade27-268f-53e9-b7c7-94b33ffafb85",
+      "targetId": "2d58b41b-2bec-5c0b-8fe7-f58b308dd4dd",
+      "kind": "uses"
+    },
+    {
+      "id": "0f42f5c9-7631-5fdb-85f6-3b6dd7f81676",
+      "sourceId": "9a0c787e-bc50-519a-a509-52a612562d78",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "uses"
+    },
+    {
+      "id": "11cd61d3-a4ed-5556-9a4e-dab5afe981bd",
+      "sourceId": "9d530ce0-2cc0-5bd2-97ba-747f70eaeae0",
+      "targetId": "de49d962-a2c6-5750-bfc5-b6a0f2e978ca",
+      "kind": "flow"
+    },
+    {
+      "id": "120a7daa-77ce-5ed4-801b-7933e564341a",
+      "sourceId": "9406330b-ec6d-5f3b-b677-f9416eae79c1",
+      "targetId": "f053f070-4012-5e9f-8042-33582113f78a",
+      "kind": "related"
+    },
+    {
+      "id": "1912e1f2-304c-56c9-a7b5-413a19acc747",
+      "sourceId": "8a73a7db-381f-5fb1-9476-3018dcf8506f",
+      "targetId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "kind": "related"
+    },
+    {
+      "id": "19522b32-6fe3-594d-83e3-e69d7ddfad00",
+      "sourceId": "9a0c787e-bc50-519a-a509-52a612562d78",
+      "targetId": "68bc3caa-a554-5c69-bf6d-5584539eb7fb",
+      "kind": "uses"
+    },
+    {
+      "id": "19c1856d-757e-508e-b775-97a1f1aa8116",
+      "sourceId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "targetId": "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+      "kind": "related"
+    },
+    {
+      "id": "1b76df66-3533-5001-874b-e4f27f1280af",
+      "sourceId": "f3ec1959-a3f8-5c9a-b7ab-7b96ebd3c862",
+      "targetId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "kind": "related"
+    },
+    {
+      "id": "1f94aff1-6f6e-515e-bbae-7a352152f52b",
+      "sourceId": "7be8026c-58d7-59d8-9519-bdd97068eeae",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "feeds"
+    },
+    {
+      "id": "207aa6d8-3a8a-56bf-ab29-eb0d5d0d90d9",
+      "sourceId": "8bbade27-268f-53e9-b7c7-94b33ffafb85",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "uses"
+    },
+    {
+      "id": "23c345a8-e9f8-55ff-9e54-9f33c58f9105",
+      "sourceId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "23dffa3f-fcd0-595c-abf1-134b4eca8fc3",
+      "sourceId": "631f46b3-6613-5787-9952-af633d6d9b7f",
+      "targetId": "f5b28d6a-7066-5919-aa95-f222a27a04de",
+      "kind": "uses"
+    },
+    {
+      "id": "2476cc8b-d974-5c37-9371-8059fc6a0e47",
+      "sourceId": "8bbade27-268f-53e9-b7c7-94b33ffafb85",
+      "targetId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "kind": "uses"
+    },
+    {
+      "id": "26bab516-63a9-5201-9674-b6ef8521b375",
+      "sourceId": "129f85f0-1557-5995-bf71-203da64b8d4d",
+      "targetId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "kind": "uses"
+    },
+    {
+      "id": "2db45f40-d44d-5331-97e0-61b18c6ed538",
+      "sourceId": "c23f9210-181b-5e3f-b0e4-c52476a2c41c",
+      "targetId": "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+      "kind": "feeds"
+    },
+    {
+      "id": "2e75f034-2ffa-5e18-ae40-47fe56ac5462",
+      "sourceId": "9406330b-ec6d-5f3b-b677-f9416eae79c1",
+      "targetId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "kind": "related"
+    },
+    {
+      "id": "30152360-b935-53c8-8a06-e4cc21be22db",
+      "sourceId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "targetId": "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+      "kind": "related"
+    },
+    {
+      "id": "302f7de4-2a6e-50f0-afe3-1ab642808165",
+      "sourceId": "631f46b3-6613-5787-9952-af633d6d9b7f",
+      "targetId": "69867329-3c22-5796-8df0-951ea1c10320",
+      "kind": "uses"
+    },
+    {
+      "id": "304c1261-fdd4-5d9b-9f57-a5a5c15d34c5",
+      "sourceId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "targetId": "a358df43-cb72-5d82-9663-de704c8e04e8",
+      "kind": "related"
+    },
+    {
+      "id": "30b36bb3-4485-5922-9127-7e12a78f6e5b",
+      "sourceId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "targetId": "fcced2b5-6f90-5106-a380-725438ff396a",
+      "kind": "related"
+    },
+    {
+      "id": "314774c9-82b1-5ebe-90cf-eec8d59cd44e",
+      "sourceId": "ed5df8a3-0dc9-57e3-90cc-ad8f71b06ab5",
+      "targetId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "kind": "uses"
+    },
+    {
+      "id": "33050da2-db76-5b77-b9c1-f0ac056cf6b7",
+      "sourceId": "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "334543ec-767c-5023-a4ac-4f6232d40df8",
+      "sourceId": "6fa03c3d-267b-5b76-9b2a-2e5017556c32",
+      "targetId": "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+      "kind": "related"
+    },
+    {
+      "id": "3360c02e-5c16-5b8c-b77f-05dee2ccf571",
+      "sourceId": "5f1de1f8-f496-53c8-a9cd-32927c41aadd",
+      "targetId": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "kind": "feeds"
+    },
+    {
+      "id": "33e47d99-e20b-5196-80ec-bac56a3f0e75",
+      "sourceId": "2099904d-e247-5fec-8269-c601a1d1a8f0",
+      "targetId": "f3ec1959-a3f8-5c9a-b7ab-7b96ebd3c862",
+      "kind": "related"
+    },
+    {
+      "id": "33f8c057-b86c-57dd-9434-c64203bd04bf",
+      "sourceId": "0b242530-0450-57b6-91a1-f6bda26b8bf2",
+      "targetId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "kind": "related"
+    },
+    {
+      "id": "3439942c-8a4f-5ab3-bc44-0ed541661525",
+      "sourceId": "fcced2b5-6f90-5106-a380-725438ff396a",
+      "targetId": "a2d7394c-ea44-5e53-85f4-43223e5e3bd2",
+      "kind": "related"
+    },
+    {
+      "id": "35b6472a-a72e-5062-9c12-3e04648fdbfb",
+      "sourceId": "292b869a-c82e-51c8-965e-023b9844f667",
+      "targetId": "e7505105-4da3-541a-bfd0-a4a2e554598b",
+      "kind": "uses"
+    },
+    {
+      "id": "3997bd31-18fb-5225-8ccf-535aff907aeb",
+      "sourceId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "targetId": "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+      "kind": "related"
+    },
+    {
+      "id": "3bb7823e-2d55-50d1-9daf-5a7688ef9313",
+      "sourceId": "6fa03c3d-267b-5b76-9b2a-2e5017556c32",
+      "targetId": "69867329-3c22-5796-8df0-951ea1c10320",
+      "kind": "related"
+    },
+    {
+      "id": "3c67a92c-ec18-517d-af93-ef331164f933",
+      "sourceId": "31fe87d8-3dc0-583a-9c0d-748bd40093ad",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "3d06fd3d-32b7-5fec-871b-1f0e102ab3a3",
+      "sourceId": "94afbb82-9875-56df-9185-b7b2d66d3a98",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "3d118518-d351-5c1d-ad45-d0609d9215aa",
+      "sourceId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "targetId": "25266905-adff-5cab-a3c4-4fca1ddeb830",
+      "kind": "related"
+    },
+    {
+      "id": "3d119c26-b753-5dd7-9e23-384e063bdaa2",
+      "sourceId": "e7505105-4da3-541a-bfd0-a4a2e554598b",
+      "targetId": "fcced2b5-6f90-5106-a380-725438ff396a",
+      "kind": "related"
+    },
+    {
+      "id": "3f652163-9097-5308-b124-290ee33a3411",
+      "sourceId": "a8ceaf29-ecf9-5cfd-a5ae-483f27204852",
+      "targetId": "7019877b-b6c2-53c4-a8ca-c534487a93e2",
+      "kind": "feeds"
+    },
+    {
+      "id": "3f9a3fe9-9675-52e8-97b0-eeb698cb77d9",
+      "sourceId": "10bf30ce-1ce2-572c-adfc-d99ba3fcbc2f",
+      "targetId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "kind": "related"
+    },
+    {
+      "id": "404f158b-40b2-520b-8f6b-06cfaf034ae3",
+      "sourceId": "a2d7394c-ea44-5e53-85f4-43223e5e3bd2",
+      "targetId": "fcced2b5-6f90-5106-a380-725438ff396a",
+      "kind": "related"
+    },
+    {
+      "id": "4108c3ad-06db-5a42-bdf9-79baf4b7bfb1",
+      "sourceId": "69867329-3c22-5796-8df0-951ea1c10320",
+      "targetId": "e6a21e3f-4336-5608-9ca4-ec2ffbc5f4db",
+      "kind": "related"
+    },
+    {
+      "id": "41fcf88f-8ad8-5626-8603-be691d68e905",
+      "sourceId": "d3aa3727-ab64-51d4-8698-5ab1992edaaa",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "42439ea1-1020-5ad8-a3eb-9cee216b4388",
+      "sourceId": "6383eea0-98e2-5187-948e-69eaee553206",
+      "targetId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "kind": "uses"
+    },
+    {
+      "id": "45a0c236-d81e-5e03-9e30-866a274930e2",
+      "sourceId": "f5b28d6a-7066-5919-aa95-f222a27a04de",
+      "targetId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "kind": "related"
+    },
+    {
+      "id": "4995570e-4630-5589-ab4b-a9708203de18",
+      "sourceId": "27ed933c-5db9-543a-8b27-673ae8d4eaaa",
+      "targetId": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "kind": "uses"
+    },
+    {
+      "id": "4a251d08-b612-5f01-85c4-938ac9f65a4e",
+      "sourceId": "ed5df8a3-0dc9-57e3-90cc-ad8f71b06ab5",
+      "targetId": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "kind": "uses"
+    },
+    {
+      "id": "4c39ce84-eef2-54da-9084-8a3a60f56e1f",
+      "sourceId": "7c9906c8-da9d-5999-ac74-007db4f1786c",
+      "targetId": "0fac2261-a537-5f6b-8ac7-a5f2b41e9362",
+      "kind": "flow"
+    },
+    {
+      "id": "4d205b64-c04a-5b61-bc81-02086d2f4998",
+      "sourceId": "fdb2fb11-e1b8-587e-9223-c232f3353273",
+      "targetId": "ada73b1e-5dd8-5c34-8e33-898a519cd360",
+      "kind": "related"
+    },
+    {
+      "id": "4da00a05-e9ea-5261-a4b9-8bb6a85ab5d4",
+      "sourceId": "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "518f1a9d-85bd-59da-b86c-85f776bd871f",
+      "sourceId": "62e9e176-52d4-5f7d-90f6-0c273d01762b",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "5318cb33-598e-568f-a674-ec9dcb087186",
+      "sourceId": "e91c47e2-d2bb-59be-8200-cdd360c5ca73",
+      "targetId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "kind": "related"
+    },
+    {
+      "id": "560c2e4a-b9bb-5a07-b349-621e38a94959",
+      "sourceId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "targetId": "a1aa7aec-ab34-5f79-86cc-9888c179d66a",
+      "kind": "related"
+    },
+    {
+      "id": "57ab7792-ecb4-57ad-b348-7894960a595f",
+      "sourceId": "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+      "targetId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "kind": "related"
+    },
+    {
+      "id": "59cfb45d-285b-585c-8e8e-cf6e5736ccd0",
+      "sourceId": "9d530ce0-2cc0-5bd2-97ba-747f70eaeae0",
+      "targetId": "26687463-3aa7-587d-8322-4e3550d67f64",
+      "kind": "flow"
+    },
+    {
+      "id": "5adc891c-0873-5475-a65c-23d52d3ad29c",
+      "sourceId": "eb62cf6a-4415-5fc7-8b3c-1d6ea7fd8a9f",
+      "targetId": "c1124bec-5c23-51f6-b040-d70a1786f6a7",
+      "kind": "related"
+    },
+    {
+      "id": "5c262ca2-abc9-562d-9532-7ce9826c6b43",
+      "sourceId": "8a73a7db-381f-5fb1-9476-3018dcf8506f",
+      "targetId": "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+      "kind": "related"
+    },
+    {
+      "id": "5c822bd8-a377-5f7f-9409-eba57bf69ac9",
+      "sourceId": "9d530ce0-2cc0-5bd2-97ba-747f70eaeae0",
+      "targetId": "0c9aaf35-0d3c-50ff-a354-a0da39d2ce74",
+      "kind": "flow"
+    },
+    {
+      "id": "5e71fd37-79e0-5263-904b-e62b717ec3aa",
+      "sourceId": "27ed933c-5db9-543a-8b27-673ae8d4eaaa",
+      "targetId": "7019877b-b6c2-53c4-a8ca-c534487a93e2",
+      "kind": "uses"
+    },
+    {
+      "id": "60b77ad3-6fcf-5987-852f-921944f16297",
+      "sourceId": "292b869a-c82e-51c8-965e-023b9844f667",
+      "targetId": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "kind": "uses"
+    },
+    {
+      "id": "60df7a93-ad17-5f65-8d78-ccf098b4b42e",
+      "sourceId": "eb62cf6a-4415-5fc7-8b3c-1d6ea7fd8a9f",
+      "targetId": "5304e13a-1ff1-5ce8-9dac-c7ea181cabdd",
+      "kind": "related"
+    },
+    {
+      "id": "62d4a184-189c-50f4-b13a-2ac862c87db4",
+      "sourceId": "6fa03c3d-267b-5b76-9b2a-2e5017556c32",
+      "targetId": "54d9a9ee-9ba3-54e1-ade4-3053f82ac24d",
+      "kind": "related"
+    },
+    {
+      "id": "63c679c5-0492-56f4-8f64-bab36fdd6900",
+      "sourceId": "f49cecca-1696-5b36-952f-452d2864a0cb",
+      "targetId": "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+      "kind": "related"
+    },
+    {
+      "id": "655441c2-1f7e-5146-859d-edf5e0dc0fa4",
+      "sourceId": "516c705c-5ef4-59d2-a993-8113ab598789",
+      "targetId": "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+      "kind": "uses"
+    },
+    {
+      "id": "66d7e17c-4e1c-549b-90b8-71b51e8d8355",
+      "sourceId": "292b869a-c82e-51c8-965e-023b9844f667",
+      "targetId": "418ef296-2461-5da3-8036-b2729c55dd11",
+      "kind": "uses"
+    },
+    {
+      "id": "677bdbd6-71e4-5a11-9a35-b8dfca7ffc11",
+      "sourceId": "6383eea0-98e2-5187-948e-69eaee553206",
+      "targetId": "a1aa7aec-ab34-5f79-86cc-9888c179d66a",
+      "kind": "uses"
+    },
+    {
+      "id": "68154e5e-d3c0-5789-93e9-1a2589898f90",
+      "sourceId": "8bbade27-268f-53e9-b7c7-94b33ffafb85",
+      "targetId": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "kind": "uses"
+    },
+    {
+      "id": "6cb34cc4-f6b1-57ed-94f5-5f08ae2b4f7e",
+      "sourceId": "7be8026c-58d7-59d8-9519-bdd97068eeae",
+      "targetId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "kind": "feeds"
+    },
+    {
+      "id": "6d278ce4-f8e2-5d6f-b405-719a36e58a06",
+      "sourceId": "8a73a7db-381f-5fb1-9476-3018dcf8506f",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "71ed3b8e-24c8-5d78-a4b9-7176356b286b",
+      "sourceId": "516c705c-5ef4-59d2-a993-8113ab598789",
+      "targetId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "kind": "uses"
+    },
+    {
+      "id": "7667ce99-2df9-5a4e-a0e5-267fd9663c40",
+      "sourceId": "292b869a-c82e-51c8-965e-023b9844f667",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "uses"
+    },
+    {
+      "id": "770271d5-69e0-5508-b227-fe5fd0cca416",
+      "sourceId": "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+      "targetId": "a358df43-cb72-5d82-9663-de704c8e04e8",
+      "kind": "related"
+    },
+    {
+      "id": "796852c4-229c-5f0e-a7ad-c1a87e6968c6",
+      "sourceId": "f9a7b4ff-630b-5f50-a3ca-726e6cc67bae",
+      "targetId": "4455c8af-8d07-551f-b659-367efc542db7",
+      "kind": "related"
+    },
+    {
+      "id": "7ece9056-c6d1-5cd3-b7d1-860dfde5a36a",
+      "sourceId": "94afbb82-9875-56df-9185-b7b2d66d3a98",
+      "targetId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "kind": "related"
+    },
+    {
+      "id": "805b1da9-6a9a-51d3-819e-9c0f108a7d52",
+      "sourceId": "5f1de1f8-f496-53c8-a9cd-32927c41aadd",
+      "targetId": "6b665929-0b2b-5e2e-a7c2-10d5e3ae2c8f",
+      "kind": "feeds"
+    },
+    {
+      "id": "81043fe9-5122-5b90-bfe7-03b901e91119",
+      "sourceId": "28f16c42-117c-5003-8be2-9dfab06fb442",
+      "targetId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "kind": "uses"
+    },
+    {
+      "id": "810dd44c-63fa-5cb1-bc9c-3d3e77762fdf",
+      "sourceId": "c23f9210-181b-5e3f-b0e4-c52476a2c41c",
+      "targetId": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "kind": "feeds"
+    },
+    {
+      "id": "84ffe603-5ba2-5ab5-b56a-fb17cd5ab02d",
+      "sourceId": "6383eea0-98e2-5187-948e-69eaee553206",
+      "targetId": "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+      "kind": "uses"
+    },
+    {
+      "id": "853943d3-24c8-5be4-9e9b-79c6b837733c",
+      "sourceId": "631f46b3-6613-5787-9952-af633d6d9b7f",
+      "targetId": "7019877b-b6c2-53c4-a8ca-c534487a93e2",
+      "kind": "uses"
+    },
+    {
+      "id": "85ff9aa8-3c2f-5374-9e21-3eb8692aa200",
+      "sourceId": "28f16c42-117c-5003-8be2-9dfab06fb442",
+      "targetId": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "kind": "uses"
+    },
+    {
+      "id": "8a24e0a3-8b46-5146-a1f1-0c2e9091030e",
+      "sourceId": "ed5df8a3-0dc9-57e3-90cc-ad8f71b06ab5",
+      "targetId": "b53dc430-4aab-5675-9aac-b3ce141b2833",
+      "kind": "uses"
+    },
+    {
+      "id": "8ad84e3b-a2f7-5a0c-933c-9e339e17ea94",
+      "sourceId": "f49cecca-1696-5b36-952f-452d2864a0cb",
+      "targetId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "kind": "related"
+    },
+    {
+      "id": "8c8923f4-4a83-5a18-be15-c24b8b96eb3e",
+      "sourceId": "f053f070-4012-5e9f-8042-33582113f78a",
+      "targetId": "9406330b-ec6d-5f3b-b677-f9416eae79c1",
+      "kind": "related"
+    },
+    {
+      "id": "8eb00f21-9a46-5ab4-80f7-c8d9299d88be",
+      "sourceId": "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+      "targetId": "25266905-adff-5cab-a3c4-4fca1ddeb830",
+      "kind": "related"
+    },
+    {
+      "id": "8fcc4c93-fca7-5fbe-b72e-4c71dfa303cd",
+      "sourceId": "a8ceaf29-ecf9-5cfd-a5ae-483f27204852",
+      "targetId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "kind": "feeds"
+    },
+    {
+      "id": "92437754-6949-598f-a94a-1b0730086b0b",
+      "sourceId": "eb62cf6a-4415-5fc7-8b3c-1d6ea7fd8a9f",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "9247942e-745f-56cb-820a-c5241d8d503a",
+      "sourceId": "28f16c42-117c-5003-8be2-9dfab06fb442",
+      "targetId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "kind": "uses"
+    },
+    {
+      "id": "93f35272-c954-5aa0-af00-126005945592",
+      "sourceId": "fdb2fb11-e1b8-587e-9223-c232f3353273",
+      "targetId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "kind": "related"
+    },
+    {
+      "id": "9598532d-6359-57ec-a559-57a3eed57b8d",
+      "sourceId": "e6a21e3f-4336-5608-9ca4-ec2ffbc5f4db",
+      "targetId": "69867329-3c22-5796-8df0-951ea1c10320",
+      "kind": "related"
+    },
+    {
+      "id": "97fdb32a-e66f-58bb-bf25-f24caefe9053",
+      "sourceId": "9d530ce0-2cc0-5bd2-97ba-747f70eaeae0",
+      "targetId": "b56d41f4-fcc4-5da2-830c-132abc8d78b9",
+      "kind": "flow"
+    },
+    {
+      "id": "9a1902c7-8e85-58d5-b058-5195162d6eea",
+      "sourceId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "targetId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "kind": "related"
+    },
+    {
+      "id": "9a6bd3ad-0c08-517e-a22a-030fafac99f3",
+      "sourceId": "9a0c787e-bc50-519a-a509-52a612562d78",
+      "targetId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "kind": "uses"
+    },
+    {
+      "id": "9af0fe50-7c8a-5075-96af-e1ddfa798504",
+      "sourceId": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "targetId": "e7505105-4da3-541a-bfd0-a4a2e554598b",
+      "kind": "related"
+    },
+    {
+      "id": "9cf48fb7-0432-576b-96a0-7b13d2aa850b",
+      "sourceId": "a1aa7aec-ab34-5f79-86cc-9888c179d66a",
+      "targetId": "f49cecca-1696-5b36-952f-452d2864a0cb",
+      "kind": "related"
+    },
+    {
+      "id": "9ecc6906-dfb4-5f3a-be0a-43eba340d361",
+      "sourceId": "e6a21e3f-4336-5608-9ca4-ec2ffbc5f4db",
+      "targetId": "fcced2b5-6f90-5106-a380-725438ff396a",
+      "kind": "related"
+    },
+    {
+      "id": "a532e8c8-15c5-57bb-8395-cffff85b8cbe",
+      "sourceId": "a2d7394c-ea44-5e53-85f4-43223e5e3bd2",
+      "targetId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "kind": "related"
+    },
+    {
+      "id": "a69d5a52-9378-57cf-a48b-e77df15c572d",
+      "sourceId": "129f85f0-1557-5995-bf71-203da64b8d4d",
+      "targetId": "25266905-adff-5cab-a3c4-4fca1ddeb830",
+      "kind": "uses"
+    },
+    {
+      "id": "ad3468cb-1b05-548a-959d-166bcd9a5fc6",
+      "sourceId": "7a663a2e-fd4e-5f45-b107-99889627d3ba",
+      "targetId": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "kind": "related"
+    },
+    {
+      "id": "ad862104-79f4-503d-a27b-4cadb1403e33",
+      "sourceId": "ed5df8a3-0dc9-57e3-90cc-ad8f71b06ab5",
+      "targetId": "25266905-adff-5cab-a3c4-4fca1ddeb830",
+      "kind": "uses"
+    },
+    {
+      "id": "ae683142-570f-5c59-8037-6e89f36a544c",
+      "sourceId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "targetId": "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+      "kind": "related"
+    },
+    {
+      "id": "b583dba3-7316-5bd8-acc4-a028eb0c22b8",
+      "sourceId": "27ed933c-5db9-543a-8b27-673ae8d4eaaa",
+      "targetId": "a1aa7aec-ab34-5f79-86cc-9888c179d66a",
+      "kind": "uses"
+    },
+    {
+      "id": "bcb5327d-c967-5899-8412-2ce873ca11ef",
+      "sourceId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "targetId": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "kind": "related"
+    },
+    {
+      "id": "bcd55b57-22b5-5fe6-ae67-2541b0e38226",
+      "sourceId": "fcced2b5-6f90-5106-a380-725438ff396a",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "be06c056-117f-5277-bd2d-8f2b9ee1d580",
+      "sourceId": "31fe87d8-3dc0-583a-9c0d-748bd40093ad",
+      "targetId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "kind": "related"
+    },
+    {
+      "id": "bf287673-a077-5f96-b264-0bfefe7aba6b",
+      "sourceId": "6383eea0-98e2-5187-948e-69eaee553206",
+      "targetId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "kind": "uses"
+    },
+    {
+      "id": "bfb23ac5-c023-5a88-8f3a-89a73c9e456d",
+      "sourceId": "28f16c42-117c-5003-8be2-9dfab06fb442",
+      "targetId": "25266905-adff-5cab-a3c4-4fca1ddeb830",
+      "kind": "uses"
+    },
+    {
+      "id": "c004cae6-1a44-5589-8edc-a2d0a460c085",
+      "sourceId": "7019877b-b6c2-53c4-a8ca-c534487a93e2",
+      "targetId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "kind": "related"
+    },
+    {
+      "id": "c200c200-1538-5c7d-88f4-ebc0f8cd035a",
+      "sourceId": "8bbade27-268f-53e9-b7c7-94b33ffafb85",
+      "targetId": "7019877b-b6c2-53c4-a8ca-c534487a93e2",
+      "kind": "uses"
+    },
+    {
+      "id": "c659c12f-c724-5d48-bad2-e89ae88209f7",
+      "sourceId": "54d9a9ee-9ba3-54e1-ade4-3053f82ac24d",
+      "targetId": "6fa03c3d-267b-5b76-9b2a-2e5017556c32",
+      "kind": "related"
+    },
+    {
+      "id": "c8419c39-1cef-5b0b-8a29-4ae68696e9a3",
+      "sourceId": "c23f9210-181b-5e3f-b0e4-c52476a2c41c",
+      "targetId": "6b665929-0b2b-5e2e-a7c2-10d5e3ae2c8f",
+      "kind": "feeds"
+    },
+    {
+      "id": "c99e02e4-d687-52a0-81cb-73934ae9b716",
+      "sourceId": "7a663a2e-fd4e-5f45-b107-99889627d3ba",
+      "targetId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "kind": "related"
+    },
+    {
+      "id": "caccbee4-683f-5f01-bdb5-f2a120fe3015",
+      "sourceId": "9b627822-fc68-5b25-901e-3a3effbe36b7",
+      "targetId": "fcced2b5-6f90-5106-a380-725438ff396a",
+      "kind": "related"
+    },
+    {
+      "id": "cbcee81e-9aed-56c8-ac98-c9e270260aca",
+      "sourceId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "cf2e05f5-fbf3-589f-a603-32de4fa377f2",
+      "sourceId": "0a57384b-4460-55d3-a715-5f65d6847cfb",
+      "targetId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "kind": "related"
+    },
+    {
+      "id": "d1adb5e6-bd62-5659-bf0b-6f9cc4c84ed1",
+      "sourceId": "7a663a2e-fd4e-5f45-b107-99889627d3ba",
+      "targetId": "b53dc430-4aab-5675-9aac-b3ce141b2833",
+      "kind": "related"
+    },
+    {
+      "id": "d42dd99f-ff79-5127-ad54-2a2c32bd3ffa",
+      "sourceId": "25266905-adff-5cab-a3c4-4fca1ddeb830",
+      "targetId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "kind": "related"
+    },
+    {
+      "id": "d5da6ffc-1775-5e26-9546-f938e428ebe4",
+      "sourceId": "5f1de1f8-f496-53c8-a9cd-32927c41aadd",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "feeds"
+    },
+    {
+      "id": "d66d2e94-1804-56a7-ba4e-f792cb70a3db",
+      "sourceId": "516c705c-5ef4-59d2-a993-8113ab598789",
+      "targetId": "3853020d-0800-5448-9929-1f3e12f01039",
+      "kind": "uses"
+    },
+    {
+      "id": "d80f6fd1-6196-5cf7-befc-4b683d3c05f6",
+      "sourceId": "631f46b3-6613-5787-9952-af633d6d9b7f",
+      "targetId": "6fa03c3d-267b-5b76-9b2a-2e5017556c32",
+      "kind": "uses"
+    },
+    {
+      "id": "d81035d8-ccd3-5ee2-868a-341dcc428b81",
+      "sourceId": "68bc3caa-a554-5c69-bf6d-5584539eb7fb",
+      "targetId": "c564158b-f5c2-598d-94a6-39bc80182212",
+      "kind": "related"
+    },
+    {
+      "id": "d8ccd4c4-fd58-57ed-8195-8e27dd5aaeb8",
+      "sourceId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "targetId": "74fa31f9-5075-516f-9edc-a21a28576ccf",
+      "kind": "related"
+    },
+    {
+      "id": "da2929ee-6469-5d43-9d69-e55108aba982",
+      "sourceId": "74fa31f9-5075-516f-9edc-a21a28576ccf",
+      "targetId": "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+      "kind": "related"
+    },
+    {
+      "id": "dc3ea849-01af-5d6d-8fec-e9eef4b4c1ae",
+      "sourceId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "targetId": "eb62cf6a-4415-5fc7-8b3c-1d6ea7fd8a9f",
+      "kind": "related"
+    },
+    {
+      "id": "dcf9c77c-add1-5fd3-aee1-e2727398fb0e",
+      "sourceId": "f9a7b4ff-630b-5f50-a3ca-726e6cc67bae",
+      "targetId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "kind": "related"
+    },
+    {
+      "id": "e02f8770-4586-5d16-928c-7aae0ddcd31b",
+      "sourceId": "7019877b-b6c2-53c4-a8ca-c534487a93e2",
+      "targetId": "a2d7394c-ea44-5e53-85f4-43223e5e3bd2",
+      "kind": "related"
+    },
+    {
+      "id": "e2dbc504-fc4e-55f7-9ecb-75679dcab649",
+      "sourceId": "9b627822-fc68-5b25-901e-3a3effbe36b7",
+      "targetId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "kind": "related"
+    },
+    {
+      "id": "e57114bd-549a-5cbe-86cd-b456d80bc65e",
+      "sourceId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "targetId": "10bf30ce-1ce2-572c-adfc-d99ba3fcbc2f",
+      "kind": "related"
+    },
+    {
+      "id": "e6da1cbd-5b6e-5ead-aa0e-4e3b91ced14a",
+      "sourceId": "ed5df8a3-0dc9-57e3-90cc-ad8f71b06ab5",
+      "targetId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "kind": "uses"
+    },
+    {
+      "id": "e80fea4b-03a7-5e25-b9e6-11a9b672e131",
+      "sourceId": "fcced2b5-6f90-5106-a380-725438ff396a",
+      "targetId": "e7505105-4da3-541a-bfd0-a4a2e554598b",
+      "kind": "related"
+    },
+    {
+      "id": "e9d32bea-45cd-5192-a3f7-005f996dd92f",
+      "sourceId": "32c8b73b-03f9-58cc-9564-e8b4f29d02e6",
+      "targetId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "kind": "related"
+    },
+    {
+      "id": "ed0ca8fa-b06b-58b4-a0b6-29ef6cf270f5",
+      "sourceId": "ed5df8a3-0dc9-57e3-90cc-ad8f71b06ab5",
+      "targetId": "a1aa7aec-ab34-5f79-86cc-9888c179d66a",
+      "kind": "uses"
+    },
+    {
+      "id": "ed16e183-0ec8-59af-82c0-85693526cfef",
+      "sourceId": "292b869a-c82e-51c8-965e-023b9844f667",
+      "targetId": "b53dc430-4aab-5675-9aac-b3ce141b2833",
+      "kind": "uses"
+    },
+    {
+      "id": "ed43a1d3-40cb-564f-8262-eecdd0627fc4",
+      "sourceId": "74fa31f9-5075-516f-9edc-a21a28576ccf",
+      "targetId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "kind": "related"
+    },
+    {
+      "id": "eeb2ec36-ea1f-571b-b8ff-f13a92253119",
+      "sourceId": "129f85f0-1557-5995-bf71-203da64b8d4d",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "uses"
+    },
+    {
+      "id": "eeced955-32ae-502d-8c9b-fdba61b1fa3d",
+      "sourceId": "54d9a9ee-9ba3-54e1-ade4-3053f82ac24d",
+      "targetId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "kind": "related"
+    },
+    {
+      "id": "ef62e321-914e-56b8-93f2-898733a602f6",
+      "sourceId": "e91c47e2-d2bb-59be-8200-cdd360c5ca73",
+      "targetId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "kind": "related"
+    },
+    {
+      "id": "f153e0ab-8941-5697-bf89-d96b4f785ba9",
+      "sourceId": "6383eea0-98e2-5187-948e-69eaee553206",
+      "targetId": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "kind": "uses"
+    },
+    {
+      "id": "f1d8d784-b345-58d0-b84a-1a912cee5c4d",
+      "sourceId": "62e9e176-52d4-5f7d-90f6-0c273d01762b",
+      "targetId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "kind": "related"
+    },
+    {
+      "id": "f3617362-dbd4-5a9c-95c8-e5e90f0d58ca",
+      "sourceId": "f053f070-4012-5e9f-8042-33582113f78a",
+      "targetId": "6ff224cd-114b-5707-a7c4-9b0ed7c7677f",
+      "kind": "related"
+    },
+    {
+      "id": "f6cc9bec-b879-5842-b818-0547940005f8",
+      "sourceId": "516c705c-5ef4-59d2-a993-8113ab598789",
+      "targetId": "418ef296-2461-5da3-8036-b2729c55dd11",
+      "kind": "uses"
+    },
+    {
+      "id": "f88ea279-d7f2-565f-a37e-47ed6c3758ed",
+      "sourceId": "2099904d-e247-5fec-8269-c601a1d1a8f0",
+      "targetId": "f9a7b4ff-630b-5f50-a3ca-726e6cc67bae",
+      "kind": "related"
+    },
+    {
+      "id": "f936ca00-49a1-51db-b029-26954f893c61",
+      "sourceId": "a2a3c85b-0453-59f9-8ce0-12f67c812fa6",
+      "targetId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "kind": "related"
+    },
+    {
+      "id": "fa13053e-b764-50f3-9146-63860128168f",
+      "sourceId": "69867329-3c22-5796-8df0-951ea1c10320",
+      "targetId": "6fa03c3d-267b-5b76-9b2a-2e5017556c32",
+      "kind": "related"
+    },
+    {
+      "id": "fd31944f-4f5c-5b4d-ab0a-47095396a19c",
+      "sourceId": "129f85f0-1557-5995-bf71-203da64b8d4d",
+      "targetId": "70fb90b9-bbc7-5dbe-bac0-4772c7c04155",
+      "kind": "uses"
+    },
+    {
+      "id": "fdd9f00e-0e1a-5120-b10a-77456c0be48d",
+      "sourceId": "f5b28d6a-7066-5919-aa95-f222a27a04de",
+      "targetId": "bbf8c12d-b6b1-57c2-a72e-87404e536a7c",
+      "kind": "related"
+    },
+    {
+      "id": "ff529708-203e-5c72-a91e-2623cadcc7e7",
+      "sourceId": "7be1fe38-aaa7-515f-a952-2cdaa7c50015",
+      "targetId": "74fa31f9-5075-516f-9edc-a21a28576ccf",
+      "kind": "related"
+    },
+    {
+      "id": "ffe984f7-605c-5ff5-a747-0f3954558742",
+      "sourceId": "a358df43-cb72-5d82-9663-de704c8e04e8",
+      "targetId": "7946bd83-806b-5103-aa59-222c47cf5494",
+      "kind": "related"
+    }
+  ],
+  "industries": [
+    {
+      "id": "advertising",
+      "label": "Advertising",
+      "blurb": "Media buying, campaign delivery, audience targeting, brand safety, and cross-channel attribution across linear, digital, and retail media.",
+      "componentIds": [
+        "0833fbe4-604a-50b0-bcab-b1ad60c689d0",
+        "0b242530-0450-57b6-91a1-f6bda26b8bf2",
+        "0dbd2cca-9a98-56d8-b98a-004bfb2b3b64",
+        "0e7107db-3df7-517e-8308-27a45592bd72",
+        "171bf09f-d35e-5716-ac73-b274a7cd96d5",
+        "187c7923-9208-5130-bbb5-f70b07d80195",
+        "194d2b42-7269-506e-8015-2a8ec47471af",
+        "199a7581-936b-5631-a1ef-01737cad4d89",
+        "1ac22a22-1e74-5aea-b6f6-e2de653744bd",
+        "1d043480-bfb8-503d-9df1-dc1a51d43512",
+        "1e75940e-99cc-5b21-815c-52e8f26532c3",
+        "200377a1-846c-53c6-8797-a04014386617",
+        "2158f1fc-4688-5a72-8194-553cab3482f2",
+        "26687463-3aa7-587d-8322-4e3550d67f64",
+        "2fc5feda-1e4c-5522-93aa-3fe8b9bbaa5f",
+        "32563101-2c95-5330-917e-49ff6f5a8987",
+        "369ab76b-a125-5bda-9fd6-36ed0aeb04c3",
+        "4ab5bc88-56d4-5dfc-bad6-aba5decb3994",
+        "4cd70b89-8581-5a0a-b56f-6bace9f47a79",
+        "5055378a-64ea-5972-9eba-6b99b61964af",
+        "52b1db34-1543-51d8-8324-e5857ed5589b",
+        "5304e13a-1ff1-5ce8-9dac-c7ea181cabdd",
+        "5a0dc43a-d264-5b73-9114-fe93d88410be",
+        "5b63aaa6-17fc-588b-966b-272ee1d44a3b",
+        "6a19f5dc-53c6-566b-a590-58178ed3050d",
+        "6ad6d1a2-b69e-59a9-b813-e178fc9aafa8",
+        "6c266b3b-c329-5d69-9d76-87a47a97db05",
+        "6cdef7e8-4d58-56c4-a4f8-5c87c619e7aa",
+        "6d6e9c33-e961-56fa-a854-80361c031941",
+        "734a143f-27c0-5867-9f84-c7bfe5d485b3",
+        "75dd0c22-4731-50ea-a444-6dd9040c90a2",
+        "76e91a6b-a66c-5c39-b987-bbc1738d6b5b",
+        "7847db50-9126-5bf6-a66b-4d273813cba7",
+        "789bda8a-fd38-5745-bdb8-d0c75ecceb86",
+        "7ab7d1a7-ccc4-5834-9c70-f3802a9f7f1e",
+        "7c9906c8-da9d-5999-ac74-007db4f1786c",
+        "81c7a1e4-03cd-538e-b54e-f8ed2ac1155a",
+        "8374e745-6558-5f94-bbb1-5a94ed3c3c40",
+        "8869e52b-de1e-539d-9a8b-0cdcac46e5e1",
+        "8c19fa38-af19-5a45-9d57-2d69060da255",
+        "990e22d2-388b-5823-a98e-5c536f64a84a",
+        "99885308-41d8-5a38-83fe-1b713f7e360b",
+        "9d530ce0-2cc0-5bd2-97ba-747f70eaeae0",
+        "af740a78-2960-57d7-9d96-6a216860af55",
+        "b53dc430-4aab-5675-9aac-b3ce141b2833",
+        "b92761b1-ec09-5b22-b3cd-38a4f3905af8",
+        "baef1ef5-fa87-54db-9f48-64cc6d5d0089",
+        "bd5aeb70-e433-55e8-bd4c-1913b0c53ceb",
+        "bf080da2-ecd5-5015-a43e-1317c7c0c39e",
+        "c3f916ba-6d3f-583a-b34d-ecd12afb4f17",
+        "c731547a-517a-5639-b9ff-b6ea6faac1c3",
+        "cbfb858a-0c6f-553d-922a-1b489a75c4e5",
+        "d1a7ade8-5c03-51dd-b793-1ee90ceee245",
+        "d2c04238-0c6d-56c6-a205-c0a153b66ff5",
+        "d66595de-2d38-56bf-9c8f-8f534d9fcaee",
+        "de6d0ac4-8589-5fe4-87fc-616c9e14d99f",
+        "de7fcc45-2aa3-5658-8e5b-e726d70e2e3d",
+        "e55efffe-3911-5d89-933d-02e77f6c53d6",
+        "eb7a578c-3d74-5983-8ae9-6f169455db14",
+        "eb9aa146-d4f7-559e-a633-33c35222784a",
+        "ecd7f6e9-6165-5be4-ae00-0e12c51a27f6",
+        "ecf929e1-6ce1-5d4f-ac92-c5a987c81e3e",
+        "ecfe7af6-04b4-58e8-b94c-daa336b4a8e1",
+        "f2648520-abf8-50ea-a48b-9cbabc288f2c",
+        "f51582ad-8a9d-5811-823e-de96da7558e8",
+        "fa2dcf86-8b40-5b43-820c-eec323b47cd0",
+        "fb0d883d-5819-5ee4-bb4d-7c89591477d1",
+        "feb78bde-5ee6-5f7f-b148-d2b7f79538e0"
+      ],
+      "medallion": {
+        "Bronze": {
+          "s": "Raw ad server and partner logs",
+          "long": "Impression, click, conversion and spend events from DSPs, ad servers and clean rooms, landed exactly as received so a bid or a view can be replayed for audit."
+        },
+        "Silver": {
+          "s": "Conformed campaigns and audiences",
+          "long": "Campaigns, line items, creatives and audience segments resolved into single entities across platforms, with identity graphs stitched and frequency caps reconciled."
+        },
+        "Gold": {
+          "s": "ROAS, reach and attribution",
+          "long": "Contracted products the media and finance teams run on: ROAS and CPA by channel, incremental lift, reach and frequency, and brand safety incident rates."
+        }
+      },
+      "sources": {
+        "google-cm360": {
+          "t": "Google Campaign Manager 360",
+          "u": "https://marketingplatform.google.com/about/campaign-manager-360/"
+        },
+        "trade-desk": {
+          "t": "The Trade Desk",
+          "u": "https://www.thetradedesk.com/"
+        },
+        "meta-ads": {
+          "t": "Meta Ads Manager",
+          "u": "https://www.facebook.com/business/tools/ads-manager"
+        },
+        "amazon-ads": {
+          "t": "Amazon Ads",
+          "u": "https://advertising.amazon.com/"
+        },
+        "google-ad-manager": {
+          "t": "Google Ad Manager",
+          "u": "https://admanager.google.com/"
+        },
+        "magnite": {
+          "t": "Magnite SSP",
+          "u": "https://www.magnite.com/"
+        },
+        "index-exchange": {
+          "t": "Index Exchange",
+          "u": "https://www.indexexchange.com/"
+        },
+        "sf-marketing-cloud": {
+          "t": "Salesforce Marketing Cloud",
+          "u": "https://www.salesforce.com/products/marketing-cloud/"
+        },
+        "adobe-aep": {
+          "t": "Adobe Experience Platform",
+          "u": "https://business.adobe.com/products/experience-platform/adobe-experience-platform.html"
+        },
+        "liveramp": {
+          "t": "LiveRamp",
+          "u": "https://liveramp.com/"
+        },
+        "nielsen-one": {
+          "t": "Nielsen ONE",
+          "u": "https://www.nielsen.com/solutions/nielsen-one/"
+        },
+        "ias": {
+          "t": "Integral Ad Science",
+          "u": "https://integralads.com/"
+        },
+        "appsflyer": {
+          "t": "AppsFlyer",
+          "u": "https://www.appsflyer.com/"
+        },
+        "kantar": {
+          "t": "Kantar",
+          "u": "https://www.kantar.com/"
+        },
+        "bynder": {
+          "t": "Bynder DAM",
+          "u": "https://www.bynder.com/"
+        },
+        "celtra": {
+          "t": "Celtra",
+          "u": "https://www.celtra.com/"
+        },
+        "iab-openrtb": {
+          "t": "IAB OpenRTB",
+          "u": "https://iabtechlab.com/standards/openrtb/"
+        },
+        "liveramp-cleanroom": {
+          "t": "LiveRamp Data Collaboration",
+          "u": "https://liveramp.com/data-collaboration/"
+        },
+        "comscore": {
+          "t": "Comscore",
+          "u": "https://www.comscore.com/"
+        }
+      }
+    },
+    {
+      "id": "aerospace_space",
+      "label": "Aerospace & Space",
+      "blurb": "Aerospace OEMs, satellite operators and launch providers: PLM and the digital thread, MES and supply chain, MRO and fleet reliability, satellite telemetry, mission ops and earned-value program control.",
+      "componentIds": [
+        "03df5cdb-df96-5406-a25a-7a5f2ca0665d",
+        "07cc4009-cd9a-57db-969c-ba0a64282b18",
+        "0b242530-0450-57b6-91a1-f6bda26b8bf2",
+        "0dbd2cca-9a98-56d8-b98a-004bfb2b3b64",
+        "0eab51af-5bef-5288-a534-198c928a9f13",
+        "152477f1-bb3c-5711-af24-2874bce78b93",
+        "152d6d83-0f7b-53ea-802c-50101f7592fa",
+        "155dcd91-02ea-55d9-8ea8-eb201c6a3044",
+        "16c34227-0c94-5d36-9c94-6f25caecc036",
+        "1b1a30b9-a704-50cf-9653-3efcd3438b23",
+        "1c59a789-b8b6-5cdd-965b-ba16e4f083d6",
+        "1c64998d-10d6-5422-a27a-7e1c37559edf",
+        "26687463-3aa7-587d-8322-4e3550d67f64",
+        "2c1fb86a-7b44-5c06-9333-2f75f6f99f64",
+        "2dc1f9d2-ce72-592c-a6bc-309a7f26d373",
+        "2eb004cf-7a8f-5a4b-9050-75de683f56f6",
+        "2fc5feda-1e4c-5522-93aa-3fe8b9bbaa5f",
+        "3114fa89-e906-5a1d-aa02-0863cc570837",
+        "36ac54fb-a490-5a29-b6bc-86622217a2c0",
+        "50820c62-a2b2-5f64-8d65-ab66813af1c5",
+        "516ec6fd-b9f1-50ad-9f5c-8490a7c97efd",
+        "53bbb5eb-ca68-50ec-bd4b-f4410415638f",
+        "5429252b-1092-51ec-bd7b-fe5af41f0eff",
+        "5758bd5a-da05-5342-aeb6-ea39ee08021e",
+        "5e626968-4c3b-5548-8b9b-1e5e9d72c8e5",
+        "5f6a389a-c740-53be-b859-30ec9e6e543c",
+        "60ff9c48-032a-51c9-8cc7-c344da02a03d",
+        "62454e71-3d1d-5e4f-9623-b2b44aa49e88",
+        "62d183d7-895a-5375-8f25-94870d40eb79",
+        "6383eea0-98e2-5187-948e-69eaee553206",
+        "67743b21-68c5-50eb-af5c-8620335c4605",
+        "6b7ba36a-3001-557a-b8cc-db7a67d62885",
+        "734a143f-27c0-5867-9f84-c7bfe5d485b3",
+        "7847db50-9126-5bf6-a66b-4d273813cba7",
+        "798c9848-83ef-5bc4-91ee-c138e412351d",
+        "7a4dd5cf-dd51-512c-89ed-718fd86a921c",
+        "7c9906c8-da9d-5999-ac74-007db4f1786c",
+        "809e2785-9570-54f9-bd89-cae396e6ada0",
+        "906e0ec6-fb04-5c44-819b-391398f20067",
+        "969a276c-219d-5406-bdc5-2c0303c5c62f",
+        "9a229608-81f6-53f1-a55c-3e55993d48c4",
+        "9b4f0996-a159-5560-930f-6be1bafe5fc9",
+        "9b8160f4-1b4b-51d9-9a6d-318d1f69a1be",
+        "9ba944ca-2f27-5a94-aba7-9987386c3363",
+        "9d530ce0-2cc0-5bd2-97ba-747f70eaeae0",
+        "9e6c461b-6fb0-5727-a4dc-11686b0e33df",
+        "a2c1987d-d17b-5df3-aff0-70edc139d2f0",
+        "a4bb1c74-fb36-551e-8c59-a96283c911b6",
+        "ab949976-3e5c-527e-80bd-a5b503407bf5",
+        "bfa2467c-438f-5689-b36b-ca66585b299a",
+        "c210f259-8fd9-57a6-9d28-17833228be4a",
+        "c434fba1-ef03-595b-95ef-e165626b20d4",
+        "c73ee6df-91e3-5525-9b4a-e30ccd245ac6",
+        "cbfb858a-0c6f-553d-922a-1b489a75c4e5",
+        "cd6d711e-1937-5dfc-8e07-5e2440030924",
+        "ce933328-88a1-5f56-8992-75e07905b0d1",
+        "d66595de-2d38-56bf-9c8f-8f534d9fcaee",
+        "d69bb102-dbb5-5b77-aa8e-55c31f8f61e0",
+        "d70d56cd-c9a2-5dde-937f-7bf1d0ed4890",
+        "db129168-b744-51e6-8286-565f4b6233ff",
+        "dff7a250-ac9f-5a82-b4a1-2e0fd3c04f9c",
+        "e2ceaefd-2a09-5694-a787-bdf10c663ef1",
+        "e46052dd-8acf-5954-b16e-cc100d11f2e7",
+        "e8761f61-7a5d-5f5f-86f4-72610a1b9b32",
+        "eb44a17c-c6cf-5126-a9f1-b666d9fdeb6f",
+        "ed77f5cf-362d-5cfe-a1bf-0407a3abaf48",
+        "f17a6380-3c64-5398-8302-8c2e89224640",
+        "f41295ce-5a26-5106-9b3a-462fb4efa5a4",
+        "f488d284-413e-55ff-bcbf-3ed241abc704",
+        "f62308a6-8671-565b-9bfb-5a4f71ab77d9",
+        "fc09afc0-3b5d-5f8d-a163-88ab9ff2580f",
+        "fcc43c20-284d-53ba-bba4-a9143067631d"
+      ],
+      "medallion": {
+        "Bronze": {
+          "s": "Raw engineering and telemetry feeds",
+          "long": "CATIA and Teamcenter change orders, Opcenter and Apriso lot and process records, CCSDS satellite telemetry and ground downlink, engine and test-stand streams, Deltek cost and schedule actuals, landed exactly as received so a design change or a telemetry pass can be replayed as it stood."
+        },
+        "Silver": {
+          "s": "Conformed program, part, vehicle",
+          "long": "Programs, parts, serial numbers, satellites and engines resolved into single conformed entities across PLM, MES, MRO and mission systems, with the as-designed, as-planned and as-built configurations reconciled and every serial stitched from component to flight."
+        },
+        "Gold": {
+          "s": "EVM, yield, fleet reliability",
+          "long": "Contracted products the program and operations teams run on: earned-value cost and schedule variance by control account, first-pass yield and OEE by line, satellite and fleet reliability by vehicle, and anomaly and removal rates by subsystem."
+        }
+      },
+      "sources": {
+        "catia": {
+          "t": "Dassault CATIA / 3DEXPERIENCE",
+          "u": "https://www.3ds.com/products/catia"
+        },
+        "teamcenter": {
+          "t": "Siemens Teamcenter PLM",
+          "u": "https://plm.sw.siemens.com/en-US/teamcenter/"
+        },
+        "windchill": {
+          "t": "PTC Windchill PLM",
+          "u": "https://www.ptc.com/en/products/windchill"
+        },
+        "ansys": {
+          "t": "Ansys structural simulation",
+          "u": "https://www.ansys.com/products/structures"
+        },
+        "stk": {
+          "t": "Ansys STK (Systems Tool Kit)",
+          "u": "https://www.ansys.com/products/missions/ansys-stk"
+        },
+        "opcenter": {
+          "t": "Siemens Opcenter Execution MES",
+          "u": "https://plm.sw.siemens.com/en-US/opcenter/"
+        },
+        "apriso": {
+          "t": "DELMIA Apriso MES",
+          "u": "https://www.3ds.com/products/delmia/apriso"
+        },
+        "sap": {
+          "t": "SAP S/4HANA",
+          "u": "https://www.sap.com/products/erp/s4hana.html"
+        },
+        "avevapi": {
+          "t": "AVEVA PI System",
+          "u": "https://www.aveva.com/en/products/aveva-pi-system/"
+        },
+        "cobra": {
+          "t": "Deltek Cobra earned value management",
+          "u": "https://www.deltek.com/en/products/project-and-portfolio-management/cobra"
+        },
+        "primavera": {
+          "t": "Oracle Primavera P6",
+          "u": "https://www.oracle.com/construction-engineering/primavera-p6/"
+        },
+        "costpoint": {
+          "t": "Deltek Costpoint ERP",
+          "u": "https://www.deltek.com/en/products/erp/costpoint"
+        },
+        "kratos": {
+          "t": "Kratos OpenSpace ground platform",
+          "u": "https://www.kratosspace.com/virtual-ground/platform"
+        },
+        "ccsds": {
+          "t": "CCSDS space data standards",
+          "u": "https://public.ccsds.org/default.aspx"
+        },
+        "gmv": {
+          "t": "GMV space ground systems",
+          "u": "https://www.gmv.com/en/sectors/space"
+        },
+        "maintenix": {
+          "t": "IFS Maintenix aviation MRO",
+          "u": "https://www.ifs.com/industries/aerospace-and-defense"
+        },
+        "ksat": {
+          "t": "KSAT ground network services",
+          "u": "https://www.ksat.no/ground-network-services/"
+        },
+        "ariba": {
+          "t": "SAP Ariba spend management",
+          "u": "https://www.sap.com/products/spend-management/ariba.html"
+        }
+      }
+    },
+    {
+      "id": "agriculture",
+      "label": "Agriculture",
+      "blurb": "Farm operations, crop planning, input supply, commodity trading, and sustainability reporting across grower networks and co-ops.",
+      "componentIds": [
+        "0170bb82-3548-5ce8-aa0e-d5a8b025ffb7",
+        "0833fbe4-604a-50b0-bcab-b1ad60c689d0",
+        "0b242530-0450-57b6-91a1-f6bda26b8bf2",
+        "0dbd2cca-9a98-56d8-b98a-004bfb2b3b64",
+        "0e30c265-e78a-5838-8a29-6cc7967d11f1",
+        "14dcb9ac-f9a8-556a-bc40-2be245adda95",
+        "18542407-7947-5e70-b8d0-d36cf389a543",
+        "1d043480-bfb8-503d-9df1-dc1a51d43512",
+        "1f42f24a-941b-5e1b-a47c-ae1418a6d9b6",
+        "2038e033-ecb0-531d-8e48-b28082f21fe7",
+        "2201d05a-60f3-51d6-84ac-a95a74649381",
+        "23199f9b-6280-5f4d-9359-473f742a0711",
+        "26687463-3aa7-587d-8322-4e3550d67f64",
+        "2d21b4d8-1a2d-547d-8243-9c32549faffe",
+        "2fc5feda-1e4c-5522-93aa-3fe8b9bbaa5f",
+        "332b38cb-23c6-59bf-b2d0-24139356c8b5",
+        "348b4465-4f59-5c5b-b6bb-699d81a536bb",
+        "35e0f858-048b-5824-94a5-3b250277bb95",
+        "3a27ad6f-1c7f-586a-b3e6-2feed335f67c",
+        "424fe7ea-59c7-5075-a070-cb857cca3324",
+        "45c00460-ae04-5ce7-8788-44bf26fb4011",
+        "46076b8e-5859-5511-aee6-0e0bda5c2a06",
+        "4bd3d58c-d382-5bbb-b95b-3570e8a1c55d",
+        "4ed13052-f5c5-5167-be68-52b5212730d8",
+        "4fc9e495-76cf-54fc-95a2-14ec2f8f2d8d",
+        "5304e13a-1ff1-5ce8-9dac-c7ea181cabdd",
+        "54db25ba-7df6-55b0-a7b6-369dc1f33c73",
+        "5af4a277-e068-5a1e-a2fb-db1be9bc070b",
+        "5e8a4d87-4783-50c9-9234-06b75535846f",
+        "634d7e68-3a1e-5d87-9a1c-d89ebecb55bb",
+        "6602f2d8-1632-5188-8cf0-ed180f3dfdfa",
+        "707883f2-f965-55a5-9a8e-74a77bf1c3ba",
+        "734a143f-27c0-5867-9f84-c7bfe5d485b3",
+        "7847db50-9126-5bf6-a66b-4d273813cba7",
+        "7c9906c8-da9d-5999-ac74-007db4f1786c",
+        "825a2816-0fa5-5e98-abe8-c4fc3faaa4fa",
+        "827ffee7-39f4-5597-b98d-e158c425a5c1",
+        "836f0725-c443-5413-ae81-3c7be9ce8aa6",
+        "84af6586-8b46-52cf-8a1f-d4ea08285bd5",
+        "893426bc-6fa8-5ced-9035-46887460d2c5",
+        "8fd9873c-2c2d-51b8-b85a-941e27ce6ccb",
+        "908dd533-d425-5ee3-9f30-cd06ef51e173",
+        "9d530ce0-2cc0-5bd2-97ba-747f70eaeae0",
+        "9f6f654a-ccc9-5f64-b4a5-9acad409c139",
+        "a0d3963c-fcb3-5071-a312-3b79714aeef8",
+        "a0ffc3c5-84b3-5d56-a60c-fceb0403d83f",
+        "a8700991-9364-5d03-a205-483401a32f64",
+        "a92862aa-8713-57cf-8173-ec2e478ba19c",
+        "a9b0fc50-a805-593e-b99a-92509599bd4c",
+        "afa8dda5-04e0-5634-b060-41c710da0a2e",
+        "b53dc430-4aab-5675-9aac-b3ce141b2833",
+        "c6c21dc3-9423-58ad-bf72-1c51fab99d6f",
+        "c8b41b72-0249-51f3-8778-431ea818cef0",
+        "cbfb858a-0c6f-553d-922a-1b489a75c4e5",
+        "cd198a0d-c640-5e20-bd67-af1ffa79f949",
+        "cd68a72f-ee73-5b0c-80ad-d96cee517900",
+        "ceb87a7a-b33e-55fc-b5b5-b98eab8087e3",
+        "d3bf45b0-edfe-50d9-bac7-febe996fb1db",
+        "d66595de-2d38-56bf-9c8f-8f534d9fcaee",
+        "e0ad14ff-017d-5788-9dc0-e46aa677eaeb",
+        "e1683365-ce20-5919-9823-663ec04da98a",
+        "e3441c62-853b-531f-8123-ce28304a1c5d",
+        "eb9aa146-d4f7-559e-a633-33c35222784a",
+        "efd5a79a-be2d-5e85-97f5-f94c727c335d",
+        "f3dca667-237f-5f3c-9006-85a082d4bd50",
+        "f4fef956-b483-5cc3-843d-6de14afadb9a",
+        "f785694d-04e5-55fe-ba25-1fbf5a089461"
+      ],
+      "medallion": {
+        "Bronze": {
+          "s": "Raw field and market feeds",
+          "long": "Telemetry from equipment, weather stations, satellite imagery and exchange ticks, landed exactly as received so a yield estimate can be replayed."
+        },
+        "Silver": {
+          "s": "Conformed fields and assets",
+          "long": "Fields, parcels, equipment and contracts resolved into single entities across FMIS, ERP and trading systems."
+        },
+        "Gold": {
+          "s": "Yield, margin and carbon",
+          "long": "Contracted products agronomy and finance run on: yield per acre, input cost per bushel, basis and carbon intensity scores."
+        }
+      },
+      "sources": {
+        "john-deere": {
+          "t": "John Deere Operations Center",
+          "u": "https://www.deere.com/en/technology-products/precision-ag-technology/operations-center/"
+        },
+        "climate-fieldview": {
+          "t": "Climate FieldView",
+          "u": "https://www.climate.com/"
+        },
+        "granular": {
+          "t": "Traction Ag",
+          "u": "https://tractionag.com"
+        },
+        "sap-agri": {
+          "t": "SAP Agribusiness",
+          "u": "https://www.sap.com/industries/agribusiness.html"
+        },
+        "oracle-fb": {
+          "t": "Oracle Food and Beverage",
+          "u": "https://www.oracle.com/food-beverage/"
+        },
+        "bushel": {
+          "t": "Bushel",
+          "u": "https://bushelpowered.com/"
+        },
+        "agvance": {
+          "t": "Agvance (SSI)",
+          "u": "https://www.agvance.net"
+        },
+        "cme": {
+          "t": "CME Group",
+          "u": "https://www.cmegroup.com/markets/agriculture.html"
+        },
+        "dtn": {
+          "t": "DTN",
+          "u": "https://www.dtn.com/"
+        },
+        "barchart": {
+          "t": "Barchart",
+          "u": "https://www.barchart.com/cmdty"
+        },
+        "dtn-weather": {
+          "t": "DTN Weather",
+          "u": "https://www.dtn.com/weather/"
+        },
+        "planet": {
+          "t": "Planet Labs",
+          "u": "https://www.planet.com/"
+        },
+        "sentinel": {
+          "t": "Sentinel Hub",
+          "u": "https://www.sentinel-hub.com/"
+        },
+        "regrow": {
+          "t": "Regrow",
+          "u": "https://www.regrow.ag/"
+        },
+        "indigo": {
+          "t": "Indigo Ag",
+          "u": "https://www.indigoag.com/"
+        },
+        "usda-nass": {
+          "t": "USDA NASS",
+          "u": "https://quickstats.nass.usda.gov/"
+        },
+        "usda-rma": {
+          "t": "USDA RMA",
+          "u": "https://www.rma.usda.gov/"
+        },
+        "aggateway": {
+          "t": "AgGateway ADAPT",
+          "u": "https://www.aggateway.org/"
+        }
+      }
+    },
+    {
+      "id": "agtech",
+      "label": "AgTech",
+      "blurb": "Agriculture technology vendors: precision-ag platforms, farm-management software, equipment telematics, satellite and sensor networks, crop-science R&D, and sustainability programs.",
+      "componentIds": [
+        "012c0e27-f116-5b9d-a3ca-690dc3fe68b0",
+        "01bda97b-8af6-5f26-9a46-da8c652509e0",
+        "0b242530-0450-57b6-91a1-f6bda26b8bf2",
+        "0dbd2cca-9a98-56d8-b98a-004bfb2b3b64",
+        "12ca66f7-f04e-5cb1-8822-273e8319897a",
+        "18542407-7947-5e70-b8d0-d36cf389a543",
+        "18cb67ed-cad8-536b-a499-4ecba0cfe1b8",
+        "1eea64ee-f05b-59e9-bb1c-3a8eddcf1d27",
+        "26687463-3aa7-587d-8322-4e3550d67f64",
+        "2fc5feda-1e4c-5522-93aa-3fe8b9bbaa5f",
+        "2fec9554-c8d6-5040-95d4-805d3795454a",
+        "31bb0529-8502-53fc-97b2-0bb20560a52e",
+        "41f34b8b-86e7-51f4-9b52-0c78b88a3732",
+        "4392f19f-e810-5c85-aee4-bed999ebdd7a",
+        "44b40e36-53ff-5796-8d04-bf164df58e9e",
+        "45832c2a-76f2-5b36-8734-a12b7f3dce1f",
+        "46241951-89a4-5b74-875a-c0829c92ef03",
+        "49f63c23-11fa-542a-8a1a-bff48e841424",
+        "50b6326f-815a-569e-acc6-81578c0d93c0",
+        "5304e13a-1ff1-5ce8-9dac-c7ea181cabdd",
+        "57727c50-a299-535e-8dee-f102e747c830",
+        "5776b855-bd9e-5f56-86bb-6705e1ed8d85",
+        "59407707-e46e-50f3-ba1f-6c2f8ad3c0ac",
+        "63e84bdc-2336-5e76-8bbf-999b49bb3e03",
+        "683f02f9-ff8c-53ae-88d0-986c5355758c",
+        "70425411-f2b5-57d3-9a48-d7e6c288dc63",
+        "734a143f-27c0-5867-9f84-c7bfe5d485b3",
+        "74f3089a-8b29-56ba-97f9-37fed49a1981",
+        "7847db50-9126-5bf6-a66b-4d273813cba7",
+        "7c9906c8-da9d-5999-ac74-007db4f1786c",
+        "827ffee7-39f4-5597-b98d-e158c425a5c1",
+        "84af6586-8b46-52cf-8a1f-d4ea08285bd5",
+        "886478a4-1685-567c-b878-5ef0a9c2010a",
+        "8fd9873c-2c2d-51b8-b85a-941e27ce6ccb",
+        "9612724b-b685-5f3a-bfab-ebda44db31ed",
+        "9d530ce0-2cc0-5bd2-97ba-747f70eaeae0",
+        "a0d3963c-fcb3-5071-a312-3b79714aeef8",
+        "a17c9cac-382c-527b-8169-34470206a438",
+        "a2483bad-6d35-5a76-b988-e4551cae4477",
+        "a6709fbd-f57c-5a6e-9dbc-173b3c4325bc",
+        "aae35a09-a4e0-5e7e-8d8b-1ff5be6b12ac",
+        "ab0b5c09-790a-5ae4-a2f0-a056fe1dd812",
+        "b47e8949-6cb1-58aa-a20b-58ca0283377e",
+        "b53dc430-4aab-5675-9aac-b3ce141b2833",
+        "b9676b8e-5124-527b-9fbb-3e9d7dcc1d65",
+        "c8b41b72-0249-51f3-8778-431ea818cef0",
+        "cafaf558-effc-5c02-b9c1-55b36e8d10fd",
+        "cbfb858a-0c6f-553d-922a-1b489a75c4e5",
+        "cd198a0d-c640-5e20-bd67-af1ffa79f949",
+        "cdb76f55-cb2b-53fc-a498-fd984e00cb4d",
+        "d66595de-2d38-56bf-9c8f-8f534d9fcaee",
+        "d7f63f35-5229-5275-bba1-784e10d0552c",
+        "d80b27dd-f7db-5c86-911f-a4ee97a63ada",
+        "db058eac-ccfd-58b0-be05-2f0302d1e937",
+        "dbf17506-0db4-50a2-9b3a-7fe359962da6",
+        "dc064cb4-b2f1-529b-9cd1-56d732417663",
+        "dc85e774-f99c-5b30-bc34-e0c3b65e3b8a",
+        "df72e756-331b-5ea6-9ee0-817e57d851e1",
+        "e3bd8ad8-023c-5a4b-92fb-b22d7560eb50",
+        "e6877a7a-7951-542d-9cba-8938698d02ff",
+        "ed4a0f6e-f1f5-5e55-9330-5599175a21c4",
+        "ed9991d5-2724-58cb-8b85-7a6bb14bb454",
+        "ef1125ce-c362-5483-84fd-f9f1fb977baf",
+        "efd5a79a-be2d-5e85-97f5-f94c727c335d",
+        "f0ba704e-8a5e-554b-a598-47fb6f63c59c",
+        "f267d638-fb5b-5920-9900-43c79b48ad1d",
+        "f60f81de-f727-511e-9f8b-f8196b84230e",
+        "f62308a6-8671-565b-9bfb-5a4f71ab77d9",
+        "f8615dc2-7612-53bc-a7e3-e6dcf1f53f5c",
+        "fd69e222-7de8-539c-b78b-c04e35c685aa",
+        "fdc763e6-2580-5f53-9d74-89de7bfe8665",
+        "ffff36c9-caef-5a7f-8386-49c9287d1580"
+      ],
+      "medallion": {
+        "Bronze": {
+          "s": "Raw field & fleet feeds",
+          "long": "Machine telemetry off the CAN bus, satellite and drone imagery tiles, weather-station and soil-probe readings, agronomy trial and lab results, and FMS field boundaries landed exactly as received, so a yield map or a spray pass can always be replayed as it stood."
+        },
+        "Silver": {
+          "s": "Conformed field, grower, machine",
+          "long": "Fields, growers, crops, seasons and machines resolved into single conformed entities across the FMS, telematics, imagery and agronomy estates, with field boundaries reconciled to a common geometry and trial plots stitched to their protocols."
+        },
+        "Gold": {
+          "s": "Yield, agronomy, sustainability",
+          "long": "Contracted products the agronomy, product and sustainability teams run on: yield and vegetation index by field and hybrid, variable-rate prescription performance, machine uptime and utilisation, and verified carbon and practice-change outcomes by supply shed."
+        }
+      },
+      "sources": {
+        "fieldview": {
+          "t": "Bayer Climate FieldView",
+          "u": "https://climate.com/"
+        },
+        "jd-opscenter": {
+          "t": "John Deere Operations Center",
+          "u": "https://www.deere.com/en/technology-products/precision-ag-technology/data-management/operations-center/"
+        },
+        "trimble-ag": {
+          "t": "Trimble Agriculture",
+          "u": "https://agriculture.trimble.com/"
+        },
+        "granular": {
+          "t": "Granular Insights (Corteva)",
+          "u": "https://granular.ag/"
+        },
+        "jdlink": {
+          "t": "John Deere JDLink telematics",
+          "u": "https://www.deere.com/en/technology-products/precision-ag-technology/data-management/jdlink/"
+        },
+        "cnh-afs": {
+          "t": "Case IH Advanced Farming Systems (AFS Connect)",
+          "u": "https://www.caseih.com/en-us/unitedstates/products/advanced-farming-systems/afs-connect"
+        },
+        "agco-fuse": {
+          "t": "PTx by AGCO",
+          "u": "https://www.ptxag.com/"
+        },
+        "isobus": {
+          "t": "ISO 11783 (ISOBUS)",
+          "u": "https://en.wikipedia.org/wiki/ISO_11783"
+        },
+        "planet": {
+          "t": "Planet Labs",
+          "u": "https://www.planet.com/"
+        },
+        "sentinelhub": {
+          "t": "Sentinel Hub",
+          "u": "https://www.sentinel-hub.com/"
+        },
+        "dji-ag": {
+          "t": "DJI Agriculture",
+          "u": "https://ag.dji.com/"
+        },
+        "descartes": {
+          "t": "EarthDaily Analytics (EarthOne)",
+          "u": "https://earthdaily.com"
+        },
+        "dtn": {
+          "t": "DTN Agriculture",
+          "u": "https://www.dtn.com/agriculture/"
+        },
+        "cropx": {
+          "t": "CropX soil sensing",
+          "u": "https://cropx.com/"
+        },
+        "semios": {
+          "t": "Semios crop intelligence",
+          "u": "https://semios.com/"
+        },
+        "metos": {
+          "t": "Pessl Instruments METOS",
+          "u": "https://metos.global/en/"
+        },
+        "cropwise": {
+          "t": "Syngenta Cropwise",
+          "u": "https://www.cropwise.com/"
+        },
+        "labware": {
+          "t": "LabWare LIMS",
+          "u": "https://www.labware.com/"
+        },
+        "sap-s4": {
+          "t": "SAP S/4HANA",
+          "u": "https://www.sap.com/products/erp/s4hana.html"
+        },
+        "dssat": {
+          "t": "DSSAT crop simulation",
+          "u": "https://dssat.net/"
+        },
+        "adapt": {
+          "t": "AgGateway ADAPT framework",
+          "u": "https://adaptframework.org/"
+        },
+        "leaf": {
+          "t": "Leaf agriculture API",
+          "u": "https://withleaf.io/"
+        },
+        "verra": {
+          "t": "Verra carbon registry",
+          "u": "https://verra.org/"
+        },
+        "eudr": {
+          "t": "EU Deforestation Regulation",
+          "u": "https://environment.ec.europa.eu/topics/forests/deforestation/regulation-deforestation-free-products_en"
+        }
+      }
+    },
+    {
+      "id": "apparel_fashion",
+      "label": "Apparel & Fashion",
+      "blurb": "Seasonal collections, omnichannel retail, demand sensing, and sustainable sourcing across design, manufacturing, and direct-to-consumer channels.",
+      "componentIds": [
+        "024b4874-57f1-5cac-9e2f-a5877ac7a3b7",
+        "034b53a4-5a55-5226-87e4-4730f01eb9ef",
+        "0833fbe4-604a-50b0-bcab-b1ad60c689d0",
+        "0b242530-0450-57b6-91a1-f6bda26b8bf2",
+        "0dbd2cca-9a98-56d8-b98a-004bfb2b3b64",
+        "0f0a32d3-7b8e-5215-926a-8691ad260f82",
+        "187ec851-657c-5dd1-b221-4c6aefaf2507",
+        "1b74c3c6-5e4a-5098-8a39-035fa3a427ba",
+        "1c7c3958-481b-5645-990f-cc898d72753a",
+        "1d043480-bfb8-503d-9df1-dc1a51d43512",
+        "1d5df5aa-074f-5567-acee-f9f2c277dc9d",
+        "1f38e9a7-f1e7-578c-93b3-c0c71e215878",
+        "23c8196c-0237-5880-b281-95bf180af948",
+        "24afcde6-f433-5760-8438-e87ecdf207bc",
+        "26687463-3aa7-587d-8322-4e3550d67f64",
+        "28a20f85-2a3e-58d7-9270-58539c204b30",
+        "2f788adc-0b1d-5a58-8cfc-5f917d90eaf9",
+        "2fc5feda-1e4c-5522-93aa-3fe8b9bbaa5f",
+        "30cbe9f8-2c8d-5ad9-ba30-95a99bbfebac",
+        "433c490e-981c-5abc-be62-9c032504e908",
+        "489bbb0c-d173-523b-9abd-1fa1c2434eff",
+        "4f036892-d516-5b96-9c57-c1d5137b010d",
+        "5304e13a-1ff1-5ce8-9dac-c7ea181cabdd",
+        "5a1bfe1b-5427-5218-b040-829b94883237",
+        "5ef500bc-17fe-5d64-ab49-a54b2ca77d9d",
+        "660435ff-6084-53ca-bb30-8448b7b5e3c1",
+        "6af1f28e-8862-59c2-ae2b-074c21c7aace",
+        "6bc48e60-8e1b-5c62-83e0-198114337d93",
+        "6df304b7-8c26-53c9-b4c1-38d788866c7d",
+        "734a143f-27c0-5867-9f84-c7bfe5d485b3",
+        "76377934-6e9d-52e0-9c5b-3a98396f1f90",
+        "7847db50-9126-5bf6-a66b-4d273813cba7",
+        "7a67d260-fb22-55c5-8d84-8d5c0acba255",
+        "7c9906c8-da9d-5999-ac74-007db4f1786c",
+        "804a7d41-f8a9-5c09-9880-ca68baccdbcf",
+        "866ea8d3-0d23-5d8f-8366-dc11ee59f889",
+        "86834430-cd49-5954-91ff-d1e815604561",
+        "8714ff65-35d4-5454-ae46-b33193aaea0b",
+        "8a2e7b02-3915-5c3c-b047-0b50aa2dd0ac",
+        "8c4bcaba-481a-502f-b1ff-216d3537678c",
+        "9c7d54ad-3477-555e-9970-e83f46d3e15d",
+        "9d530ce0-2cc0-5bd2-97ba-747f70eaeae0",
+        "a05442a8-ad40-5a2d-ad23-77e3b93052dc",
+        "a93af014-1599-58fb-b3b3-cabdf9b596ea",
+        "a96e7d8d-b17a-5553-a3ae-a091ab44be12",
+        "b00c962b-ce4c-5563-8cae-257da7ad3c67",
+        "b0c44886-770f-53f2-b55c-4941c5a21949",
+        "b1643c28-b13a-5281-a21e-56a758e85a81",
+        "b53dc430-4aab-5675-9aac-b3ce141b2833",
+        "bc6fa6eb-4cb4-5f4d-88f8-782ef3337ecc",
+        "c2262e06-b951-5b45-878b-ef097a7de4d6",
+        "c9eca473-44ca-5d0a-8cb4-6ada8907f9ec",
+        "cb63ad65-e33c-529a-82b8-2c551f33a5ba",
+        "cbfb858a-0c6f-553d-922a-1b489a75c4e5",
+        "eb9aa146-d4f7-559e-a633-33c35222784a",
+        "ed6319cc-21d7-5a31-997c-b3d7217f90c6",
+        "ed97bfd7-9630-590c-8578-dda671d273ff",
+        "eef494c8-79f3-5f08-8646-cdb8186d3e9d",
+        "f2409e5b-e1a7-5383-9006-d8ceb602f3d3",
+        "f9f9e389-ec79-5e94-bb54-1d63875a22a9",
+        "fab712ce-0d7b-5fa9-9a45-a0c63c1a7a7d",
+        "fb44bd13-5db7-5631-9de5-4910625c7b31",
+        "fedc9a88-c7eb-549b-865f-622737d43ecb"
+      ],
+      "medallion": {
+        "Bronze": {
+          "s": "Raw style and sales feeds",
+          "long": "POS, e-commerce, PLM and factory WIP events landed exactly as received so a markdown or a allocation can be replayed."
+        },
+        "Silver": {
+          "s": "Conformed styles and channels",
+          "long": "Styles, SKUs, stores and digital channels resolved into single entities across ERP, PLM and commerce platforms."
+        },
+        "Gold": {
+          "s": "Sell-through, margin, OTB",
+          "long": "Contracted products merchandising and finance run on: sell-through rate, full-price sell-through, OTB and margin by collection."
+        }
+      },
+      "sources": {
+        "centric-plm": {
+          "t": "Centric PLM",
+          "u": "https://www.centricsoftware.com/"
+        },
+        "adobe-substance": {
+          "t": "Adobe Substance 3D",
+          "u": "https://www.adobe.com/products/substance3d.html"
+        },
+        "clo-3d": {
+          "t": "CLO 3D",
+          "u": "https://www.clo3d.com/"
+        },
+        "infor-fashion": {
+          "t": "Infor CloudSuite Fashion",
+          "u": "https://www.infor.com/industries/fashion"
+        },
+        "sap-retail": {
+          "t": "SAP S/4HANA Retail",
+          "u": "https://www.sap.com/industries/retail.html"
+        },
+        "blue-yonder-wms": {
+          "t": "Blue Yonder WMS",
+          "u": "https://blueyonder.com/solutions/warehouse-management"
+        },
+        "shopify": {
+          "t": "Shopify Plus",
+          "u": "https://www.shopify.com/plus"
+        },
+        "sf-commerce": {
+          "t": "Salesforce Commerce Cloud",
+          "u": "https://www.salesforce.com/commerce/"
+        },
+        "oracle-xstore": {
+          "t": "Oracle Xstore",
+          "u": "https://www.oracle.com/retail/"
+        },
+        "lectra": {
+          "t": "Lectra",
+          "u": "https://www.lectra.com/"
+        },
+        "gerber": {
+          "t": "Gerber Technology",
+          "u": "https://gerbertechnology.com/"
+        },
+        "fast-react": {
+          "t": "Fast React",
+          "u": "https://www.fastreact.com/"
+        },
+        "higg": {
+          "t": "Higg Index",
+          "u": "https://higg.com/"
+        },
+        "textile-exchange": {
+          "t": "Textile Exchange",
+          "u": "https://textileexchange.org/"
+        },
+        "edited": {
+          "t": "Edited",
+          "u": "https://edited.com/"
+        },
+        "wgsn": {
+          "t": "WGSN",
+          "u": "https://www.wgsn.com/"
+        },
+        "opensupplyhub": {
+          "t": "Open Supply Hub",
+          "u": "https://www.opensupplyhub.org/"
+        }
+      }
+    }
+  ]
+}
