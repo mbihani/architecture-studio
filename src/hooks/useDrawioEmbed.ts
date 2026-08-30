@@ -18,6 +18,12 @@
 //
 // No OAuth, no polling — all communication is event-driven postMessage, and
 // every message is origin-checked against the embed host.
+//
+// Diagnostics: a `diagnosticLog` array captures every lifecycle event (fetch,
+// iframe load, postMessage, init, timeouts, URL fallback) so the UI can show
+// what happened on screen — the browser console is not always checked. A
+// 10s fallback switches the embed URL from embed.diagrams.net to www.draw.io
+// if `init` never fires.
 // ---------------------------------------------------------------------------
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -27,6 +33,10 @@ import { api, type ApiError } from "../api/client.ts";
 /** The embed URL for the diagrams.net editor (no API key, no OAuth). */
 export const DRAWIO_EMBED_URL =
   "https://embed.diagrams.net?proto=json&svg=1&splash=0";
+
+/** Fallback embed URL (www.draw.io) tried if embed.diagrams.net fails to init. */
+const DRAWIO_FALLBACK_URL =
+  "https://www.draw.io?proto=json&svg=1&splash=0";
 
 /** Origin of the embedded draw.io editor — used as the postMessage target. */
 const DRAWIO_ORIGIN = "https://embed.diagrams.net";
@@ -67,6 +77,12 @@ export type DrawioStatus =
   | "loaded"
   | "error";
 
+/** A single entry in the on-screen diagnostic event log. */
+export interface DiagnosticEntry {
+  time: string;
+  event: string;
+}
+
 interface UseDrawioEmbedResult {
   /** Attach to the <iframe> element in EmbedFrame. */
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
@@ -78,6 +94,10 @@ interface UseDrawioEmbedResult {
   error: string | null;
   /** Coarse embed lifecycle state for the diagnostic overlay. */
   status: DrawioStatus;
+  /** The current embed URL (switches to www.draw.io after 10s if init fails). */
+  embedUrl: string;
+  /** On-screen diagnostic event log (capped at 50 entries, newest last). */
+  diagnosticLog: DiagnosticEntry[];
   /** Called when the editor iframe finishes loading its src document. */
   onIframeLoad: () => void;
   /** Called when the editor iframe fails to load its src document. */
@@ -144,12 +164,28 @@ function setInfiniteCanvas(xml: string): string {
   );
 }
 
+/** Format the current time as HH:MM:SS.mmm for the diagnostic log. */
+function formatTime(): string {
+  const d = new Date();
+  const h = String(d.getHours()).padStart(2, "0");
+  const m = String(d.getMinutes()).padStart(2, "0");
+  const s = String(d.getSeconds()).padStart(2, "0");
+  const ms = String(d.getMilliseconds()).padStart(3, "0");
+  return `${h}:${m}:${s}.${ms}`;
+}
+
 export function useDrawioEmbed(): UseDrawioEmbedResult {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [drawioXml, setDrawioXml] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<DrawioStatus>("fetching");
+  // The embed URL starts as embed.diagrams.net; if init never fires within
+  // 10s, we switch to www.draw.io as a fallback (see onIframeLoad).
+  const [embedUrl, setEmbedUrl] = useState(DRAWIO_EMBED_URL);
+  // On-screen diagnostic log — every lifecycle event is pushed here so the
+  // UI can show what happened without the user opening the browser console.
+  const [diagnosticLog, setDiagnosticLog] = useState<DiagnosticEntry[]>([]);
 
   // Refs to avoid stale closures inside the message handler.
   const xmlRef = useRef("");
@@ -164,6 +200,14 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
   // handshake — some draw.io embed configurations never send `init`. Cleared
   // when `init` fires (alongside the 20s timeout).
   const initFallbackRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // 10s URL-switch timer: if `init` still hasn't fired, switch the iframe to
+  // www.draw.io (a different CDN that may work when embed.diagrams.net doesn't).
+  const urlSwitchRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Guards against switching the URL more than once.
+  const urlSwitchedRef = useRef(false);
+  // The postMessage target origin — derived from embedUrl so messages are
+  // sent to the correct origin after the www.draw.io fallback switch.
+  const targetOriginRef = useRef(DRAWIO_ORIGIN);
   const exportResolverRef = useRef<((data: string) => void) | null>(null);
   const saveResolverRef = useRef<((xml: string) => void) | null>(null);
   // When set, the next editor "save" event triggers a page switch: the saved
@@ -171,10 +215,36 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
   // reloaded — preserving every page and any unsaved edits.
   const pendingSwitchRef = useRef<string | null>(null);
 
-  /** Post a message to the draw.io editor iframe (origin-restricted). */
-  const sendToEditor = useCallback((message: DrawioAction): void => {
-    iframeRef.current?.contentWindow?.postMessage(message, DRAWIO_ORIGIN);
+  /** Append an entry to the on-screen diagnostic log (capped at 50). */
+  const addLog = useCallback((event: string): void => {
+    setDiagnosticLog((prev) => {
+      const next = [...prev, { time: formatTime(), event }];
+      return next.length > 50 ? next.slice(next.length - 50) : next;
+    });
   }, []);
+
+  // Keep the postMessage target origin in sync with the embed URL so that
+  // after the www.draw.io fallback switch, messages are sent to the right
+  // origin (sending with a mismatched target origin is silently dropped).
+  useEffect(() => {
+    try {
+      targetOriginRef.current = new URL(embedUrl).origin;
+    } catch {
+      targetOriginRef.current = DRAWIO_ORIGIN;
+    }
+  }, [embedUrl]);
+
+  /** Post a message to the draw.io editor iframe (origin-restricted). */
+  const sendToEditor = useCallback(
+    (message: DrawioAction): void => {
+      addLog(`send action=${message.action}`);
+      iframeRef.current?.contentWindow?.postMessage(
+        message,
+        targetOriginRef.current,
+      );
+    },
+    [addLog],
+  );
 
   /**
    * Load the full mxfile XML into the editor and fit the diagram to the
@@ -189,12 +259,13 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
    */
   const loadXml = useCallback(
     (xml: string): void => {
+      addLog("load-xml");
       setStatus("loading-xml");
       const infiniteXml = setInfiniteCanvas(xml);
       sendToEditor({ action: "load", xml: infiniteXml, autosave: 0, fit: 1 });
       setStatus("loaded");
     },
-    [sendToEditor],
+    [sendToEditor, addLog],
   );
 
   // --- Load the architecture XML on mount --------------------------------
@@ -203,11 +274,14 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
   // the XML when it already has it; this effect loads it when the editor is
   // already waiting. Whichever arrives second drives the load.
   useEffect(() => {
+    addLog("mount");
+    addLog("fetch-start");
     let cancelled = false;
     api
       .getArchitecture()
       .then((res) => {
         if (cancelled) return;
+        addLog(`fetch-done xml=${res.drawioXml.length}`);
         setDrawioXml(res.drawioXml);
         xmlRef.current = res.drawioXml;
         // init fired first → the init handler had no XML to load. Load it now.
@@ -220,6 +294,7 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
       })
       .catch((err: ApiError) => {
         if (!cancelled) {
+          addLog(`fetch-error: ${err.message}`);
           setError(err.message);
           setStatus("error");
         }
@@ -230,7 +305,7 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
     return () => {
       cancelled = true;
     };
-  }, [loadXml]);
+  }, [loadXml, addLog]);
 
   // --- Listen for postMessage events from the editor --------------------
   useEffect(() => {
@@ -254,6 +329,10 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
         event.origin.includes("diagrams.net") ||
         event.origin.includes("draw.io") ||
         ALLOWED_ORIGINS.has(event.origin);
+      addLog(
+        `postmessage origin=${event.origin} event=${eventName} ` +
+          `sourceCheck=${sourceOk} originCheck=${originOk}`,
+      );
       console.log(
         `[drawio] postMessage origin=${event.origin} event=${eventName} ` +
           `sourceCheck=${sourceOk} originCheck=${originOk}`,
@@ -267,9 +346,10 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
       if (typeof msg !== "object" || msg === null) return;
 
       if (msg.event === "init") {
+        addLog("init");
         editorReadyRef.current = true;
-        // The editor initialized — cancel the 20s init timeout and the 5s
-        // fallback timer started in onIframeLoad so neither can fire after a
+        // The editor initialized — cancel the 20s init timeout, the 5s
+        // fallback, and the 10s URL-switch timer so none can fire after a
         // successful init.
         if (initTimeoutRef.current) {
           clearTimeout(initTimeoutRef.current);
@@ -278,6 +358,10 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
         if (initFallbackRef.current) {
           clearTimeout(initFallbackRef.current);
           initFallbackRef.current = null;
+        }
+        if (urlSwitchRef.current) {
+          clearTimeout(urlSwitchRef.current);
+          urlSwitchRef.current = null;
         }
         // Configure the editor, then load the full mxfile (all pages as tabs).
         sendToEditor({ action: "configure", config: { format: "xml" } });
@@ -325,7 +409,7 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
 
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
-  }, [sendToEditor, loadXml]);
+  }, [sendToEditor, loadXml, addLog]);
 
   // --- Init timeout cleanup --------------------------------------------
   // The 20s init timeout is started in onIframeLoad (when the iframe's src
@@ -341,6 +425,10 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
       if (initFallbackRef.current) {
         clearTimeout(initFallbackRef.current);
         initFallbackRef.current = null;
+      }
+      if (urlSwitchRef.current) {
+        clearTimeout(urlSwitchRef.current);
+        urlSwitchRef.current = null;
       }
     };
   }, []);
@@ -400,6 +488,7 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
    * is past this point entirely.
    */
   const onIframeLoad = useCallback((): void => {
+    addLog("iframe-load");
     if (editorReadyRef.current) return;
     setStatus((prev) =>
       prev === "error" || prev === "init-waiting" || prev === "loading-xml"
@@ -411,6 +500,7 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
     if (initTimeoutRef.current) clearTimeout(initTimeoutRef.current);
     initTimeoutRef.current = setTimeout(() => {
       if (editorReadyRef.current) return;
+      addLog("timeout-20s");
       setStatus("error");
       setError((prev) =>
         prev
@@ -424,6 +514,7 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
     if (initFallbackRef.current) clearTimeout(initFallbackRef.current);
     initFallbackRef.current = setTimeout(() => {
       if (editorReadyRef.current) return; // init already fired
+      addLog("fallback-5s");
       if (xmlRef.current) {
         console.log("[drawio] init timeout — attempting direct load without init");
         loadXml(xmlRef.current);
@@ -433,7 +524,23 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
         editorReadyRef.current = true;
       }
     }, 5000);
-  }, [loadXml]);
+
+    // 10s URL fallback: if init still hasn't fired, switch the iframe to
+    // www.draw.io — a different CDN that may work when embed.diagrams.net
+    // doesn't. Only fires once (guarded by urlSwitchedRef). After the switch
+    // the iframe reloads, which re-fires onIframeLoad and restarts the 20s
+    // timeout + 5s fallback for the new URL.
+    if (urlSwitchRef.current) clearTimeout(urlSwitchRef.current);
+    if (!urlSwitchedRef.current) {
+      urlSwitchRef.current = setTimeout(() => {
+        if (editorReadyRef.current) return; // init already fired
+        if (urlSwitchedRef.current) return; // already switched
+        urlSwitchedRef.current = true;
+        addLog("fallback-url → www.draw.io");
+        setEmbedUrl(DRAWIO_FALLBACK_URL);
+      }, 10000);
+    }
+  }, [loadXml, addLog]);
 
   /**
    * Called by EmbedFrame when the iframe fails to load its src document (e.g.
@@ -441,11 +548,12 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
    * waiting for the 20s init timeout.
    */
   const onIframeError = useCallback((): void => {
+    addLog("iframe-error");
     setStatus("error");
     setError(
       "draw.io editor iframe failed to load. Check your network connection to embed.diagrams.net.",
     );
-  }, []);
+  }, [addLog]);
 
   return {
     iframeRef,
@@ -453,6 +561,8 @@ export function useDrawioEmbed(): UseDrawioEmbedResult {
     loading,
     error,
     status,
+    embedUrl,
+    diagnosticLog,
     onIframeLoad,
     onIframeError,
     save,
