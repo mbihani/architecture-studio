@@ -17977,6 +17977,9 @@ console.log("[arch-studio] init complete");
     "body.edit-mode .rgroup.sel-group, body.edit-mode .cloud-sec.sel-group {",
     "  outline:3px solid var(--brand); outline-offset:3px; border-radius:10px; }",
     "body.edit-mode .atom.sel-atom { outline:3px solid var(--brand); outline-offset:2px; z-index:20; }",
+    "body.edit-mode .atom.multi-selected, body.edit-mode .rgroup.multi-selected { outline:3px solid #7c3aed; outline-offset:3px; z-index:21; }",
+    "#edit-tools button.on { background:#7c3aed; border-color:#7c3aed; color:white; }",
+    "#multi-count { align-self:center; min-width:68px; color:#7c3aed; font-weight:750; text-align:center; }",
     "body.edit-mode .rgroup .rtiles:empty { min-height:18px; border:1px dashed var(--line-strong); border-radius:7px; }",
     "/* zone (whole column/pocket) selection in edit mode */",
     "body.edit-mode .col.sel-zone, body.edit-mode .pocket.sel-zone {",
@@ -18121,6 +18124,8 @@ console.log("[arch-studio] init complete");
     '<button id="edit-toggle" type="button">Edit Mode: ON</button>' +
     '<button id="edit-reset" type="button">Reset to Reference</button>' +
     '<button id="edit-duplicate" type="button">Duplicate Canvas</button>' +
+    '<button id="edit-multi" type="button">Multi-Select</button>' +
+    '<span id="multi-count" role="status" aria-live="polite">0 selected</span>' +
     '<button id="edit-newbox" type="button">New Box</button>' +
     '<button id="edit-add" type="button">Add Component</button>' +
     '<button id="edit-delete" type="button">Delete</button>';
@@ -18130,11 +18135,44 @@ console.log("[arch-studio] init complete");
   var newboxBtn  = byId2("edit-newbox");
   var resetBtn   = byId2("edit-reset");
   var duplicateBtn = byId2("edit-duplicate");
+  var multiBtn = byId2("edit-multi");
+  var multiCount = byId2("multi-count");
   var addCompBtn = byId2("edit-add");
   var deleteBtn  = byId2("edit-delete");
 
   var selected = null;   /* { type:'atom'|'group'|'cloud'|'zone', el?, zone?, gidx? } */
   var drag = null;
+  var multiMode = false;
+  var multiSelection = new Map();
+  var rangeAnchor = null;
+
+  function updateMultiUI(){
+    multiBtn.classList.toggle("on", multiMode);
+    multiBtn.setAttribute("aria-pressed", multiMode ? "true" : "false");
+    multiCount.textContent = multiSelection.size + " selected";
+    if(multiMode) deleteBtn.style.display = multiSelection.size ? "inline-block" : "none";
+  }
+  function clearMulti(){
+    multiSelection.forEach(function(v){ if(v.el) v.el.classList.remove("multi-selected"); });
+    multiSelection.clear(); rangeAnchor = null; updateMultiUI();
+  }
+  function toggleMultiItem(item){
+    if(multiSelection.has(item.key)){
+      var old = multiSelection.get(item.key); if(old.el) old.el.classList.remove("multi-selected");
+      multiSelection.delete(item.key);
+    }else{
+      multiSelection.set(item.key, item); if(item.el) item.el.classList.add("multi-selected");
+    }
+    updateMultiUI();
+  }
+  function atomMultiItem(el){
+    var rec = byId[el.dataset.id];
+    if(!rec || !Array.isArray(rec.arr)) return null;
+    var grp = el.closest(".rgroup");
+    return { key:"atom:" + el.dataset.id, type:"atom", el:el, arr:rec.arr, tile:rec.tile,
+      groupKey:grp ? grp.dataset.zone + ":" + grp.dataset.gidx : "" };
+  }
+  multiBtn.onclick = function(){ multiMode = !multiMode; clearSel(); if(!multiMode) clearMulti(); updateMultiUI(); };
 
   var bypassSwitchConfirm = false;
   var _editApplyIndustry = applyIndustry;
@@ -18232,6 +18270,19 @@ console.log("[arch-studio] init complete");
     var atom = e.target.closest && e.target.closest(".atom");
     if(atom){
       e.preventDefault();
+      if(multiMode){
+        var item = atomMultiItem(atom);
+        if(!item) return;
+        if(e.shiftKey && rangeAnchor && rangeAnchor.groupKey === item.groupKey){
+          var atoms = Array.prototype.slice.call(atom.closest(".rgroup").querySelectorAll(".atom"));
+          var a = atoms.indexOf(rangeAnchor.el), b = atoms.indexOf(atom);
+          atoms.slice(Math.min(a,b), Math.max(a,b) + 1).forEach(function(node){
+            var ri = atomMultiItem(node); if(ri && !multiSelection.has(ri.key)) toggleMultiItem(ri);
+          });
+        }else toggleMultiItem(item);
+        rangeAnchor = item;
+        return;
+      }
       selectAtom(atom);
       drag = { el:atom, x:e.clientX, y:e.clientY,
         left:parseFloat(atom.style.left)||0, top:parseFloat(atom.style.top)||0, moved:false };
@@ -18240,12 +18291,17 @@ console.log("[arch-studio] init complete");
     var grp = e.target.closest && e.target.closest(".rgroup");
     if(grp && grp.dataset.zone){
       e.preventDefault();
+      if(multiMode){
+        toggleMultiItem({ key:"group:" + grp.dataset.zone + ":" + grp.dataset.gidx, type:"group", el:grp,
+          zone:grp.dataset.zone, gidx:parseInt(grp.dataset.gidx, 10) });
+        return;
+      }
       selectGroup(grp, grp.dataset.zone, parseInt(grp.dataset.gidx, 10));
       return;
     }
     var csec = e.target.closest && e.target.closest(".cloud-sec");
     if(csec){ e.preventDefault(); selectCloud(csec); return; }
-    clearSel();
+    if(multiMode) clearMulti(); else clearSel();
   }, true);
 
   document.addEventListener("mousemove", function(e){
@@ -18281,6 +18337,16 @@ console.log("[arch-studio] init complete");
 
   /* ---------- delete: writes back to ARCH so it survives build() ---------- */
   deleteBtn.onclick = function(){
+    if(multiMode && multiSelection.size){
+      var groups = [], atoms = [];
+      multiSelection.forEach(function(item){ (item.type === "group" ? groups : atoms).push(item); });
+      /* Remove child atoms first, then groups in descending index order. */
+      atoms.forEach(function(item){ var i = item.arr.indexOf(item.tile); if(i >= 0) item.arr.splice(i, 1); });
+      groups.sort(function(a,b){ return a.zone === b.zone ? b.gidx - a.gidx : a.zone.localeCompare(b.zone); })
+        .forEach(function(item){ var rail = ARCH.rails[item.zone]; if(rail && rail.groups[item.gidx]) rail.groups.splice(item.gidx, 1); });
+      clearMulti(); persistCustom(); build(); fitBoard(); toast(atoms.length + groups.length + " items deleted.");
+      return;
+    }
     if(!selected) return;
     if(selected.type === "zone"){
       var zone = selected.zone;
@@ -18411,6 +18477,7 @@ console.log("[arch-studio] init complete");
 
   document.addEventListener("keydown", function(e){
     if(e.key === "Escape" && modalEl) closeModal();
+    else if(e.key === "Escape" && multiSelection.size) clearMulti();
     if(e.key === "Enter" && modalEl && e.target && e.target.id === "m-name") byId2("m-ok").click();
     /* focus trap: keep Tab/Shift+Tab cycling inside the open modal */
     if(modalEl && e.key === "Tab"){
@@ -18434,6 +18501,7 @@ console.log("[arch-studio] init complete");
   }
   setEditMode(true);
   toggleBtn.textContent = "Edit Mode: ON";
+  updateMultiUI();
   syncIndTabs();
   placeTools();
   window.addEventListener("resize", placeTools);
