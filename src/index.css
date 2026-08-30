@@ -97,17 +97,77 @@ body,
   min-height: 0;
   position: relative;
   background: var(--body-bg);
+  overflow: hidden;
 }
 
-.embed-frame {
+/* SVG viewer (pan / zoom) --------------------------------------------- */
+.svg-viewer {
   position: absolute;
   inset: 0;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
 }
 
-.embed-frame__iframe {
+.svg-viewer__viewport {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  border: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.svg-viewer__viewport svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.svg-viewer__controls {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.svg-viewer__btn {
+  min-width: 1.8rem;
+  height: 1.8rem;
+  padding: 0 0.4rem;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #1f2937;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svg-viewer__btn:hover {
+  background: #f3f4f6;
+}
+
+.svg-viewer__btn--fit {
+  font-size: 0.78rem;
+}
+
+.svg-viewer__zoom {
+  min-width: 3rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #4b5563;
+  font-variant-numeric: tabular-nums;
 }
 
 .app-placeholder {
