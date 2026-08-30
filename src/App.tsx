@@ -16,14 +16,70 @@
 // keyless.
 // ---------------------------------------------------------------------------
 
+import { useEffect, useState } from "react";
+
 import { EmbedFrame } from "./components/EmbedFrame.tsx";
 import { ExportButton } from "./components/ExportButton.tsx";
 import { Header } from "./components/Header.tsx";
 import { IndustrySwitcher } from "./components/IndustrySwitcher.tsx";
-import { useDrawioEmbed } from "./hooks/useDrawioEmbed.ts";
+import { useDrawioEmbed, type DrawioStatus } from "./hooks/useDrawioEmbed.ts";
+
+// ---------------------------------------------------------------------------
+// StatusOverlay — a small, dismissible badge in the bottom-right corner that
+// surfaces the draw.io embed lifecycle so the load is observable without a
+// browser console. Auto-hides 5s after the terminal "loaded" state; errors
+// stay visible (in red) until dismissed. Click anywhere on it to dismiss.
+// ---------------------------------------------------------------------------
+
+const STATUS_TEXT: Record<Exclude<DrawioStatus, "error">, string> = {
+  fetching: "Fetching architecture…",
+  "init-waiting": "Editor initializing…",
+  "loading-xml": "Editor ready, loading XML…",
+  loaded: "XML loaded ✓",
+};
+
+interface StatusOverlayProps {
+  status: DrawioStatus;
+  error: string | null;
+}
+
+function StatusOverlay({ status, error }: StatusOverlayProps): React.ReactElement | null {
+  const [hidden, setHidden] = useState(false);
+
+  // Auto-hide 5s after reaching the terminal "loaded" state; re-show on any
+  // later state change (e.g. an error after a successful load).
+  useEffect(() => {
+    if (status !== "loaded") {
+      setHidden(false);
+      return;
+    }
+    const timer = setTimeout(() => setHidden(true), 5000);
+    return () => clearTimeout(timer);
+  }, [status]);
+
+  if (hidden) return null;
+
+  const text =
+    status === "error" ? `Error: ${error ?? "unknown"}` : STATUS_TEXT[status];
+  return (
+    <div
+      className={
+        status === "error"
+          ? "status-overlay status-overlay--error"
+          : "status-overlay"
+      }
+      role="status"
+      onClick={() => setHidden(true)}
+      title="click to dismiss"
+    >
+      {text}
+    </div>
+  );
+}
 
 export function App(): React.ReactElement {
-  const { iframeRef, loading, error, exportPng, switchPage } = useDrawioEmbed();
+  const { iframeRef, loading, error, status, exportPng, switchPage } =
+    useDrawioEmbed();
 
   return (
     <div className="app">
@@ -49,6 +105,7 @@ export function App(): React.ReactElement {
           </div>
         )}
         {!loading && !error && <EmbedFrame iframeRef={iframeRef} />}
+        <StatusOverlay status={status} error={error} />
       </main>
     </div>
   );

@@ -1,10 +1,11 @@
 // ---------------------------------------------------------------------------
 // EmbedFrame — hosts the draw.io (diagrams.net) embeddable editor.
 //
-// The iframe is pointed at https://embed.diagrams.net?proto=json&svg=1&splash=0
-// (free, no OAuth, no API key). Communication with the editor happens via
-// window.postMessage — the useDrawioEmbed hook owns that lifecycle and passes
-// the iframe ref down here. This component is purely presentational.
+// The iframe is pointed at the draw.io embed URL (see DRAWIO_EMBED_URL, which
+// includes &zoom=Fit so large diagrams auto-fit the viewport). Communication
+// with the editor happens via window.postMessage — the useDrawioEmbed hook
+// owns that lifecycle and passes the iframe ref down here. This component is
+// purely presentational.
 // ---------------------------------------------------------------------------
 
 import { DRAWIO_EMBED_URL } from "../hooks/useDrawioEmbed.ts";
