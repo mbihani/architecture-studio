@@ -1,8 +1,10 @@
 // ---------------------------------------------------------------------------
-// IndustrySwitcher — dropdown to switch the active industry overlay.
+// IndustrySwitcher — dropdown to switch the active industry diagram page.
 //
-// Lists industries from GET /api/industries and, on selection, calls
-// POST /api/industries/:id/activate (which may create/switch a Lucid page).
+// Lists industries from GET /api/industries (parsed from the mxfile's
+// <diagram> elements). On selection, calls POST /api/industries/:id/activate
+// to get the single-page mxfile XML, then passes it to the parent via
+// onActivate so the editor loads the new page.
 // ---------------------------------------------------------------------------
 
 import { useEffect, useState } from "react";
@@ -10,7 +12,12 @@ import { useEffect, useState } from "react";
 import { api, type ApiError } from "../api/client.ts";
 import type { Industry } from "../types/index.ts";
 
-export function IndustrySwitcher(): React.ReactElement {
+interface IndustrySwitcherProps {
+  /** Called with the activated industry's single-page mxfile XML. */
+  onActivate: (drawioXml: string) => void;
+}
+
+export function IndustrySwitcher({ onActivate }: IndustrySwitcherProps): React.ReactElement {
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [activeId, setActiveId] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -45,7 +52,8 @@ export function IndustrySwitcher(): React.ReactElement {
     setActivating(true);
     setError(null);
     try {
-      await api.activateIndustry(id);
+      const res = await api.activateIndustry(id);
+      onActivate(res.drawioXml);
     } catch (err) {
       setError((err as ApiError).message);
     } finally {

@@ -1,26 +1,28 @@
 // ---------------------------------------------------------------------------
-// EmbedFrame — renders the editable Lucidchart canvas.
+// EmbedFrame — hosts the draw.io (diagrams.net) embeddable editor.
 //
-// Lucid's token-based Embed API loads a document inside an iframe pointed at
-// https://lucid.app/embeds?token=... . The backend generates a short-lived
-// token (POST /api/embed/session) and hands back the full URL; this component
-// simply hosts the iframe.
+// The iframe is pointed at https://embed.diagrams.net?proto=json&svg=1&splash=0
+// (free, no OAuth, no API key). Communication with the editor happens via
+// window.postMessage — the useDrawioEmbed hook owns that lifecycle and passes
+// the iframe ref down here. This component is purely presentational.
 // ---------------------------------------------------------------------------
 
+import { DRAWIO_EMBED_URL } from "../hooks/useDrawioEmbed.ts";
+
 interface EmbedFrameProps {
-  /** Full embed URL returned by POST /api/embed/session. */
-  url: string;
+  /** Ref to the iframe element; owned by useDrawioEmbed for postMessage. */
+  iframeRef: React.RefObject<HTMLIFrameElement | null>;
 }
 
-export function EmbedFrame({ url }: EmbedFrameProps): React.ReactElement {
+export function EmbedFrame({ iframeRef }: EmbedFrameProps): React.ReactElement {
   return (
     <div className="embed-frame">
       <iframe
-        title="Lucidchart architecture editor"
-        src={url}
+        ref={iframeRef}
+        title="draw.io architecture editor"
+        src={DRAWIO_EMBED_URL}
         className="embed-frame__iframe"
         allow="fullscreen"
-        // Lucid's embed expects to be allowed full size and to run scripts.
         allowFullScreen
       />
     </div>

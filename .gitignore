@@ -8,3 +8,5 @@ dist/
 converter/tmp/
 *.lucid
 __pycache__/
+data/
+*.tsbuildinfo

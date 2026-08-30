@@ -130,30 +130,3 @@ body,
   word-break: break-word;
 }
 
-.connect-button {
-  padding: 0.6rem 1.2rem;
-  background: var(--accent);
-  color: #fff;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.connect-button:hover {
-  filter: brightness(1.05);
-}
-
-.app-sync-error {
-  position: absolute;
-  bottom: 0.5rem;
-  right: 0.5rem;
-  font-size: 0.75rem;
-  color: #b91c1c;
-  background: rgba(255, 255, 255, 0.85);
-  padding: 0.1rem 0.4rem;
-  border-radius: 3px;
-  max-width: 24rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}

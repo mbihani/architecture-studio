@@ -13,10 +13,7 @@ import { fileURLToPath } from "node:url";
 import cors from "cors";
 import express from "express";
 
-import { authRouter } from "./routes/auth.ts";
-import { documentsRouter } from "./routes/documents.ts";
-import { embedRouter } from "./routes/embed.ts";
-import { exportRouter } from "./routes/export.ts";
+import { architectureRouter } from "./routes/architecture.ts";
 import { industriesRouter } from "./routes/industries.ts";
 
 const PORT = Number(process.env.PORT ?? 8080);
@@ -56,11 +53,8 @@ app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
 // Mount every route group under /api.
-app.use("/api", authRouter);
-app.use("/api", embedRouter);
-app.use("/api", documentsRouter);
+app.use("/api", architectureRouter);
 app.use("/api", industriesRouter);
-app.use("/api", exportRouter);
 
 // Health check.
 app.get("/api/health", (_req, res) => {

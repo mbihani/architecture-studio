@@ -1,20 +1,16 @@
 // ---------------------------------------------------------------------------
 // Thin fetch wrapper for the Architecture Studio backend API.
 //
-// In development, Vite proxies "/api" to the Express backend on port 3001
-// (see vite.config.ts), so all requests are same-origin. In production the
+// In development, Vite proxies "/api" to the Express backend (see
+// vite.config.ts), so all requests are same-origin. In production the
 // frontend is served by the same host, so "/api" works there too.
 // ---------------------------------------------------------------------------
 
 import type {
   ActivateIndustryResponse,
-  AuthStatus,
-  CreateDocumentResponse,
-  DocumentContents,
-  DocumentListItem,
-  EmbedSessionResponse,
+  ArchitectureResponse,
   Industry,
-  LucidImportJson,
+  SaveArchitectureResponse,
 } from "../types/index.ts";
 
 const API_BASE = "/api";
@@ -47,69 +43,33 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     }
     throw new ApiError(res.status, `${res.status}: ${detail}`);
   }
-  // Some endpoints (e.g. export) return non-JSON; callers that need the raw
-  // response use `rawRequest` instead.
   return (await res.json()) as T;
 }
 
-/** A raw fetch that does not parse JSON (used for file downloads). */
-export async function rawRequest(path: string, init?: RequestInit): Promise<Response> {
-  const res = await fetch(`${API_BASE}${path}`, init);
-  if (!res.ok) {
-    throw new ApiError(res.status, `${res.status}: request to ${path} failed`);
-  }
-  return res;
-}
-
-/** Request body for POST /api/embed/session. */
-interface EmbedSessionRequest {
-  documentId: string;
-}
-
-/** Request body for POST /api/documents/create. */
-interface CreateDocumentRequest {
-  importJson: LucidImportJson;
-  name: string;
+/** Request body for POST /api/architecture. */
+interface SaveArchitectureRequest {
+  drawioXml: string;
 }
 
 export const api = {
-  // --- Auth -------------------------------------------------------------
-  getAuthStatus: () => request<AuthStatus>("/auth/status"),
+  // --- Architecture (draw.io XML) ---------------------------------------
+  /** Fetch the full architecture mxfile XML. */
+  getArchitecture: () => request<ArchitectureResponse>("/architecture"),
 
-  // --- Embed ------------------------------------------------------------
-  getEmbedSession: (documentId: string) =>
-    request<EmbedSessionResponse>("/embed/session", {
+  /** Persist the edited architecture mxfile XML. */
+  saveArchitecture: (drawioXml: string) =>
+    request<SaveArchitectureResponse>("/architecture", {
       method: "POST",
-      body: JSON.stringify({ documentId } satisfies EmbedSessionRequest),
+      body: JSON.stringify({ drawioXml } satisfies SaveArchitectureRequest),
     }),
-
-  // --- Documents --------------------------------------------------------
-  createDocument: (importJson: LucidImportJson, name: string) =>
-    request<CreateDocumentResponse>("/documents/create", {
-      method: "POST",
-      body: JSON.stringify({ importJson, name } satisfies CreateDocumentRequest),
-    }),
-
-  listDocuments: () => request<DocumentListItem[]>("/documents"),
-
-  getDocumentContents: (id: string) =>
-    request<DocumentContents>(`/documents/${encodeURIComponent(id)}/contents`),
 
   // --- Industries -------------------------------------------------------
   getIndustries: () => request<Industry[]>("/industries"),
 
+  /** Activate an industry overlay; returns the single-page mxfile XML. */
   activateIndustry: (id: string) =>
     request<ActivateIndustryResponse>(
       `/industries/${encodeURIComponent(id)}/activate`,
       { method: "POST" },
-    ),
-
-  // --- Export -----------------------------------------------------------
-  // Real binary export (PNG/PDF) served by the documents route, which calls
-  // Lucid's async export endpoint. Returns the raw Response so the caller can
-  // read the blob + Content-Disposition filename.
-  exportDocument: (id: string, format: "png" | "pdf" = "png") =>
-    rawRequest(
-      `/documents/${encodeURIComponent(id)}/export?format=${encodeURIComponent(format)}`,
     ),
 };
