@@ -10,3 +10,6 @@ converter/tmp/
 __pycache__/
 data/
 *.tsbuildinfo
+# Playwright artifacts
+test-results/
+playwright-report/
