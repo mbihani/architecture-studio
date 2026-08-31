@@ -17615,21 +17615,24 @@ function fitBoard(){
   alignConnectors();
   staggerFlows();
 }
-function fitLayout(){
-  fitInEl.style.transform = "";
-  fitEl.style.height = "";
-  document.body.dataset.fit = "1";
-  document.body.classList.toggle("fitting", window.innerWidth >= FIT_FROM_W);
-  /* a fitted board can be zoomed when the user switches to a builder tab or a
-     narrow window, where the board is not fitted and the zoom has no meaning;
-     reset it so the zoomed overflow, the .zoomed class and scroll offsets do
-     not leak into those unfitted modes (both early returns below bail first). */
+/* A fitted board can be zoomed when the user switches to a builder tab or a
+   narrow window, where the board is not fitted and the zoom has no meaning;
+   reset it so the zoomed overflow, the .zoomed class and scroll offsets do
+   not leak into those unfitted modes. Called only before the early returns in
+   fitLayout, never on the normal fitted path, so a zoom set by zoomAt survives
+   the fitBoard() it triggers. */
+function resetZoom(){
   zoomLevel = 1;
   fitEl.style.overflow = "";
   document.body.classList.remove("zoomed");
   fitEl.scrollLeft = 0;
   fitEl.scrollTop = 0;
-  updateZoomPct();
+}
+function fitLayout(){
+  fitInEl.style.transform = "";
+  fitEl.style.height = "";
+  document.body.dataset.fit = "1";
+  document.body.classList.toggle("fitting", window.innerWidth >= FIT_FROM_W);
   /* a user-made tab has no board to fit: the builder is a normal-sized form, so
      it must not be scaled, and it takes the height the board would have had so
      its card lands in the middle of the window */
@@ -17637,10 +17640,11 @@ function fitLayout(){
     builderEl.style.minHeight =
       Math.max(240, Math.floor(window.innerHeight - fitEl.getBoundingClientRect().top
         - window.scrollY)) + "px";
+    resetZoom();
     return;
   }
   builderEl.style.minHeight = "";
-  if(window.innerWidth < FIT_FROM_W) return;
+  if(window.innerWidth < FIT_FROM_W){ resetZoom(); return; }
   const h = fitInEl.offsetHeight;
   /* document-relative top, so a scrolled page does not inflate the budget */
   const top = fitEl.getBoundingClientRect().top + window.scrollY;
@@ -17648,7 +17652,7 @@ function fitLayout(){
      without a rounding scrollbar and without an odd strip under the board */
   const availH = Math.floor(window.innerHeight - top);
   const availW = fitEl.clientWidth - SIDE_PAD * 2;
-  if(availH < 240) return;
+  if(availH < 240){ resetZoom(); return; }
   const dw = designWidth();
   /* Both views scale UP into the space they are given. Holding the full board at
      1 was what left it floating small in the middle of a large monitor with a
@@ -17679,7 +17683,6 @@ function fitLayout(){
      pan across the overflow instead. */
   fitEl.style.height = Math.min(availH, Math.ceil(h * zs + dy * 2)) + "px";
   document.body.dataset.fit = zs.toFixed(3);
-  updateZoomPct();
 }
 
 /* One-off actions (tab, edit) call fitBoard directly so the new scale is in
@@ -17695,14 +17698,10 @@ new ResizeObserver(scheduleFit).observe(document.querySelector(".board"));
 
 /* ---------- zoom + pan (a view feature: works in any mode) ----------
    The board is scaled by zoomLevel on top of the fit scale, and .fit scrolls to
-   reveal the overflow. Panning is just scrolling .fit, so the wheel, the
-   scrollbars and a click-drag all move through the same space and stay in sync.
+   reveal the overflow. Panning is just scrolling .fit, so the scrollbars and a
+   click-drag all move through the same space and stay in sync.
    Components keep their own drag handlers; the pan only starts when the press
    lands on the canvas itself, not on a component, group, tile or flow. */
-function updateZoomPct(){
-  const el = document.getElementById("zoom-pct");
-  if(el) el.textContent = Math.round(zoomLevel * 100) + "%";
-}
 /* Zoom toward a fixed point (mx,my) in .fit viewport pixels: solve for the board
    point under it before, re-fit at the new level, then scroll so that point is
    still under it after. fitDx/fitDy are unchanged across a pure zoom (s is). */
@@ -17723,12 +17722,11 @@ function zoomAt(newZoom, mx, my){
   fitEl.scrollTop  = Math.round(fitDy + ly * z2 - my);
 }
 function zoomBy(factor, mx, my){ zoomAt(zoomLevel * factor, mx, my); }
-function zoomFit(){ zoomLevel = 1; fitBoard(); fitEl.scrollLeft = 0; fitEl.scrollTop = 0; }
 
-/* Ctrl+wheel zooms toward the cursor; a plain wheel falls through to .fit's
-   native scroll, which is what pans vertically when zoomed in. */
+/* Mouse-wheel zooms toward the cursor. Panning is the click-drag below plus the
+   scrollbars that appear when zoomed in. */
 fitEl.addEventListener("wheel", function(e){
-  if(!e.ctrlKey) return;
+  if(!/scale\(/.test(fitInEl.style.transform)) return;
   e.preventDefault();
   const r = fitEl.getBoundingClientRect();
   zoomBy(Math.exp(-e.deltaY * 0.0015), e.clientX - r.left, e.clientY - r.top);
@@ -18094,7 +18092,7 @@ console.log("[arch-studio] init complete");
     "  background:var(--card); box-shadow:var(--shadow-lg); font:12px/1.2 system-ui,sans-serif; }",
     "#edit-tools .edit-tools-title { font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;",
     "  color:var(--muted); padding:0 4px 6px; border-bottom:1px solid var(--line-strong); margin-bottom:4px; }",
-    "body:not(.edit-mode) #edit-tools > *:not(#edit-toggle):not(.zoom-tools) { display:none !important; }",
+    "body:not(.edit-mode) #edit-tools > *:not(#edit-toggle) { display:none !important; }",
     "body:not(.edit-mode) #edit-tools { border:none; box-shadow:none; background:transparent; }",
     "body:not(.edit-mode) #edit-tools #edit-toggle { font-weight:700; }",
     "#edit-tools button { width:100%; text-align:left; flex:0 0 auto; min-height:32px;",
@@ -18156,12 +18154,6 @@ console.log("[arch-studio] init complete");
     ".atom, .atom *, .rgroup-t, .rg-label, .ctile, .ct-name, .ct-sub { min-width:0; }",
     ".atom .nm, .rg-label, .ct-name, .ct-sub { overflow:hidden; text-overflow:ellipsis; }",
     ".rg-label, .ct-name { white-space:nowrap; }",
-    "/* zoom controls are a view feature, so they stay visible outside edit mode */",
-    ".zoom-tools { display:contents; }",
-    "#zoom-pct { align-self:center; width:auto; max-width:100%; padding:3px 8px; border-radius:999px;",
-    "  background:color-mix(in srgb,var(--brand) 12%,var(--card)); color:var(--brand);",
-    "  font-weight:750; font-size:12px; text-align:center; }",
-    "#zoom-fit { text-align:center; }",
     "/* grab only once the canvas is pannable; grabbing while a pan is in flight */",
     "body.zoomed .fit, body.zoomed .fit-in, body.zoomed .board { cursor:grab; }",
     "body.panning, body.panning * { cursor:grabbing !important; }",
@@ -18173,7 +18165,7 @@ console.log("[arch-studio] init complete");
     "  #edit-tools{width:52px;padding:8px 4px}",
     "  #edit-tools .edit-tools-title{display:none}",
     "  #edit-tools button{padding:6px 4px;font-size:10px;text-align:center;min-height:34px}",
-    "  #multi-count,#zoom-pct{font-size:10px;padding:2px 4px}",
+    "  #multi-count{font-size:10px;padding:2px 4px}",
     "  #edit-toast{bottom:14px;max-width:calc(100vw - 28px)} }"
   ].join("\n");
   document.head.appendChild(style);
@@ -18389,13 +18381,7 @@ console.log("[arch-studio] init complete");
     '<input id="edit-import-file" type="file" accept="application/json,.json" hidden>' +
     '<button id="edit-newbox" type="button" aria-label="Create a new empty box in a zone">New Box</button>' +
     '<button id="edit-add" type="button" aria-label="Add a component to the selected box">Add Component</button>' +
-    '<button id="edit-delete" type="button" aria-label="Delete the selected item or items">Delete</button>' +
-    '<div class="zoom-tools">' +
-      '<button id="zoom-in" type="button" aria-label="Zoom the canvas in">+ Zoom in</button>' +
-      '<button id="zoom-out" type="button" aria-label="Zoom the canvas out">– Zoom out</button>' +
-      '<span id="zoom-pct" role="status" aria-live="polite">100%</span>' +
-      '<button id="zoom-fit" type="button" aria-label="Fit the whole board in the viewport">⤢ Fit</button>' +
-    '</div>';
+    '<button id="edit-delete" type="button" aria-label="Delete the selected item or items">Delete</button>';
   /* Append to <body> (not inside #board's transformed .fit-in ancestor) so the
      sidebar's position:fixed is anchored to the viewport, not the scaled board. */
   document.body.appendChild(tools);
@@ -18835,13 +18821,6 @@ console.log("[arch-studio] init complete");
     }
     openAddComponentModal();
   };
-
-  /* ---------- zoom controls (the buttons live in #edit-tools but zoom works
-     in any mode; the maths lives with the fit code above) ---------- */
-  byId2("zoom-in").onclick  = function(){ zoomBy(1.25, fitEl.clientWidth / 2, fitEl.clientHeight / 2); };
-  byId2("zoom-out").onclick = function(){ zoomBy(1 / 1.25, fitEl.clientWidth / 2, fitEl.clientHeight / 2); };
-  byId2("zoom-fit").onclick = zoomFit;
-  updateZoomPct();
 
   function openAddComponentModal(){
     openModal({
