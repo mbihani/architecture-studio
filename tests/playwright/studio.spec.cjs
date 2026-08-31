@@ -62,15 +62,19 @@ test.describe("a) App loads", () => {
    b) INDUSTRY SELECTION — clicking a tab updates the architecture
    ========================================================================= */
 test.describe("b) Industry selection", () => {
-  test("clicking an industry tab switches the reference architecture", async ({ page }) => {
+  test("clicking an industry in the dropdown switches the reference architecture", async ({ page }) => {
     await ready(page);
     await dismissModal(page);
 
-    // pick the first built, non-active industry tab
-    const target = page.locator(".ind-tab:not(.soon):not(.on)").first();
+    // open the industry dropdown
+    await page.locator("#ind-dropdown-btn").click();
+    await expect(page.locator("#ind-dropdown-panel")).toBeVisible();
+
+    // pick the first built, non-active industry option
+    const target = page.locator(".ind-dropdown-item:not(.soon):not(.on)").first();
     await target.waitFor({ state: "visible" });
     const label = (await target.textContent()).trim();
-    // Capture the tab's identity up front: the tab bar is fully re-rendered on
+    // Capture the option's identity up front: the list is fully re-rendered on
     // an industry switch, so the live `target` locator re-resolves afterwards
     // and no longer points at the clicked element.
     const indId = await target.getAttribute("data-ind");
@@ -83,8 +87,10 @@ test.describe("b) Industry selection", () => {
     await page.locator("#m-ok").click();
     await expect(page.locator(".modal-overlay")).toHaveCount(0);
 
-    // the chosen tab is now active (look it up by data-ind, not the stale locator)
-    await expect(page.locator('.ind-tab[data-ind="' + indId + '"]')).toHaveClass(/\bon\b/);
+    // the chosen option is now active (look it up by data-ind, not the stale locator)
+    await expect(page.locator('.ind-dropdown-item[data-ind="' + indId + '"]')).toHaveClass(/\bon\b/);
+    // the dropdown button label reflects the new industry
+    await expect(page.locator("#ind-dropdown-label")).toContainText(label);
     // canvas status reflects the new industry, and never the old "My Canvas" label
     const status = await page.locator("#canvas-status").textContent();
     expect(status).toContain(label);
@@ -432,7 +438,7 @@ test.describe("m) Multi-select", () => {
    n) UI NO OVERLAP — sticky bars don't overlap at various scroll positions
    ========================================================================= */
 test.describe("n) UI no overlap", () => {
-  test("header, industry tabs and edit toolbar never overlap when scrolled", async ({ page }) => {
+  test("header, industry dropdown bar and edit sidebar never overlap when scrolled", async ({ page }) => {
     await ready(page);
 
     // The reference tab canvas-status must show the architecture name, never
@@ -451,17 +457,19 @@ test.describe("n) UI no overlap", () => {
       expect(h).toBeTruthy();
       expect(t).toBeTruthy();
       expect(e).toBeTruthy();
-      // header sits above tabs with no vertical overlap (1px sub-pixel tolerance)
+      // header sits above both the dropdown bar and the sidebar (1px sub-pixel tolerance)
       expect(h.y + h.height).toBeLessThanOrEqual(t.y + 1);
-      // tabs sit above the edit toolbar with no vertical overlap
-      expect(t.y + t.height).toBeLessThanOrEqual(e.y + 1);
-      // the toolbar is fully on-screen
-      expect(e.y).toBeGreaterThanOrEqual(0);
+      expect(h.y + h.height).toBeLessThanOrEqual(e.y + 1);
+      // the fixed left sidebar and the dropdown bar sit side by side: the sidebar's
+      // right edge never crosses the dropdown bar's left edge
+      expect(e.x + e.width).toBeLessThanOrEqual(t.x + 1);
+      // the sidebar is anchored to the left edge and fully on-screen
+      expect(e.x).toBeGreaterThanOrEqual(0);
       expect(e.width).toBeGreaterThan(0);
     };
 
     await checkStack();
-    // scroll the page down so all three stickies enter their stuck state
+    // scroll the page down so the sticky dropdown bar enters its stuck state
     await page.evaluate(() => window.scrollTo(0, 600));
     await page.waitForTimeout(150);
     await checkStack();
@@ -470,18 +478,17 @@ test.describe("n) UI no overlap", () => {
     await checkStack();
   });
 
-  test("industry tab bar stays sticky (visible) when scrolled down", async ({ page }) => {
+  test("industry dropdown bar stays sticky (visible) when scrolled down", async ({ page }) => {
     await ready(page);
     await page.evaluate(() => window.scrollTo(0, 800));
     await page.waitForTimeout(150);
-    // the industry tab bar is still pinned within the viewport
+    // the industry dropdown bar is still pinned within the viewport
     const tabsBox = await page.locator("#ind-tabs").boundingBox();
     expect(tabsBox).toBeTruthy();
     expect(tabsBox.y).toBeGreaterThanOrEqual(0);
     expect(tabsBox.y).toBeLessThan(200);
-    // and at least one industry tab chip is visible within it
-    const chip = page.locator(".ind-tab").first();
-    await expect(chip).toBeVisible();
+    // and the dropdown button is visible within it
+    await expect(page.locator("#ind-dropdown-btn")).toBeVisible();
   });
 });
 
@@ -510,12 +517,13 @@ test.describe("o) Responsive", () => {
         }));
         expect(overflow.scrollW).toBeLessThanOrEqual(overflow.clientW + 1);
 
-        // sticky bars still stack without overlap at this width
+        // sidebar sits to the left of the dropdown bar with no overlap at this width
         const h = await page.locator("header.top").boundingBox();
         const t = await page.locator("#ind-tabs").boundingBox();
         const e = await page.locator("#edit-tools").boundingBox();
         expect(h.y + h.height).toBeLessThanOrEqual(t.y + 1);
-        expect(t.y + t.height).toBeLessThanOrEqual(e.y + 1);
+        expect(h.y + h.height).toBeLessThanOrEqual(e.y + 1);
+        expect(e.x + e.width).toBeLessThanOrEqual(t.x + 1);
         expect(errors).toEqual([]);
       } finally {
         await page.close();

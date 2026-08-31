@@ -17951,40 +17951,58 @@ console.log("[arch-studio] init complete");
   /* ---------- injected styles ---------- */
   var style = document.createElement("style");
   style.textContent = [
-    "/* industry tab bar */",
-    "#ind-tabs { position:sticky; top:0; z-index:31; display:flex; align-items:center; gap:8px; min-width:0;",
+    "/* industry dropdown (replaces the horizontal tab bar) */",
+    "#ind-tabs { position:sticky; top:0; z-index:31; display:flex; align-items:center; gap:10px; margin-left:180px;",
     "  padding:7px 14px; background:var(--card); border-bottom:1px solid var(--line-strong);",
     "  font:12px/1.2 system-ui,sans-serif; }",
-    "#ind-tabs .ind-tabs-scroll { display:flex; gap:5px; flex:1 1 0; min-width:80px; overflow-x:auto;",
-    "  scroll-behavior:smooth; padding:2px 2px 5px; -ms-overflow-style:none; scrollbar-width:thin; }",
-    "#ind-tabs .ind-tabs-scroll::-webkit-scrollbar { height:6px; }",
-    "#ind-tabs .ind-tabs-scroll::-webkit-scrollbar-thumb { background:var(--line-strong); border-radius:3px; }",
-    "#ind-tabs .ind-tab { flex:0 0 auto; border:1px solid var(--line-strong); border-radius:999px;",
-    "  padding:5px 12px; background:var(--card); color:var(--muted); cursor:pointer; font:inherit;",
-    "  font-weight:650; white-space:nowrap; transition:.14s; }",
-    "#ind-tabs .ind-tab:hover { border-color:var(--brand); color:var(--brand); }",
-    "#ind-tabs .ind-tab.on { background:var(--brand); border-color:var(--brand); color:var(--on-accent); }",
-    "#ind-tabs .ind-tab.soon { opacity:.42; cursor:not-allowed; text-decoration:line-through; }",
-    "#ind-tabs .ind-filter { flex:0 0 min(150px,24vw); min-width:90px; border:1px solid var(--line-strong); border-radius:7px;",
-    "  padding:5px 9px; background:var(--well); color:var(--ink); font:inherit; }",
+    ".ind-dropdown { position:relative; flex:0 0 auto; }",
+    ".ind-dropdown-btn { display:inline-flex; align-items:center; gap:8px; min-width:180px;",
+    "  border:1px solid var(--line-strong); border-radius:8px; padding:7px 12px; background:var(--card);",
+    "  color:var(--ink); cursor:pointer; font:inherit; font-weight:650; }",
+    ".ind-dropdown-btn:hover, .ind-dropdown-btn[aria-expanded=\"true\"] { border-color:var(--brand); color:var(--brand); }",
+    ".ind-dropdown-label { white-space:nowrap; }",
+    ".ind-dropdown-chevron { margin-left:auto; font-size:11px; color:var(--muted); transition:.14s; }",
+    ".ind-dropdown-btn[aria-expanded=\"true\"] .ind-dropdown-chevron { transform:rotate(180deg); }",
+    ".ind-dropdown-panel { position:absolute; top:calc(100% + 4px); left:0; z-index:36; width:290px;",
+    "  max-height:min(60vh,420px); display:flex; flex-direction:column; border:1px solid var(--line-strong);",
+    "  border-radius:10px; background:var(--card); box-shadow:var(--shadow-lg); overflow:hidden; }",
+    ".ind-dropdown-panel[hidden] { display:none; }",
+    ".ind-dropdown-search { width:100%; box-sizing:border-box; border:none; border-bottom:1px solid var(--line-strong);",
+    "  padding:9px 12px; background:var(--well); color:var(--ink); font:inherit; }",
+    ".ind-dropdown-search:focus { outline:2px solid var(--brand); outline-offset:-2px; }",
+    ".ind-dropdown-list { overflow-y:auto; padding:5px; }",
+    ".ind-dropdown-list::-webkit-scrollbar { width:8px; }",
+    ".ind-dropdown-list::-webkit-scrollbar-thumb { background:var(--line-strong); border-radius:4px; }",
+    ".ind-dropdown-item { display:block; width:100%; text-align:left; border:1px solid transparent; border-radius:7px;",
+    "  padding:7px 10px; background:transparent; color:var(--ink); cursor:pointer; font:inherit; }",
+    ".ind-dropdown-item:hover { background:color-mix(in srgb,var(--brand) 10%,var(--card)); }",
+    ".ind-dropdown-item.on { background:var(--brand); border-color:var(--brand); color:var(--on-accent); font-weight:650; }",
+    ".ind-dropdown-item.soon { opacity:.42; cursor:not-allowed; text-decoration:line-through; }",
+    ".ind-dropdown-item i { font-style:normal; font-size:10px; color:var(--muted); margin-left:6px; }",
+    ".ind-dropdown-item.on i { color:var(--on-accent); }",
     "@media print { #ind-tabs { display:none !important; } }",
-    "#canvas-status { flex:0 0 auto; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;",
+    "#canvas-status { flex:1 1 auto; min-width:0; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;",
     "  padding:6px 10px; border-radius:999px; background:color-mix(in srgb,var(--brand) 12%,var(--card));",
     "  color:var(--brand); font-weight:750; }",
-    "/* edit toolbar */",
-    "#edit-tools { position:sticky; top:0; z-index:35; display:flex; flex-wrap:nowrap; gap:8px;",
-    "  max-width:100%; max-height:none; overflow-x:auto; box-sizing:border-box;",
-    "  padding:8px; border:1px solid var(--line-strong); border-radius:10px; background:var(--card);",
-    "  box-shadow:var(--shadow-lg); font:12px/1.2 system-ui,sans-serif; }",
+    "/* reserve space for the fixed left sidebar so the canvas is never hidden behind it */",
+    "#fit { margin-left:180px; }",
+    "/* edit toolbar — vertical fixed sidebar on the left */",
+    "#edit-tools { position:fixed; left:0; top:60px; bottom:0; width:180px; z-index:35;",
+    "  display:flex; flex-direction:column; gap:6px; padding:12px 10px; overflow-y:auto;",
+    "  border:1px solid var(--line-strong); border-left:none; border-radius:0 10px 10px 0;",
+    "  background:var(--card); box-shadow:var(--shadow-lg); font:12px/1.2 system-ui,sans-serif; }",
+    "#edit-tools .edit-tools-title { font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;",
+    "  color:var(--muted); padding:0 4px 6px; border-bottom:1px solid var(--line-strong); margin-bottom:4px; }",
     "body:not(.edit-mode) #edit-tools > *:not(#edit-toggle) { display:none !important; }",
-    "body:not(.edit-mode) #edit-tools { border:none; padding:4px 8px; box-shadow:none; background:transparent; }",
+    "body:not(.edit-mode) #edit-tools { border:none; box-shadow:none; background:transparent; }",
     "body:not(.edit-mode) #edit-tools #edit-toggle { font-weight:700; }",
-    "#edit-tools button { flex:0 0 auto; min-height:32px; border:1px solid var(--line-strong); border-radius:7px; padding:7px 10px;",
+    "#edit-tools button { width:100%; text-align:left; flex:0 0 auto; min-height:32px;",
+    "  border:1px solid var(--line-strong); border-radius:7px; padding:7px 10px;",
     "  background:var(--card); color:var(--ink); cursor:pointer; font:inherit; }",
     "#edit-tools button:hover { border-color:var(--brand); color:var(--brand); }",
     "#edit-tools #edit-delete { display:none; color:var(--danger); }",
     "#edit-tools #edit-delete:hover { border-color:var(--danger); }",
-    "@media print { #edit-tools { display:none !important; } }",
+    "@media print { #edit-tools { display:none !important; } #fit { margin-left:0 !important; } }",
     "/* selection in edit mode */",
     "body.edit-mode .atom { cursor:grab; user-select:none; }",
     "body.edit-mode .rgroup.sel-group, body.edit-mode .cloud-sec.sel-group {",
@@ -17992,7 +18010,8 @@ console.log("[arch-studio] init complete");
     "body.edit-mode .atom.sel-atom { outline:3px solid var(--brand); outline-offset:2px; z-index:20; }",
     "body.edit-mode .atom.multi-selected, body.edit-mode .rgroup.multi-selected { outline:3px solid #7c3aed; outline-offset:3px; z-index:21; }",
     "#edit-tools button.on { background:#7c3aed; border-color:#7c3aed; color:white; }",
-    "#multi-count { align-self:center; min-width:68px; color:#7c3aed; font-weight:750; text-align:center; }",
+    "#multi-count { align-self:center; width:auto; max-width:100%; padding:3px 8px; border-radius:999px;",
+    "  background:color-mix(in srgb,#7c3aed 14%,var(--card)); color:#7c3aed; font-weight:750; font-size:12px; text-align:center; }",
     "body.edit-mode .rgroup .rtiles:empty { min-height:18px; border:1px dashed var(--line-strong); border-radius:7px; }",
     "body.edit-mode .rgroup .rtiles:empty::after { content:\"Empty box — use Add Component\"; display:block; padding:4px 8px; color:var(--muted); font:11px/1.3 system-ui,sans-serif; text-align:center; }",
     ".zone-empty { padding:10px 14px; color:var(--muted); font:italic 12px/1.3 system-ui,sans-serif; }",
@@ -18036,8 +18055,15 @@ console.log("[arch-studio] init complete");
     ".atom, .atom *, .rgroup-t, .rg-label, .ctile, .ct-name, .ct-sub { min-width:0; }",
     ".atom .nm, .rg-label, .ct-name, .ct-sub { overflow:hidden; text-overflow:ellipsis; }",
     ".rg-label, .ct-name { white-space:nowrap; }",
-    "@media (max-width:720px){ #canvas-status{display:none} #ind-tabs{padding-inline:8px;gap:5px}",
-    "  #edit-tools button{padding:6px 8px}",
+    "@media (max-width:720px){ #canvas-status{display:none}",
+    "  #ind-tabs{padding-inline:8px;gap:5px;margin-left:52px}",
+    "  #ind-tabs .ind-dropdown-btn{min-width:0;max-width:200px}",
+    "  #ind-tabs .ind-dropdown-panel{width:260px}",
+    "  #fit{margin-left:52px}",
+    "  #edit-tools{width:52px;padding:8px 4px}",
+    "  #edit-tools .edit-tools-title{display:none}",
+    "  #edit-tools button{padding:6px 4px;font-size:10px;text-align:center;min-height:34px}",
+    "  #multi-count{font-size:10px;padding:2px 4px}",
     "  #edit-toast{bottom:14px;max-width:calc(100vw - 28px)} }"
   ].join("\n");
   document.head.appendChild(style);
@@ -18054,21 +18080,36 @@ console.log("[arch-studio] init complete");
   window.toast = toast;   /* expose so the native edit drawer (openEdit) can surface errors too */
 
   /* ============================================================
-     1. INDUSTRY TAB BAR — primary selector (dropdown stays as fallback)
+     1. INDUSTRY DROPDOWN — primary selector with embedded search
      ============================================================ */
   var indTabs = document.createElement("div");
   indTabs.id = "ind-tabs";
   indTabs.innerHTML =
-    '<div class="ind-tabs-scroll" id="ind-tabs-scroll"></div>' +
-    '<span id="canvas-status" role="status" aria-live="polite"></span>' +
-    '<input class="ind-filter" id="ind-filter" type="search" autocomplete="off" placeholder="Filter industries…">';
+    '<div class="ind-dropdown" id="ind-dropdown">' +
+      '<button class="ind-dropdown-btn" id="ind-dropdown-btn" type="button" aria-haspopup="listbox" aria-expanded="false">' +
+        '<span class="ind-dropdown-label" id="ind-dropdown-label">Standard</span>' +
+        '<span class="ind-dropdown-chevron" aria-hidden="true">▾</span>' +
+      '</button>' +
+      '<div class="ind-dropdown-panel" id="ind-dropdown-panel" role="listbox" hidden>' +
+        '<input class="ind-dropdown-search" id="ind-dropdown-search" type="search" autocomplete="off" placeholder="Filter industries…">' +
+        '<div class="ind-dropdown-list" id="ind-dropdown-list"></div>' +
+      '</div>' +
+    '</div>' +
+    '<span id="canvas-status" role="status" aria-live="polite"></span>';
   (document.getElementsByTagName("header")[0] || document.body).after(indTabs);
 
-  var tabsScroll = byId2("ind-tabs-scroll");
-  var filterInput = byId2("ind-filter");
+  var indDropdown = byId2("ind-dropdown");
+  var indDropdownBtn = byId2("ind-dropdown-btn");
+  var indDropdownLabel = byId2("ind-dropdown-label");
+  var indDropdownPanel = byId2("ind-dropdown-panel");
+  var indSearch = byId2("ind-dropdown-search");
+  var indList = byId2("ind-dropdown-list");
   var canvasStatus = byId2("canvas-status");
 
-  function currentIndustryName(){ return industryLabel(ARCH.industry || "generic") || "Standard"; }
+  function currentIndustryName(){
+    var id = ARCH.industry || "generic";
+    return id === "generic" ? "Standard" : (industryLabel(id) || id);
+  }
   function updateCanvasStatus(){
     var boardName = currentBoardName();
     canvasStatus.textContent = "Editing: " + currentIndustryName() + " — " + boardName;
@@ -18078,21 +18119,23 @@ console.log("[arch-studio] init complete");
   function buildIndTabs(){
     var cur = ARCH.industry || "generic";
     var rows = [["generic","Standard"]].concat(INDUSTRY_CATALOG);
-    tabsScroll.innerHTML = rows.map(function(r){
+    indList.innerHTML = rows.map(function(r){
       var id = r[0], label = r[1];
       var built = (id === "generic") || !!INDUSTRIES[id];
-      return '<button class="ind-tab' + (id === cur ? " on" : "") + (built ? "" : " soon") +
-        '" data-ind="' + id + '"' + (built ? "" : " disabled") + '><span>' + esc(label) + '</span></button>';
+      return '<button class="ind-dropdown-item' + (id === cur ? " on" : "") + (built ? "" : " soon") +
+        '" data-ind="' + id + '" role="option" aria-selected="' + (id === cur ? "true" : "false") + '"' +
+        (built ? "" : " disabled") + '><span>' + esc(label) + '</span>' + (built ? "" : ' <i>soon</i>') + '</button>';
     }).join("");
-    tabsScroll.querySelectorAll(".ind-tab").forEach(function(b){
+    indList.querySelectorAll(".ind-dropdown-item").forEach(function(b){
       if(b.disabled) return;
-      b.onclick = function(e){ e.stopPropagation(); requestIndustrySwitch(b.dataset.ind); };
+      b.onclick = function(e){ e.stopPropagation(); closeIndDropdown(); requestIndustrySwitch(b.dataset.ind); };
     });
     applyIndFilter();
+    updateIndDropdownLabel();
   }
   function applyIndFilter(){
-    var q = (filterInput.value || "").trim().toLowerCase();
-    tabsScroll.querySelectorAll(".ind-tab").forEach(function(b){
+    var q = (indSearch.value || "").trim().toLowerCase();
+    indList.querySelectorAll(".ind-dropdown-item").forEach(function(b){
       if(b.dataset.ind === "generic"){ b.style.display = ""; return; }
       var label = b.textContent.trim().toLowerCase();
       b.style.display = (!q || label.indexOf(q) >= 0 || b.dataset.ind.indexOf(q) >= 0) ? "" : "none";
@@ -18100,17 +18143,53 @@ console.log("[arch-studio] init complete");
   }
   function syncIndTabs(){
     var cur = ARCH.industry || "generic";
-    tabsScroll.querySelectorAll(".ind-tab").forEach(function(b){
-      b.classList.toggle("on", b.dataset.ind === cur);
+    indList.querySelectorAll(".ind-dropdown-item").forEach(function(b){
+      var on = b.dataset.ind === cur;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
     });
+    updateIndDropdownLabel();
     updateCanvasStatus();
   }
-  filterInput.oninput = applyIndFilter;
-  filterInput.onclick = function(e){ e.stopPropagation(); };
+  function updateIndDropdownLabel(){
+    var cur = ARCH.industry || "generic";
+    var row = cur === "generic" ? null : INDUSTRY_CATALOG.filter(function(x){ return x[0] === cur; })[0];
+    indDropdownLabel.textContent = row ? row[1] : (cur === "generic" ? "Standard" : industryLabel(cur));
+  }
+
+  /* open/close the dropdown panel; the search auto-focuses when opened and the
+     list re-filters from a clean query every time. */
+  function openIndDropdown(){
+    indDropdownPanel.hidden = false;
+    indDropdownBtn.setAttribute("aria-expanded", "true");
+    indSearch.value = "";
+    applyIndFilter();
+    setTimeout(function(){ indSearch.focus(); }, 0);
+  }
+  function closeIndDropdown(){
+    indDropdownPanel.hidden = true;
+    indDropdownBtn.setAttribute("aria-expanded", "false");
+  }
+  indDropdownBtn.onclick = function(e){
+    e.stopPropagation();
+    if(indDropdownPanel.hidden) openIndDropdown(); else closeIndDropdown();
+  };
+  indSearch.oninput = applyIndFilter;
+  indSearch.onclick = function(e){ e.stopPropagation(); };
+  /* close the dropdown on an outside click … */
+  document.addEventListener("click", function(e){
+    if(indDropdownPanel.hidden) return;
+    if(e.target.closest && e.target.closest("#ind-dropdown")) return;
+    closeIndDropdown();
+  });
+  /* … or pressing Escape */
+  document.addEventListener("keydown", function(e){
+    if(!indDropdownPanel.hidden && e.key === "Escape"){ e.preventDefault(); e.stopPropagation(); closeIndDropdown(); indDropdownBtn.focus(); }
+  });
 
   /* syncIndustryBtn is the single function the native code calls after every
-     applyIndustry(), so wrapping it keeps the tab bar in sync across the
-     dropdown, URL restores, load and the tab bar itself. */
+     applyIndustry(), so wrapping it keeps the dropdown in sync across the
+     native #ind-btn picker, URL restores, load and the dropdown itself. */
   var _origSyncIndustryBtn = syncIndustryBtn;
   syncIndustryBtn = function(){ _origSyncIndustryBtn.apply(this, arguments); syncIndTabs(); };
 
@@ -18188,6 +18267,7 @@ console.log("[arch-studio] init complete");
   tools.setAttribute("role","toolbar");
   tools.setAttribute("aria-label","Architecture editor controls");
   tools.innerHTML =
+    '<div class="edit-tools-title">Edit Tools</div>' +
     '<button id="edit-toggle" type="button" aria-label="Toggle edit mode">Edit Mode: ON</button>' +
     '<button id="edit-reset" type="button" aria-label="Reset canvas to the reference architecture">Reset to Reference</button>' +
     '<button id="edit-duplicate" type="button" aria-label="Duplicate this canvas into a new tab">Duplicate Canvas</button>' +
@@ -18200,7 +18280,9 @@ console.log("[arch-studio] init complete");
     '<button id="edit-newbox" type="button" aria-label="Create a new empty box in a zone">New Box</button>' +
     '<button id="edit-add" type="button" aria-label="Add a component to the selected box">Add Component</button>' +
     '<button id="edit-delete" type="button" aria-label="Delete the selected item or items">Delete</button>';
-  document.getElementById('board').insertAdjacentElement('beforebegin', tools);
+  /* Append to <body> (not inside #board's transformed .fit-in ancestor) so the
+     sidebar's position:fixed is anchored to the viewport, not the scaled board. */
+  document.body.appendChild(tools);
 
   var toggleBtn  = byId2("edit-toggle");
   var newboxBtn  = byId2("edit-newbox");
@@ -18739,12 +18821,14 @@ console.log("[arch-studio] init complete");
   }
 
   /* ---------- boot: edit mode on + place toolbar below the tab bar ---------- */
+  /* The sidebar is position:fixed (top:60px / bottom:0) and the dropdown bar is
+     position:sticky; both sit just below the header, so placeTools pins them to
+     the live header height rather than the hardcoded 60px CSS fallback. */
   function placeTools(){
     var header = document.getElementsByTagName("header")[0];
     var headerH = header ? header.offsetHeight : 0;
-    var tabsH = indTabs.offsetHeight || 0;
     indTabs.style.top = headerH + "px";
-    tools.style.top = (headerH + tabsH + 6) + "px";
+    tools.style.top = headerH + "px";
   }
   setEditMode(true);
   toggleBtn.textContent = "Edit Mode: ON";
