@@ -17615,20 +17615,24 @@ function fitBoard(){
   alignConnectors();
   staggerFlows();
 }
-function fitLayout(){
-  fitInEl.style.transform = "";
-  fitEl.style.height = "";
-  document.body.dataset.fit = "1";
-  document.body.classList.toggle("fitting", window.innerWidth >= FIT_FROM_W);
-  /* a fitted board can be zoomed when the user switches to a builder tab or a
-     narrow window, where the board is not fitted and the zoom has no meaning;
-     reset it so the zoomed overflow, the .zoomed class and scroll offsets do
-     not leak into those unfitted modes (both early returns below bail first). */
+/* A fitted board can be zoomed when the user switches to a builder tab or a
+   narrow window, where the board is not fitted and the zoom has no meaning;
+   reset it so the zoomed overflow, the .zoomed class and scroll offsets do
+   not leak into those unfitted modes. Called only before the early returns in
+   fitLayout, never on the normal fitted path, so a zoom set by zoomAt survives
+   the fitBoard() it triggers. */
+function resetZoom(){
   zoomLevel = 1;
   fitEl.style.overflow = "";
   document.body.classList.remove("zoomed");
   fitEl.scrollLeft = 0;
   fitEl.scrollTop = 0;
+}
+function fitLayout(){
+  fitInEl.style.transform = "";
+  fitEl.style.height = "";
+  document.body.dataset.fit = "1";
+  document.body.classList.toggle("fitting", window.innerWidth >= FIT_FROM_W);
   /* a user-made tab has no board to fit: the builder is a normal-sized form, so
      it must not be scaled, and it takes the height the board would have had so
      its card lands in the middle of the window */
@@ -17636,10 +17640,11 @@ function fitLayout(){
     builderEl.style.minHeight =
       Math.max(240, Math.floor(window.innerHeight - fitEl.getBoundingClientRect().top
         - window.scrollY)) + "px";
+    resetZoom();
     return;
   }
   builderEl.style.minHeight = "";
-  if(window.innerWidth < FIT_FROM_W) return;
+  if(window.innerWidth < FIT_FROM_W){ resetZoom(); return; }
   const h = fitInEl.offsetHeight;
   /* document-relative top, so a scrolled page does not inflate the budget */
   const top = fitEl.getBoundingClientRect().top + window.scrollY;
@@ -17647,7 +17652,7 @@ function fitLayout(){
      without a rounding scrollbar and without an odd strip under the board */
   const availH = Math.floor(window.innerHeight - top);
   const availW = fitEl.clientWidth - SIDE_PAD * 2;
-  if(availH < 240) return;
+  if(availH < 240){ resetZoom(); return; }
   const dw = designWidth();
   /* Both views scale UP into the space they are given. Holding the full board at
      1 was what left it floating small in the middle of a large monitor with a
@@ -17721,6 +17726,7 @@ function zoomBy(factor, mx, my){ zoomAt(zoomLevel * factor, mx, my); }
 /* Mouse-wheel zooms toward the cursor. Panning is the click-drag below plus the
    scrollbars that appear when zoomed in. */
 fitEl.addEventListener("wheel", function(e){
+  if(!/scale\(/.test(fitInEl.style.transform)) return;
   e.preventDefault();
   const r = fitEl.getBoundingClientRect();
   zoomBy(Math.exp(-e.deltaY * 0.0015), e.clientX - r.left, e.clientY - r.top);
