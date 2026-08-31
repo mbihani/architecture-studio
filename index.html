@@ -17620,6 +17620,16 @@ function fitLayout(){
   fitEl.style.height = "";
   document.body.dataset.fit = "1";
   document.body.classList.toggle("fitting", window.innerWidth >= FIT_FROM_W);
+  /* a fitted board can be zoomed when the user switches to a builder tab or a
+     narrow window, where the board is not fitted and the zoom has no meaning;
+     reset it so the zoomed overflow, the .zoomed class and scroll offsets do
+     not leak into those unfitted modes (both early returns below bail first). */
+  zoomLevel = 1;
+  fitEl.style.overflow = "";
+  document.body.classList.remove("zoomed");
+  fitEl.scrollLeft = 0;
+  fitEl.scrollTop = 0;
+  updateZoomPct();
   /* a user-made tab has no board to fit: the builder is a normal-sized form, so
      it must not be scaled, and it takes the height the board would have had so
      its card lands in the middle of the window */
@@ -17729,7 +17739,7 @@ fitEl.addEventListener("wheel", function(e){
    keep their own behaviour; the edit-mode drag handler (capture phase) has
    already run by the time this bubble-phase handler fires. */
 let pan = null;
-const PAN_SKIP = ".atom,.rgroup,.cloud-sec,.colhead,.pockhead,.resize-handle,.custom-flow,.addbtn";
+const PAN_SKIP = ".atom,.rgroup,.cloud-sec,.colhead,.pockhead,.resize-handle,.custom-flow,.flow,.medal-arrow,.addbtn";
 fitEl.addEventListener("mousedown", function(e){
   if(e.button !== 0) return;
   if(e.target.closest && e.target.closest(PAN_SKIP)) return;
@@ -17747,6 +17757,13 @@ document.addEventListener("mouseup", function(){
   pan = null;
   document.body.classList.remove("panning");
 }, true);
+/* a pointer released outside the window never fires document mouseup, so pan
+   and the .panning class would stick; clear them on window blur instead. */
+window.addEventListener("blur", function(){
+  if(!pan) return;
+  pan = null;
+  document.body.classList.remove("panning");
+});
 
 /* The other half of liveUrl(): a link written into an exported PDF or deck has
    to reopen the board it was exported from. Nothing here is remembered, because
