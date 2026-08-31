@@ -18184,7 +18184,7 @@ console.log("[arch-studio] init complete");
   });
   /* … or pressing Escape */
   document.addEventListener("keydown", function(e){
-    if(!indDropdownPanel.hidden && e.key === "Escape"){ closeIndDropdown(); indDropdownBtn.focus(); }
+    if(!indDropdownPanel.hidden && e.key === "Escape"){ e.preventDefault(); e.stopPropagation(); closeIndDropdown(); indDropdownBtn.focus(); }
   });
 
   /* syncIndustryBtn is the single function the native code calls after every
