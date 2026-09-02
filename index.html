@@ -18401,6 +18401,11 @@ console.log("[arch-studio] init complete");
      the canvas keeps working if the bridge fails to load.
      ============================================================ */
   var _lastSuggestions = [];
+  /* M5 vision-extraction review state (editable current-state from a diagram). */
+  var _extractRows = [];      /* [{ name, category, description }] — human-editable */
+  var _extractConns = [];     /* [{ source, target, kind }] — passed through */
+  var _extractZones = [];     /* [string] */
+  var _extractSummary = "";
   function aiBridge(){
     var B = window.ArchBridge;
     return (B && typeof B.flattenBoardToSemantic === "function"
@@ -18412,8 +18417,18 @@ console.log("[arch-studio] init complete");
     var body =
       '<div class="ai-panel">' +
         '<div class="ai-field"><label for="ai-current">Current-state architecture' +
-          ' <span class="ai-hint">JSON: {"components":[…],"connections":[…]}</span></label>' +
-          '<textarea id="ai-current" rows="3" placeholder=\'{"components":[{"name":"Teradata"},{"name":"Informatica PowerCenter"}],"connections":[]}\'></textarea></div>' +
+          ' <span class="ai-hint">paste JSON below, or extract it from a diagram image</span></label>' +
+          '<textarea id="ai-current" rows="3" placeholder=\'{"components":[{"name":"Teradata"},{"name":"Informatica PowerCenter"}],"connections":[]}\'></textarea>' +
+          '<div class="ai-extract">' +
+            '<div class="ai-extract-controls">' +
+              '<input id="ai-image" type="file" accept="image/png,image/jpeg,application/pdf" aria-label="Current-state architecture diagram (PNG, JPEG or PDF)">' +
+              '<input id="ai-extract-hint" type="text" placeholder="hint (optional), e.g. Federal Bank collections current state" aria-label="Extraction hint">' +
+              '<button id="ai-extract-btn" type="button">Extract from image</button>' +
+            '</div>' +
+            '<div id="ai-extract-status" role="status" aria-live="polite" class="ai-status"></div>' +
+            '<div id="ai-extract-review" class="ai-extract-review"></div>' +
+          '</div>' +
+        '</div>' +
         '<div class="ai-field"><label for="ai-discovery">Discovery notes' +
           ' <span class="ai-hint">JSON object or free text</span></label>' +
           '<textarea id="ai-discovery" rows="3" placeholder="present_state, challenges, data_volume, compliance, timeline…"></textarea></div>' +
@@ -18431,7 +18446,12 @@ console.log("[arch-studio] init complete");
       sub:"Sends the reference board plus your customer inputs to the Product Research Agent, then lets you review and apply its suggestions.",
       body: body,
       okText:"Get Suggestions",
-      onOk: onAiOk
+      onOk: onAiOk,
+      onRender: function(){
+        _extractRows = []; _extractConns = []; _extractZones = []; _extractSummary = "";
+        var eb = byId2("ai-extract-btn"); if(eb) eb.onclick = runAiExtract;
+        renderExtractReview();
+      }
     });
     var ok = byId2("m-ok"); if(ok) ok.dataset.mode = "suggest";
     _lastSuggestions = [];
@@ -18542,6 +18562,140 @@ console.log("[arch-studio] init complete");
       rememberUndo(); loadBoardSnap(next); persistCustom(); build(); fitBoard();
       toast("Applied " + accepted.length + " suggestion" + (accepted.length === 1 ? "" : "s") + " to the canvas.");
     }catch(err){ console.error("Apply suggestions failed", err); toast("Could not apply suggestions."); }
+  }
+
+  /* ---------- M5: current-state from a diagram image (vision extract) ---------- */
+  function runAiExtract(){
+    var fileInput = byId2("ai-image");
+    var file = fileInput && fileInput.files && fileInput.files[0];
+    var status = byId2("ai-extract-status");
+    if(!file){ if(status){ status.className = "ai-status error"; status.textContent = "Choose an image or PDF first."; } return; }
+    var reader = new FileReader();
+    reader.onerror = function(){ if(status){ status.className = "ai-status error"; status.textContent = "Could not read the file."; } };
+    reader.onload = function(){
+      /* readAsDataURL gives "data:<mime>;base64,<payload>"; strip the prefix and
+         send raw base64 (the endpoint tolerates both, raw is the documented shape). */
+      var dataUrl = String(reader.result || "");
+      var comma = dataUrl.indexOf(",");
+      var b64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+      postExtract(b64, file.type || "image/png");
+    };
+    try{ reader.readAsDataURL(file); }
+    catch(err){ if(status){ status.className = "ai-status error"; status.textContent = "Could not read the file: " + (err && err.message || err); } }
+  }
+  function postExtract(imageB64, mimeType){
+    var status = byId2("ai-extract-status"), review = byId2("ai-extract-review"), btn = byId2("ai-extract-btn");
+    var hintEl = byId2("ai-extract-hint");
+    var hint = (hintEl && hintEl.value || "").trim();
+    var payload = { image_base64: imageB64, mime_type: mimeType || "image/png" };
+    if(hint) payload.hint = hint;
+    /* Same call path the suggest button uses: proxy (same-origin) unless the
+       config opts into the direct browser call to the agent origin. */
+    var cfg = window.ArchStudioConfig || {};
+    var useProxy = cfg.useProxy !== false;
+    var base = useProxy ? "" : (cfg.agentBaseUrl || "");
+    var url = base + "/api/studio/extract";
+    var opts = { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) };
+    if(!useProxy) opts.credentials = "include";
+    if(btn) btn.disabled = true;
+    if(review) review.innerHTML = "";
+    if(status){ status.className = "ai-status busy"; status.textContent = "Extracting components from the image… this can take ~5–40s."; }
+    fetch(url, opts).then(function(r){
+      return r.text().then(function(t){ return { status:r.status, ok:r.ok, text:t }; });
+    }).then(function(resp){
+      if(btn) btn.disabled = false;
+      if(!resp.ok){
+        var extra = (resp.status === 401 || resp.status === 403)
+          ? " A 401/403 on the direct browser call means cross-app auth/CORS blocked it — set STUDIO_USE_PROXY=true so the studio server proxies with its service-principal token."
+          : "";
+        if(status){ status.className = "ai-status error"; status.textContent = "Extract error " + resp.status + ": " + resp.text.slice(0,400) + extra; }
+        return;
+      }
+      var data; try{ data = JSON.parse(resp.text); }catch(e){ if(status){ status.className = "ai-status error"; status.textContent = "Agent returned non-JSON."; } return; }
+      loadExtractReview(data);
+    }).catch(function(err){
+      if(btn) btn.disabled = false;
+      if(status){ status.className = "ai-status error";
+        status.textContent = "Extract failed: " + (err && err.message || err) + ". A direct browser call to the agent is likely blocked by CORS/401 — switch to the proxy (STUDIO_USE_PROXY=true on the studio app)."; }
+    });
+  }
+  function loadExtractReview(data){
+    var B = aiBridge();
+    var norm = (B && typeof B.extractionToCurrentState === "function")
+      ? B.extractionToCurrentState(data)
+      : { components:[], connections:[] };
+    _extractRows = (Array.isArray(norm.components) ? norm.components : []).map(function(c){
+      return { name:c.name || "", category:c.category || "", description:c.description || "" };
+    });
+    _extractConns = Array.isArray(norm.connections) ? norm.connections : [];
+    _extractZones = (data && Array.isArray(data.zones)) ? data.zones.slice() : [];
+    _extractSummary = (data && data.summary) ? String(data.summary) : "";
+    var status = byId2("ai-extract-status");
+    if(status){ status.className = "ai-status";
+      status.textContent = "Extracted " + _extractRows.length + " component" + (_extractRows.length === 1 ? "" : "s") +
+        " and " + _extractConns.length + " connection" + (_extractConns.length === 1 ? "" : "s") +
+        ". Review/edit below, then click “Use as current state”."; }
+    renderExtractReview();
+  }
+  function renderExtractReview(){
+    var review = byId2("ai-extract-review");
+    if(!review) return;
+    if(!_extractRows.length && !_extractConns.length && !_extractSummary){ review.innerHTML = ""; return; }
+    var html = '<div class="ai-extract-h">Extracted current state <span class="ai-hint">editable — vision output, correct before use</span></div>';
+    if(_extractSummary) html += '<div class="ai-extract-summary">' + esc(_extractSummary) + '</div>';
+    html += '<div class="ai-extract-tablewrap"><table class="ai-extract-table">' +
+      '<thead><tr><th>Name</th><th>Category</th><th>Description</th><th aria-label="Remove"></th></tr></thead><tbody>';
+    _extractRows.forEach(function(c, i){
+      /* NB: esc() does not escape quotes, so values are set via .value in JS below,
+         never injected into value="…" attributes. */
+      html += '<tr>' +
+        '<td><input class="ai-ex-name" data-i="' + i + '" type="text" aria-label="Component name"></td>' +
+        '<td><input class="ai-ex-cat" data-i="' + i + '" type="text" aria-label="Component category"></td>' +
+        '<td><input class="ai-ex-desc" data-i="' + i + '" type="text" aria-label="Component description"></td>' +
+        '<td><button type="button" class="ai-ex-rm" data-i="' + i + '" aria-label="Remove component">✕</button></td>' +
+      '</tr>';
+    });
+    html += '</tbody></table></div>';
+    html += '<div class="ai-extract-actions">' +
+      '<button type="button" id="ai-ex-add">Add component</button>' +
+      '<button type="button" id="ai-ex-use" class="primary">Use as current state</button></div>';
+    if(_extractConns.length){
+      html += '<div class="ai-extract-h">Connections <span class="ai-count">' + _extractConns.length + '</span></div>' +
+        '<ul class="ai-extract-conns">';
+      _extractConns.forEach(function(cn){
+        var k = cn && cn.kind ? " (" + esc(cn.kind) + ")" : "";
+        html += '<li>' + esc((cn && cn.source) || "?") + ' → ' + esc((cn && cn.target) || "?") + k + '</li>';
+      });
+      html += '</ul>';
+    }
+    if(_extractZones.length){
+      html += '<div class="ai-extract-zones">Zones: ' + _extractZones.map(function(z){ return esc(String(z)); }).join(", ") + '</div>';
+    }
+    review.innerHTML = html;
+    /* Set values + wire handlers in JS (avoids attribute-injection via esc()). */
+    review.querySelectorAll(".ai-ex-name").forEach(function(el){ var i = +el.dataset.i; el.value = (_extractRows[i] && _extractRows[i].name) || ""; el.oninput = function(){ if(_extractRows[i]) _extractRows[i].name = el.value; }; });
+    review.querySelectorAll(".ai-ex-cat").forEach(function(el){ var i = +el.dataset.i; el.value = (_extractRows[i] && _extractRows[i].category) || ""; el.oninput = function(){ if(_extractRows[i]) _extractRows[i].category = el.value; }; });
+    review.querySelectorAll(".ai-ex-desc").forEach(function(el){ var i = +el.dataset.i; el.value = (_extractRows[i] && _extractRows[i].description) || ""; el.oninput = function(){ if(_extractRows[i]) _extractRows[i].description = el.value; }; });
+    review.querySelectorAll(".ai-ex-rm").forEach(function(el){ el.onclick = function(){ var i = +el.dataset.i; if(i >= 0 && i < _extractRows.length){ _extractRows.splice(i, 1); renderExtractReview(); } }; });
+    var addBtn = byId2("ai-ex-add"); if(addBtn) addBtn.onclick = function(){ _extractRows.push({ name:"", category:"", description:"" }); renderExtractReview(); };
+    var useBtn = byId2("ai-ex-use"); if(useBtn) useBtn.onclick = useExtractAsCurrentState;
+  }
+  function useExtractAsCurrentState(){
+    var comps = _extractRows.map(function(c){
+      return { name:String(c.name || "").trim(), category:String(c.category || ""), description:String(c.description || "") };
+    }).filter(function(c){ return c.name; });   /* drop blank-name rows on commit */
+    var cur = { components: comps, connections: Array.isArray(_extractConns) ? _extractConns : [] };
+    var ta = byId2("ai-current");
+    if(ta){
+      ta.value = JSON.stringify(cur);   /* both routes feed the same current_state textarea */
+      ta.classList.add("ai-current-active");
+      setTimeout(function(){ ta.classList.remove("ai-current-active"); }, 1600);
+      if(ta.focus) ta.focus();
+    }
+    var status = byId2("ai-extract-status");
+    if(status){ status.className = "ai-status";
+      status.textContent = "Current state set from the extracted diagram (" + comps.length + " component" + (comps.length === 1 ? "" : "s") +
+        "). It now fills the Current-state field above and will be sent with Get Suggestions."; }
   }
   if(aiBtn) aiBtn.onclick = openAiPanel;
 
@@ -19029,6 +19183,25 @@ console.log("[arch-studio] init complete");
   .ai-pri-low { background:#eafaf1; border-color:#abebc6; }
   .ai-net { background:#eaf2fd; border-color:#a9cbf5; }
   .ai-cat { opacity:.8; }
+  /* M5 vision-extraction review (additive, scoped to .ai-extract*) */
+  .ai-extract { display:flex; flex-direction:column; gap:6px; margin-top:6px; padding-top:6px; border-top:1px dashed var(--bd, #ddd); }
+  .ai-extract-controls { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .ai-extract-controls input[type=text] { flex:1 1 200px; }
+  .ai-extract-review { display:flex; flex-direction:column; gap:6px; }
+  .ai-extract-h { font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; opacity:.8; }
+  .ai-extract-h .ai-hint { font-weight:400; text-transform:none; letter-spacing:0; }
+  .ai-extract-h .ai-count { opacity:.6; }
+  .ai-extract-summary { font-size:12px; opacity:.85; }
+  .ai-extract-tablewrap { overflow-x:auto; }
+  .ai-extract-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .ai-extract-table th { text-align:left; font-size:10px; text-transform:uppercase; opacity:.6; padding:2px 4px; font-weight:600; }
+  .ai-extract-table td { padding:2px 4px; vertical-align:top; }
+  .ai-extract-table input[type=text] { width:100%; box-sizing:border-box; font:inherit; font-size:12px; padding:4px 6px; border:1px solid var(--bd, #ccc); border-radius:5px; background:var(--surface, #fff); color:inherit; }
+  .ai-ex-rm { border:1px solid var(--bd, #ccc); border-radius:5px; background:transparent; color:inherit; cursor:pointer; padding:2px 8px; line-height:1; }
+  .ai-extract-actions { display:flex; gap:8px; flex-wrap:wrap; }
+  .ai-extract-conns { margin:0; padding-left:18px; font-size:12px; opacity:.85; }
+  .ai-extract-zones { font-size:12px; opacity:.75; }
+  .ai-current-active { outline:2px solid var(--brand, #7c3aed); outline-offset:1px; }
 </style>
 
 <!-- Format bridge (pure ES module) + studio config. Guarded so the page still

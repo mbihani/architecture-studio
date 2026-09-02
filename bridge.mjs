@@ -16,6 +16,8 @@
  *   flattenBoardToSemantic(board)              -> { version, industry, components[], edges[] }
  *   buildCardLibrary(board)                    -> [{ n, zone, caps, long }, ...]
  *   applySuggestionsToBoard(board, accepted[]) -> new board with suggestions applied
+ *   extractionToCurrentState(extractResponse)  -> { components:[{name,category,description}],
+ *                                                   connections:[{source,target,kind}] }
  */
 
 /* ------------------------------------------------------------------ */
@@ -243,6 +245,50 @@ export function buildCardLibrary(board) {
     });
   });
   return cards;
+}
+
+/* ------------------------------------------------------------------ */
+/* extractionToCurrentState                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Map a vision-extraction response
+ *   { components:[{name,type,category,description}], connections:[{source,target,kind}], zones, summary }
+ * into the `current_state` shape the agent's /api/studio/suggest accepts
+ * (its `_normalize_arch` reads `{components, connections}`):
+ *   { components:[{name,category,description}], connections:[{source,target,kind}] }
+ *
+ * Pure + defensive: never throws on missing / malformed input, degrades to
+ * empty arrays. Components with a blank name are dropped (they carry no signal
+ * and would confuse name-matching downstream). Connections are passed through,
+ * normalized to {source,target,kind} — no filtering by component reference.
+ */
+export function extractionToCurrentState(extractResponse) {
+  const src = extractResponse && typeof extractResponse === "object" ? extractResponse : {};
+
+  const components = [];
+  (Array.isArray(src.components) ? src.components : []).forEach((c) => {
+    if (c == null || typeof c !== "object") return;
+    const name = String(c.name == null ? "" : c.name).trim();
+    if (!name) return; // drop empty-name components
+    components.push({
+      name,
+      category: c.category == null ? "" : String(c.category),
+      description: c.description == null ? "" : String(c.description),
+    });
+  });
+
+  const connections = [];
+  (Array.isArray(src.connections) ? src.connections : []).forEach((cn) => {
+    if (cn == null || typeof cn !== "object") return;
+    connections.push({
+      source: cn.source == null ? "" : String(cn.source),
+      target: cn.target == null ? "" : String(cn.target),
+      kind: cn.kind == null ? "" : String(cn.kind),
+    });
+  });
+
+  return { components, connections };
 }
 
 /* ------------------------------------------------------------------ */

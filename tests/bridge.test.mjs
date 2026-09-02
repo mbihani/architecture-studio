@@ -5,6 +5,7 @@ import {
   flattenBoardToSemantic,
   buildCardLibrary,
   applySuggestionsToBoard,
+  extractionToCurrentState,
 } from "../bridge.mjs";
 
 /* ------------------------------------------------------------------ */
@@ -274,6 +275,61 @@ test("round-trip flatten -> apply -> flatten keeps _uids stable", () => {
 
   // flattening the applied board twice is stable
   assert.deepEqual(flattenBoardToSemantic(applied), doc2);
+});
+
+/* ------------------------------------------------------------------ */
+/* extractionToCurrentState                                           */
+/* ------------------------------------------------------------------ */
+
+test("extractionToCurrentState returns empty arrays for empty / nullish input", () => {
+  assert.deepEqual(extractionToCurrentState({}), { components: [], connections: [] });
+  assert.deepEqual(extractionToCurrentState(null), { components: [], connections: [] });
+  assert.deepEqual(extractionToCurrentState(undefined), { components: [], connections: [] });
+  assert.deepEqual(extractionToCurrentState({ components: [], connections: [] }), { components: [], connections: [] });
+});
+
+test("extractionToCurrentState maps a typical vision response and drops empty-name components", () => {
+  const resp = {
+    components: [
+      { name: "Finacle CBS", type: "database", category: "source", description: "Oracle Exadata core banking" },
+      { name: "  ", type: "unknown", category: "platform", description: "blank name -> dropped" },
+      { name: "Enterprise EDW", category: "platform" },
+    ],
+    connections: [
+      { source: "Finacle CBS", target: "Enterprise EDW", kind: "batch" },
+      { source: "Enterprise EDW", target: "AML" },
+    ],
+    zones: ["ingest", "platform"],
+    summary: "Batch EDW pipeline",
+  };
+  const out = extractionToCurrentState(resp);
+  // empty-name component dropped -> 2 remain, only name/category/description kept (type dropped)
+  assert.equal(out.components.length, 2);
+  assert.deepEqual(out.components[0], { name: "Finacle CBS", category: "source", description: "Oracle Exadata core banking" });
+  assert.deepEqual(out.components[1], { name: "Enterprise EDW", category: "platform", description: "" });
+  assert.ok(out.components.every((c) => !("type" in c)));
+  // connections passed through, normalized to {source,target,kind}
+  assert.equal(out.connections.length, 2);
+  assert.deepEqual(out.connections[0], { source: "Finacle CBS", target: "Enterprise EDW", kind: "batch" });
+  assert.deepEqual(out.connections[1], { source: "Enterprise EDW", target: "AML", kind: "" });
+});
+
+test("extractionToCurrentState never throws on malformed input", () => {
+  const bad = [
+    "not an object", 42, true, [],
+    { components: "nope", connections: 5 },
+    { components: [null, 3, "x", {}, { name: 7 }], connections: [null, "edge", { source: 1 }] },
+    { components: [{ name: "OK" }] },
+  ];
+  for (const b of bad) {
+    assert.doesNotThrow(() => extractionToCurrentState(b));
+    const out = extractionToCurrentState(b);
+    assert.ok(Array.isArray(out.components) && Array.isArray(out.connections));
+  }
+  // name coerced from a non-string is still kept when non-empty; {} and {name:7->"7"} behavior:
+  const coerced = extractionToCurrentState({ components: [{ name: 7 }, {}] });
+  assert.equal(coerced.components.length, 1);
+  assert.equal(coerced.components[0].name, "7");
 });
 
 test("bridge functions never throw on empty / malformed boards", () => {
