@@ -16,6 +16,7 @@
  *   flattenBoardToSemantic(board)              -> { version, industry, components[], edges[] }
  *   buildCardLibrary(board)                    -> [{ n, zone, caps, long }, ...]
  *   applySuggestionsToBoard(board, accepted[]) -> new board with suggestions applied
+ *   boardToSpecMarkdown(board)                 -> string (Markdown spec of the board)
  *   extractionToCurrentState(extractResponse)  -> { components:[{name,category,description}],
  *                                                   connections:[{source,target,kind}] }
  */
@@ -432,10 +433,16 @@ function placementArrayFor(board, bucket) {
 
 /**
  * Apply accepted suggestions to a NEW board (pure — no DOM, no mutation of input):
- *   remove : delete the tile whose _uid===component_id (fallback name===component).
+ *   remove : MARK the matched tile _aiState:"remove" and KEEP it in place (do not
+ *            splice). This (i) lets the target diagram show what is being retired
+ *            (the Phase-4 diff view) and (ii) prevents removing platform tiles from
+ *            dropping the board below the studio's storedStateUsable() threshold
+ *            (>= 60% of BASE platform tiles), which was silently rejecting the
+ *            applied board and leaving the canvas un-rendered.
  *   modify : append a "Target: " note to long/s and mark _aiState:"modify".
  *   add    : if component_id resolves to an existing tile, mark it _aiState:"add";
- *            else create a NET-NEW tile and place it by category.
+ *            else create a NET-NEW tile (given a generic `product` icon so it draws
+ *            as a real glyph, not a bare dot) and place it by category.
  * The result is designed to keep satisfying the studio's storedStateUsable().
  */
 export function applySuggestionsToBoard(board, acceptedSuggestions) {
@@ -444,7 +451,6 @@ export function applySuggestionsToBoard(board, acceptedSuggestions) {
 
   const idx = indexTiles(next);
   const usedUids = new Set(idx.records.map((r) => r.tile && r.tile._uid).filter(Boolean));
-  const removals = []; // { arr, tile } spliced after the pass, by identity
   const list = Array.isArray(acceptedSuggestions) ? acceptedSuggestions : [];
 
   const findRec = (s) => {
@@ -469,7 +475,9 @@ export function applySuggestionsToBoard(board, acceptedSuggestions) {
 
     if (action === "remove") {
       const rec = findRec(s);
-      if (rec && Array.isArray(rec.arr)) removals.push({ arr: rec.arr, tile: rec.tile });
+      // M6a: mark, do NOT splice — keep the tile so the diff view can show it as
+      // retiring and so the platform-tile count never falls under the gate.
+      if (rec && rec.tile) rec.tile._aiState = "remove";
       return;
     }
 
@@ -505,6 +513,11 @@ export function applySuggestionsToBoard(board, acceptedSuggestions) {
         s: String(s.setup_notes || "").slice(0, 80),
         long: s.reason || "",
         caps: [],
+        // A valid ICONS key (verified present) so the renderer draws a real glyph
+        // instead of falling back to the generic `dot`. The renderer also tolerates
+        // a missing `ic` (svg()/titleIcon() fall back to ICONS.dot), so this is
+        // belt-and-braces, not load-bearing.
+        ic: "product",
         _uid: mintUid(bucket, name),
         _aiState: "add",
         _net_new: true,
@@ -513,11 +526,141 @@ export function applySuggestionsToBoard(board, acceptedSuggestions) {
     }
   });
 
-  // Apply removals by identity (index-safe).
-  removals.forEach(({ arr, tile }) => {
-    const i = arr.indexOf(tile);
-    if (i >= 0) arr.splice(i, 1);
-  });
-
   return next;
+}
+
+/* ------------------------------------------------------------------ */
+/* boardToSpecMarkdown                                                */
+/* ------------------------------------------------------------------ */
+
+/** Title-case an industry id ("wealth_management" -> "Wealth Management"). */
+function titleizeIndustry(ind) {
+  const s = String(ind == null ? "" : ind).trim();
+  if (!s) return "Generic";
+  return s
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1) : w))
+    .join(" ") || "Generic";
+}
+
+/** Category display labels for the spec. */
+const SPEC_CATEGORY_LABEL = {
+  platform: "Platform & Governance",
+  cloud: "Cloud & Integrations",
+  source: "Sources",
+  ingestion: "Ingestion",
+  consumer: "Consumers",
+  usecase: "Use Cases",
+};
+
+/* A deterministic, dependency-ordered build sequence: the cloud substrate and
+   the platform/governance layer come first, then the sources they read, then
+   ingestion, then who and what consumes the governed results. Any category not
+   listed here is appended alphabetically. */
+const SPEC_SETUP_ORDER = ["cloud", "platform", "source", "ingestion", "consumer", "usecase"];
+
+function specLabelFor(cat) {
+  return SPEC_CATEGORY_LABEL[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
+}
+
+/**
+ * Render the CURRENT board as a Markdown spec for the demo-creation team.
+ * Pure + defensive: never throws; degrades to a minimal doc on empty input.
+ *   - Title (industry) + a summary line (component counts by category + edges).
+ *   - Component inventory grouped by category: name · capabilities · description.
+ *   - Data-flow section derived from edges (source → target).
+ *   - A dependency-ordered setup sequence (cloud/platform → sources → ingestion
+ *     → consumers/use-cases).
+ */
+export function boardToSpecMarkdown(board) {
+  const doc = flattenBoardToSemantic(board);
+  const comps = Array.isArray(doc.components) ? doc.components : [];
+  const edges = Array.isArray(doc.edges) ? doc.edges : [];
+  const title = titleizeIndustry(doc.industry);
+
+  const idToName = new Map();
+  comps.forEach((c) => { if (c && c.id != null) idToName.set(c.id, c.name); });
+
+  // Group components by category, preserving first-seen order within a group.
+  const byCat = new Map();
+  comps.forEach((c) => {
+    const cat = c && c.category ? String(c.category) : "platform";
+    if (!byCat.has(cat)) byCat.set(cat, []);
+    byCat.get(cat).push(c);
+  });
+  // Iteration order: the known dependency order first, then any extras sorted.
+  const cats = [];
+  SPEC_SETUP_ORDER.forEach((k) => { if (byCat.has(k)) cats.push(k); });
+  [...byCat.keys()].sort().forEach((k) => { if (cats.indexOf(k) < 0) cats.push(k); });
+
+  const lines = [];
+  lines.push(`# ${title} — Target Architecture Spec`);
+  lines.push("");
+
+  // Summary line: total + per-category counts + flow count.
+  const perCat = cats.map((c) => `${specLabelFor(c)} ${byCat.get(c).length}`).join(", ");
+  lines.push(
+    `**${comps.length}** component${comps.length === 1 ? "" : "s"}` +
+    (perCat ? ` (${perCat})` : "") +
+    ` · **${edges.length}** data flow${edges.length === 1 ? "" : "s"}.`,
+  );
+  lines.push("");
+
+  // Component inventory grouped by category.
+  lines.push("## Component Inventory");
+  if (!comps.length) {
+    lines.push("");
+    lines.push("_No components on the board._");
+  } else {
+    cats.forEach((cat) => {
+      const items = byCat.get(cat);
+      lines.push("");
+      lines.push(`### ${specLabelFor(cat)} (${items.length})`);
+      items.forEach((c) => {
+        const caps = Array.isArray(c.capabilities) ? c.capabilities.filter(Boolean) : [];
+        const parts = [];
+        if (caps.length) parts.push(caps.join(", "));
+        const desc = c && c.description ? String(c.description).trim() : "";
+        if (desc) parts.push(desc);
+        const suffix = parts.length ? ` — ${parts.join(" · ")}` : "";
+        lines.push(`- **${c.name}**${suffix}`);
+      });
+    });
+  }
+  lines.push("");
+
+  // Data flows from resolved edges.
+  lines.push("## Data Flows");
+  lines.push("");
+  if (!edges.length) {
+    lines.push("_No explicit data flows defined._");
+  } else {
+    edges.forEach((e) => {
+      const from = idToName.get(e.sourceId) || e.sourceId;
+      const to = idToName.get(e.targetId) || e.targetId;
+      const kind = e && e.kind ? ` (${e.kind})` : "";
+      lines.push(`- ${from} → ${to}${kind}`);
+    });
+  }
+  lines.push("");
+
+  // Dependency-ordered setup sequence.
+  lines.push("## Setup Sequence");
+  lines.push("");
+  let n = 0;
+  cats.forEach((cat) => {
+    byCat.get(cat).forEach((c) => {
+      n += 1;
+      const desc = c && c.description ? String(c.description).trim() : "";
+      const short = desc ? ` — ${desc.length > 160 ? desc.slice(0, 157) + "…" : desc}` : "";
+      lines.push(`${n}. **${c.name}** _(${specLabelFor(cat)})_${short}`);
+    });
+  });
+  if (!n) lines.push("_Nothing to set up._");
+  lines.push("");
+
+  return lines.join("\n");
 }

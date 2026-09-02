@@ -13227,6 +13227,12 @@ function reg(el, tile, arr, sectionName){
   const id = "a" + (++uid);
   el.dataset.id = id;
   el.classList.add("atom");
+  /* AI diff view (M6a): a tile carrying an _aiState set by the format bridge's
+     applySuggestionsToBoard gets a matching class so the board renderer colours
+     it — ai-add (recommended / net-new), ai-modify (retune), ai-remove (retiring).
+     reg() is the one path every tile type flows through, so one line covers cards,
+     rail tiles, cloud/top chips, panel heads/columns and side chips alike. */
+  if(tile && tile._aiState) el.classList.add("ai-" + tile._aiState);
   el.onclick = (e)=>{ e.stopPropagation(); if(!editMode) openDetail(id); };
   /* the release-stage filter reads this attribute off the DOM, so every atom
      gets it in the one place every atom is created */
@@ -18377,6 +18383,7 @@ console.log("[arch-studio] init complete");
     '<span id="multi-count" role="status" aria-live="polite">0 selected</span>' +
     '<button id="edit-connect" type="button" aria-pressed="false" aria-label="Toggle connection mode to draw custom flows">Connect</button>' +
     '<button id="edit-export" type="button" aria-label="Export the current canvas as a JSON file">Export</button>' +
+    '<button id="edit-spec" type="button" aria-label="Generate a Markdown specification of the current canvas">Generate Spec</button>' +
     '<button id="edit-import" type="button" aria-label="Import a canvas from a JSON file">Import</button>' +
     '<input id="edit-import-file" type="file" accept="application/json,.json" hidden>' +
     '<button id="edit-newbox" type="button" aria-label="Create a new empty box in a zone">New Box</button>' +
@@ -18395,6 +18402,7 @@ console.log("[arch-studio] init complete");
   var multiCount = byId2("multi-count");
   var connectBtn = byId2("edit-connect");
   var exportBtn = byId2("edit-export");
+  var specBtn = byId2("edit-spec");
   var importBtn = byId2("edit-import");
   var importFile = byId2("edit-import-file");
   var addCompBtn = byId2("edit-add");
@@ -18484,6 +18492,20 @@ console.log("[arch-studio] init complete");
       a.download = "architecture-" + (ARCH.industry || "generic") + ".json"; a.click();
       setTimeout(function(){ URL.revokeObjectURL(a.href); }, 0);
     }catch(err){ console.error("Export failed", err); toast("Export failed."); }
+  };
+  /* M6b — Generate a Markdown spec of the current board for the demo-creation
+     team, via the pure bridge helper. Same Blob + <a download> path as Export. */
+  if(specBtn) specBtn.onclick = function(){
+    try{
+      var B = aiBridge();
+      if(!B || typeof B.boardToSpecMarkdown !== "function"){ toast("Spec generator unavailable — reload the page (bridge.mjs did not load)."); return; }
+      var md = B.boardToSpecMarkdown(boardSnapshot());
+      var blob = new Blob([md], {type:"text/markdown"});
+      var a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+      a.download = "architecture-spec-" + (ARCH.industry || "generic") + ".md"; a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 0);
+      toast("Spec exported.");
+    }catch(err){ console.error("Spec export failed", err); toast("Spec export failed."); }
   };
   importBtn.onclick = function(){ importFile.value = ""; importFile.click(); };
   importFile.onchange = function(){
@@ -18623,7 +18645,11 @@ console.log("[arch-studio] init complete");
     var order = ["add","modify","remove"], groups = {};
     sugg.forEach(function(s, i){ var a = String(s.action||"other").toLowerCase(); (groups[a] || (groups[a]=[])).push({ s:s, i:i }); });
     Object.keys(groups).forEach(function(a){ if(order.indexOf(a) < 0) order.push(a); });
-    var html = "";
+    /* Legend for the canvas diff colours applied by Apply (M6a). */
+    var html = '<div class="ai-legend">' +
+      '<span><i class="lg-add"></i>added / net-new</span>' +
+      '<span><i class="lg-modify"></i>modified</span>' +
+      '<span><i class="lg-remove"></i>retiring</span></div>';
     order.forEach(function(act){
       var rows = groups[act]; if(!rows || !rows.length) return;
       html += '<div class="ai-group"><div class="ai-group-h">' + esc(act.toUpperCase()) + ' <span class="ai-count">' + rows.length + '</span></div>';
@@ -19305,6 +19331,26 @@ console.log("[arch-studio] init complete");
   .ai-extract-conns { margin:0; padding-left:18px; font-size:12px; opacity:.85; }
   .ai-extract-zones { font-size:12px; opacity:.75; }
   .ai-current-active { outline:2px solid var(--brand, #7c3aed); outline-offset:1px; }
+  /* M6a — AI diff colouring on the board canvas. reg() stamps ai-add / ai-modify /
+     ai-remove onto the tile element; these read against each palette's own blue and
+     amber token families (defined for light AND body.theme-dark) so they stay legible
+     in every palette and in dark mode. Kept subtle: an inset ring + a faint wash, no
+     layout shift. */
+  .atom.ai-add { box-shadow: inset 0 0 0 2px var(--g-blue-line); background-color: var(--g-blue-bg) !important; }
+  .atom.ai-add .p-name, .atom.ai-add .t-name, .atom.ai-add .ct-name, .atom.ai-add .ph-name { color: var(--g-blue-ink); }
+  .atom.ai-modify { box-shadow: inset 0 0 0 2px var(--g-amber-line); background-color: var(--g-amber-bg) !important; }
+  .atom.ai-modify .p-name, .atom.ai-modify .t-name, .atom.ai-modify .ct-name, .atom.ai-modify .ph-name { color: var(--g-amber-ink); }
+  .atom.ai-remove { box-shadow: inset 0 0 0 2px var(--muted); opacity:.55; }
+  .atom.ai-remove .p-name, .atom.ai-remove .t-name, .atom.ai-remove .ct-name, .atom.ai-remove .ph-name,
+  .atom.ai-remove .pl-name > span, .atom.ai-remove .fc-name, .atom.ai-remove .tagpill,
+  .atom.ai-remove .bl-name span, .atom.ai-remove .ms-n { text-decoration: line-through; }
+  /* legend under the applied suggestions, explaining the canvas colours */
+  .ai-legend { display:flex; flex-wrap:wrap; gap:10px; font-size:11px; opacity:.85; margin:2px 0 8px; }
+  .ai-legend span { display:inline-flex; align-items:center; gap:5px; }
+  .ai-legend i { width:11px; height:11px; border-radius:3px; display:inline-block; border:1px solid; }
+  .ai-legend .lg-add { background:var(--g-blue-bg); border-color:var(--g-blue-line); }
+  .ai-legend .lg-modify { background:var(--g-amber-bg); border-color:var(--g-amber-line); }
+  .ai-legend .lg-remove { background:transparent; border-color:var(--muted); }
 </style>
 
 <!-- Format bridge (pure ES module) + studio config. Guarded so the page still
