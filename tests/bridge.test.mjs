@@ -334,11 +334,128 @@ test("extractionToCurrentState never throws on malformed input", () => {
   assert.equal(coerced.components[0].name, "7");
 });
 
+/* ------------------------------------------------------------------ */
+/* focus mode + reason / replaces stamping                            */
+/* ------------------------------------------------------------------ */
+
+// Depth-first find a tile by exact name anywhere on the board (names are unique
+// in the fixture), so these assertions don't depend on net-new placement paths.
+function findTile(board, name) {
+  let found = null;
+  const walk = (o) => {
+    if (found || o == null || typeof o !== "object") return;
+    if (Array.isArray(o)) { o.forEach(walk); return; }
+    if (typeof o.n === "string" && o.n === name) { found = o; return; }
+    Object.keys(o).forEach((k) => walk(o[k]));
+  };
+  walk(board);
+  return found;
+}
+
+test("applySuggestionsToBoard stamps _aiReason and _replaces on applied add/modify tiles", () => {
+  const base = ensureUids(fixture());
+  const dlUid = base.bands[1].rows[0].items[0]._uid; // Delta Lake
+  const out = applySuggestionsToBoard(base, [
+    { action: "add", component: "Delta Lake", component_id: dlUid, category: "platform", reason: "already have open storage", replaces: ["Teradata"] },
+    { action: "add", component: "Managed Ingestion", component_id: null, category: "ingestion", reason: "managed CDC", replaces: ["Custom ETL Tool"] },
+    { action: "modify", component: "Lakehouse", component_id: null, modifications: ["RT"], reason: "low latency serving", replaces: [] },
+  ]);
+  // add(existing)
+  const dl = findTile(out, "Delta Lake");
+  assert.equal(dl._aiReason, "already have open storage");
+  assert.deepEqual(dl._replaces, ["Teradata"]);
+  // add(net-new)
+  const nn = findTile(out, "Managed Ingestion");
+  assert.ok(nn && nn._net_new === true);
+  assert.equal(nn._aiReason, "managed CDC");
+  assert.deepEqual(nn._replaces, ["Custom ETL Tool"]);
+  // modify (empty replaces -> no _replaces key)
+  const lh = findTile(out, "Lakehouse");
+  assert.equal(lh._aiReason, "low latency serving");
+  assert.equal(lh._replaces, undefined);
+});
+
+test("applySuggestionsToBoard greys the existing tile a suggestion replaces", () => {
+  const base = ensureUids(fixture());
+  const out = applySuggestionsToBoard(base, [
+    // net-new that supplants an existing tile the user did NOT separately remove
+    { action: "add", component: "Managed Ingestion", component_id: null, category: "ingestion", reason: "x", replaces: ["Custom ETL Tool"] },
+  ]);
+  const etl = findTile(out, "Custom ETL Tool");
+  assert.equal(etl._aiState, "remove");
+  // the net-new tile itself is an add, not a remove
+  assert.equal(findTile(out, "Managed Ingestion")._aiState, "add");
+});
+
+test("a replaced name that is itself an add/modify target is not overwritten to remove", () => {
+  const base = ensureUids(fixture());
+  const dlUid = base.bands[1].rows[0].items[0]._uid; // Delta Lake
+  const out = applySuggestionsToBoard(base, [
+    { action: "add", component: "Delta Lake", component_id: dlUid, category: "platform", reason: "keep" },
+    { action: "add", component: "Managed Ingestion", component_id: null, category: "ingestion", reason: "x", replaces: ["Delta Lake"] },
+  ]);
+  // Delta Lake stays "add" (it is a target); the replace mapping must not demote it.
+  assert.equal(findTile(out, "Delta Lake")._aiState, "add");
+});
+
+test("applySuggestionsToBoard marks focus vs peripheral (AI-touched always focus) and stamps _flowOrder", () => {
+  const base = ensureUids(fixture());
+  const dlUid = base.bands[1].rows[0].items[0]._uid; // Delta Lake
+  // mixed-case flow/focus prove case-insensitive matching
+  const out = applySuggestionsToBoard(base, [
+    { action: "add", component: "AI Search", component_id: null, category: "platform", reason: "retrieval" }, // net-new
+    { action: "add", component: "Delta Lake", component_id: dlUid, category: "platform", reason: "keep" },     // existing, flagged
+  ], {
+    flow: ["OPERATIONAL DATABASES", "Lakeflow Connect", "lakehouse"],
+    focus: ["operational databases", "Lakeflow Connect", "Lakehouse"],
+  });
+  assert.ok(minimalShapeOk(out), "focus marking must not break the board shape");
+
+  // focus-set members are in focus, not peripheral
+  const opdb = findTile(out, "Operational Databases");
+  assert.equal(opdb._focus, true);
+  assert.equal(opdb._peripheral, undefined);
+
+  // not in focus set and not AI-touched -> peripheral
+  const execs = findTile(out, "Executives");
+  assert.equal(execs._peripheral, true);
+  assert.equal(execs._focus, undefined);
+
+  // AI-touched tiles are always focus even when absent from the focus set
+  assert.equal(findTile(out, "AI Search")._focus, true);   // net-new
+  assert.equal(findTile(out, "Delta Lake")._focus, true);  // flagged add
+
+  // flow order is 1-based and case-insensitive; off-flow tiles carry none
+  assert.equal(opdb._flowOrder, 1);
+  assert.equal(findTile(out, "Lakeflow Connect")._flowOrder, 2);
+  assert.equal(findTile(out, "Lakehouse")._flowOrder, 3);
+  assert.equal(execs._flowOrder, undefined);
+});
+
+test("applySuggestionsToBoard leaves focus flags untouched when no focus set is given", () => {
+  const base = ensureUids(fixture());
+  const dlUid = base.bands[1].rows[0].items[0]._uid;
+  const out = applySuggestionsToBoard(base, [
+    { action: "add", component: "Delta Lake", component_id: dlUid, category: "platform", reason: "keep" },
+  ]);
+  const opdb = findTile(out, "Operational Databases");
+  assert.equal(opdb._focus, undefined);
+  assert.equal(opdb._peripheral, undefined);
+  assert.equal(opdb._flowOrder, undefined);
+  // backward-compatible: a 2-arg call behaves exactly as before
+  const out2 = applySuggestionsToBoard(base, [
+    { action: "add", component: "Delta Lake", component_id: dlUid, category: "platform", reason: "keep" },
+  ], undefined);
+  assert.equal(findTile(out2, "Operational Databases")._focus, undefined);
+});
+
 test("bridge functions never throw on empty / malformed boards", () => {
   for (const bad of [null, undefined, {}, { bands: null, rails: null }, { bands: [{}], rails: { src: {} }, top: {}, cloud: {} }]) {
     assert.doesNotThrow(() => ensureUids(bad));
     assert.doesNotThrow(() => flattenBoardToSemantic(bad));
     assert.doesNotThrow(() => buildCardLibrary(bad));
     assert.doesNotThrow(() => applySuggestionsToBoard(bad, [{ action: "add", component: "X", component_id: null, category: "platform" }]));
+    // focus opts must also degrade safely on malformed boards
+    assert.doesNotThrow(() => applySuggestionsToBoard(bad, [{ action: "add", component: "X", component_id: null, category: "platform", replaces: ["Y"] }], { flow: ["X"], focus: ["X"] }));
   }
 });

@@ -15,7 +15,12 @@
  *   ensureUids(board)                          -> new board, every tile has a stable _uid
  *   flattenBoardToSemantic(board)              -> { version, industry, components[], edges[] }
  *   buildCardLibrary(board)                    -> [{ n, zone, caps, long }, ...]
- *   applySuggestionsToBoard(board, accepted[]) -> new board with suggestions applied
+ *   applySuggestionsToBoard(board, accepted[], opts?) -> new board with suggestions applied
+ *       opts = { flow:[names], focus:[names] } drives use-case focus mode:
+ *       marks _focus / _peripheral on every tile and stamps a 1-based _flowOrder
+ *       on tiles named in `flow`. Applied add/modify tiles also carry _aiReason /
+ *       _replaces, and any existing tile they name in `replaces` is greyed
+ *       (_aiState:"remove") so the replacement is visible on the canvas.
  *   boardToSpecMarkdown(board)                 -> string (Markdown spec of the board)
  *   extractionToCurrentState(extractResponse)  -> { components:[{name,category,description}],
  *                                                   connections:[{source,target,kind}] }
@@ -443,9 +448,12 @@ function placementArrayFor(board, bucket) {
  *   add    : if component_id resolves to an existing tile, mark it _aiState:"add";
  *            else create a NET-NEW tile (given a generic `product` icon so it draws
  *            as a real glyph, not a bare dot) and place it by category.
+ * Every applied add/modify also stamps its `reason` (_aiReason) and `replaces`
+ * (_replaces) onto the affected tile, and greys any existing tile it names in
+ * `replaces` (see below). `opts = { flow, focus }` then drives focus mode.
  * The result is designed to keep satisfying the studio's storedStateUsable().
  */
-export function applySuggestionsToBoard(board, acceptedSuggestions) {
+export function applySuggestionsToBoard(board, acceptedSuggestions, opts) {
   const next = ensureUids(board);
   if (next == null || typeof next !== "object") return next;
 
@@ -467,6 +475,21 @@ export function applySuggestionsToBoard(board, acceptedSuggestions) {
     while (usedUids.has(uid)) uid = `${base}-${i++}`;
     usedUids.add(uid);
     return uid;
+  };
+
+  /* Coerce a value (list, scalar, or nullish) to a clean array of non-empty strings. */
+  const normStrList = (v) =>
+    (Array.isArray(v) ? v : (v == null ? [] : [v]))
+      .map((x) => String(x == null ? "" : x).trim())
+      .filter(Boolean);
+
+  /* Feature 1: record WHY a tile is in the target and WHAT it supplants. */
+  const stampReason = (tile, s) => {
+    if (!tile || !s) return;
+    const reason = s.reason == null ? "" : String(s.reason);
+    if (reason) tile._aiReason = reason;
+    const rep = normStrList(s.replaces);
+    if (rep.length) tile._replaces = rep;
   };
 
   list.forEach((s) => {
@@ -493,6 +516,7 @@ export function applySuggestionsToBoard(board, acceptedSuggestions) {
         else rec.tile.long = note;
       }
       rec.tile._aiState = "modify";
+      stampReason(rec.tile, s);
       return;
     }
 
@@ -501,6 +525,7 @@ export function applySuggestionsToBoard(board, acceptedSuggestions) {
       if (rec && rec.tile) {
         // Recommended existing component — just flag it.
         rec.tile._aiState = "add";
+        stampReason(rec.tile, s);
         return;
       }
       // NET-NEW SKU.
@@ -522,9 +547,58 @@ export function applySuggestionsToBoard(board, acceptedSuggestions) {
         _aiState: "add",
         _net_new: true,
       };
+      stampReason(tile, s);
       arr.push(tile);
     }
   });
+
+  /* Feature 1 — replacement visibility: for every applied add/modify that names
+     things it supplants, grey the matching EXISTING board tile (by name,
+     case-insensitive) so the retiring component is visible even when the user
+     didn't separately accept its removal. `idx.byName` was built before any
+     net-new tiles were pushed, so this only ever touches pre-existing tiles.
+     A tile already flagged add/modify (it is itself a target) is left alone. */
+  const replaced = new Set();
+  list.forEach((s) => {
+    if (s == null || typeof s !== "object") return;
+    const action = String(s.action || "").toLowerCase();
+    if (action !== "add" && action !== "modify") return;
+    normStrList(s.replaces).forEach((nm) => replaced.add(nm.toLowerCase()));
+  });
+  replaced.forEach((nm) => {
+    const rec = idx.byName.get(nm);
+    if (rec && rec.tile && rec.tile._aiState !== "add" && rec.tile._aiState !== "modify") {
+      rec.tile._aiState = "remove";
+    }
+  });
+
+  /* Feature 2 — use-case focus mode. When a focus set is supplied, mark every
+     tile _focus (in the use-case flow) or _peripheral (reference context that
+     should recede). AI-touched tiles (net-new / add / modify) are always in
+     focus. `flow` (the ordered end-to-end path) stamps a 1-based _flowOrder so
+     the renderer can draw an ordinal badge. Purely visual: no tile is removed,
+     so this never trips storedStateUsable(). */
+  const focusList = opts && Array.isArray(opts.focus) ? opts.focus : [];
+  const flowList = opts && Array.isArray(opts.flow) ? opts.flow : [];
+  if (focusList.length) {
+    const focusSet = new Set(
+      focusList.map((x) => String(x == null ? "" : x).trim().toLowerCase()).filter(Boolean),
+    );
+    const flowIdx = new Map(); // lower-cased name -> 1-based order (first occurrence wins)
+    flowList.forEach((nm, i) => {
+      const k = String(nm == null ? "" : nm).trim().toLowerCase();
+      if (k && !flowIdx.has(k)) flowIdx.set(k, i + 1);
+    });
+    forEachTile(next, (t) => {
+      if (t == null) return;
+      const nm = String(t.n == null ? "" : t.n).trim().toLowerCase();
+      const aiTouched = t._net_new === true || t._aiState === "add" || t._aiState === "modify";
+      if (focusSet.has(nm) || aiTouched) { t._focus = true; delete t._peripheral; }
+      else { t._peripheral = true; delete t._focus; }
+      if (nm && flowIdx.has(nm)) t._flowOrder = flowIdx.get(nm);
+      else delete t._flowOrder;
+    });
+  }
 
   return next;
 }
