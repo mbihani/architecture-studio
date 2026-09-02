@@ -214,8 +214,10 @@ test("applySuggestionsToBoard handles add(existing), add(net-new), remove, modif
   assert.ok(dlt._uid && dlt._uid.startsWith("ingestion:"));
   assert.ok(dlt.s.length <= 80);
 
-  // remove: Custom ETL Tool gone
-  assert.equal(out.rails.ing.groups[0].tiles.find((t) => t.n === "Custom ETL Tool"), undefined);
+  // remove (M6a): Custom ETL Tool is KEPT in place and marked as retiring, not spliced.
+  const etl = out.rails.ing.groups[0].tiles.find((t) => t.n === "Custom ETL Tool");
+  assert.ok(etl, "a removed tile must be kept on the board (diff view)");
+  assert.equal(etl._aiState, "remove");
 
   // modify: Lakehouse long appended with a Target note + flagged
   const lh = out.bands[1].rows[0].items.find((t) => t.n === "Lakehouse");
