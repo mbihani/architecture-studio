@@ -32,7 +32,7 @@ module.exports = defineConfig({
        index.html there first (same as run.sh). reuseExistingServer:false
        guarantees each run serves THIS checkout's index.html, never a
        stale server left running by another copy of the project. */
-    command: "mkdir -p dist && cp index.html dist/index.html && PORT=8080 node server.mjs",
+    command: "mkdir -p dist && cp index.html dist/index.html && cp bridge.mjs dist/bridge.mjs && PORT=8080 node server.mjs",
     port: 8080,
     cwd: __dirname,
     reuseExistingServer: false,

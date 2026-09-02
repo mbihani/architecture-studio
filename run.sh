@@ -7,5 +7,6 @@ echo "=== Node $(node --version) ==="
 echo "=== Serving Amr extension HTML ==="
 mkdir -p dist
 cp index.html dist/index.html
+cp bridge.mjs dist/bridge.mjs
 echo "=== Starting server on PORT ${PORT:-8080} ==="
 exec node server.mjs

@@ -1,1 +1,10 @@
 command: ["bash", "run.sh"]
+env:
+  # Product Research Agent app — same workspace (fevm-india-feos).
+  - name: AGENT_BASE_URL
+    value: "https://product-research-agent-7474648672396020.aws.databricksapps.com"
+  # Route studio→agent calls through the server-side SP-token proxy (robust across
+  # Databricks App origins). Set to "false" to call the agent directly from the
+  # browser (requires STUDIO_ORIGIN set on the agent app for credentialed CORS).
+  - name: STUDIO_USE_PROXY
+    value: "true"
