@@ -8,7 +8,12 @@ const DIST = path.resolve("dist");
 /* --- Studio <-> Product Research Agent integration config (env-driven) --- */
 const AGENT_BASE_URL = (process.env.AGENT_BASE_URL || "").replace(/\/+$/, "");
 const USE_PROXY = (process.env.STUDIO_USE_PROXY || "true") === "true";
-const DATABRICKS_HOST = (process.env.DATABRICKS_HOST || "").replace(/\/+$/, "");
+// Databricks Apps inject DATABRICKS_HOST WITHOUT a scheme (e.g. "foo.cloud.databricks.com");
+// fetch() needs an absolute URL, so ensure https://.
+const _RAW_DBX_HOST = (process.env.DATABRICKS_HOST || "").replace(/\/+$/, "");
+const DATABRICKS_HOST = _RAW_DBX_HOST && !/^https?:\/\//.test(_RAW_DBX_HOST)
+  ? `https://${_RAW_DBX_HOST}`
+  : _RAW_DBX_HOST;
 const CLIENT_ID = process.env.DATABRICKS_CLIENT_ID || "";
 const CLIENT_SECRET = process.env.DATABRICKS_CLIENT_SECRET || "";
 // Which /api/* POST paths are proxied straight through to the agent.
