@@ -13233,6 +13233,27 @@ function reg(el, tile, arr, sectionName){
      reg() is the one path every tile type flows through, so one line covers cards,
      rail tiles, cloud/top chips, panel heads/columns and side chips alike. */
   if(tile && tile._aiState) el.classList.add("ai-" + tile._aiState);
+  /* Feature 1/2 (AI focus mode): the format bridge marks each tile _focus /
+     _peripheral, stamps _flowOrder on the use-case path, and records _aiReason /
+     _replaces. Surface all three here, the one place every atom is created:
+       - ai-focus / ai-peripheral drive the focus-mode dimming (CSS gates the dim
+         on body.ai-focus-mode, so the toggle can reveal the full board);
+       - a numbered pill renders the ingestion→serving sequence at a glance;
+       - a native title tooltip tells the user WHY the node is in the target. */
+  if(tile && tile._focus) el.classList.add("ai-focus");
+  else if(tile && tile._peripheral) el.classList.add("ai-peripheral");
+  if(tile && (tile._aiReason || (tile._replaces && tile._replaces.length))){
+    var tip = tile._aiReason ? ("Why: " + tile._aiReason) : "";
+    if(tile._replaces && tile._replaces.length) tip += (tip ? "\n" : "") + "Replaces: " + tile._replaces.join(", ");
+    if(tip) el.title = tip;
+  }
+  if(tile && tile._flowOrder){
+    el.classList.add("ai-flow");
+    var fb = document.createElement("span");
+    fb.className = "ai-flow-badge"; fb.setAttribute("aria-hidden","true");
+    fb.textContent = tile._flowOrder;
+    el.appendChild(fb);
+  }
   el.onclick = (e)=>{ e.stopPropagation(); if(!editMode) openDetail(id); };
   /* the release-stage filter reads this attribute off the DOM, so every atom
      gets it in the one place every atom is created */
@@ -14198,6 +14219,14 @@ function openDetail(id, via){
   document.getElementById("d-tagline").textContent = t.s || t.desc || genieDomain(t) || "";
   document.getElementById("d-stage").innerHTML = stageBadge(t.st);
   let html = "";
+  /* When this tile was placed/tuned by the AI target-architecture flow, lead with
+     WHY it is here and WHAT it replaces (stamped by the format bridge). */
+  if(t._aiReason || (t._replaces && t._replaces.length)){
+    html += `<h4>Why this is in the target</h4>`;
+    if(t._aiReason) html += `<p>${esc(t._aiReason)}</p>`;
+    if(t._replaces && t._replaces.length)
+      html += `<p class="d-note">Replaces: ${esc(t._replaces.join(", "))}</p>`;
+  }
   if(activeRef && activeRef.map[t.n]){
     html += `<h4>How it is used in this architecture</h4><div class="d-refbox"><ul>` +
       activeRef.map[t.n].map(x=>`<li>${esc(x)}</li>`).join("") + `</ul></div>`;
@@ -18389,7 +18418,8 @@ console.log("[arch-studio] init complete");
     '<button id="edit-newbox" type="button" aria-label="Create a new empty box in a zone">New Box</button>' +
     '<button id="edit-add" type="button" aria-label="Add a component to the selected box">Add Component</button>' +
     '<button id="edit-delete" type="button" aria-label="Delete the selected item or items">Delete</button>' +
-    '<button id="edit-ai" type="button" aria-label="Ask the Product Research Agent for a target architecture">AI Target Architecture</button>';
+    '<button id="edit-ai" type="button" aria-label="Ask the Product Research Agent for a target architecture">AI Target Architecture</button>' +
+    '<button id="edit-focus" type="button" aria-pressed="false" aria-label="Toggle use-case focus mode (dim peripheral reference components)">Focus on use case</button>';
   /* Append to <body> (not inside #board's transformed .fit-in ancestor) so the
      sidebar's position:fixed is anchored to the viewport, not the scaled board. */
   document.body.appendChild(tools);
@@ -18408,6 +18438,7 @@ console.log("[arch-studio] init complete");
   var addCompBtn = byId2("edit-add");
   var deleteBtn  = byId2("edit-delete");
   var aiBtn      = byId2("edit-ai");
+  var focusBtn   = byId2("edit-focus");
 
   var selected = null;   /* { type:'atom'|'group'|'cloud'|'zone', el?, zone?, gidx? } */
   var drag = null;
@@ -18525,6 +18556,11 @@ console.log("[arch-studio] init complete");
      the canvas keeps working if the bridge fails to load.
      ============================================================ */
   var _lastSuggestions = [];
+  /* Focus-mode inputs from the last suggest response: the ordered end-to-end
+     flow (component names) and the use-case-essential components. Parsed out of
+     the response in renderAiSuggestions(); consumed by applyAiAccepted(). */
+  var _lastFlow = [];
+  var _lastFocus = [];
   /* M5 vision-extraction review state (editable current-state from a diagram). */
   var _extractRows = [];      /* [{ name, category, description }] — human-editable */
   var _extractConns = [];     /* [{ source, target, kind }] — passed through */
@@ -18578,7 +18614,7 @@ console.log("[arch-studio] init complete");
       }
     });
     var ok = byId2("m-ok"); if(ok) ok.dataset.mode = "suggest";
-    _lastSuggestions = [];
+    _lastSuggestions = []; _lastFlow = []; _lastFocus = [];
   }
   function onAiOk(){
     var ok = byId2("m-ok");
@@ -18637,6 +18673,10 @@ console.log("[arch-studio] init complete");
     var status = byId2("ai-status"), results = byId2("ai-results"), ok = byId2("m-ok");
     var sugg = Array.isArray(data.suggestions) ? data.suggestions : [];
     _lastSuggestions = sugg;
+    /* Focus-mode inputs travel alongside the suggestions: `flow` is the ordered
+       end-to-end path and `focus_components` the use-case essentials. */
+    _lastFlow = Array.isArray(data.flow) ? data.flow : [];
+    _lastFocus = Array.isArray(data.focus_components) ? data.focus_components : [];
     var ds = data.diff_stats || {};
     if(status){ status.className = "ai-status";
       status.textContent = (data.summary || (sugg.length + " suggestions.")) +
@@ -18656,6 +18696,13 @@ console.log("[arch-studio] init complete");
       rows.forEach(function(r){
         var s = r.s, pri = String(s.priority||"").toLowerCase();
         var checked = (pri === "high") ? " checked" : "";
+        /* Surface the existing replacement mapping: for an add/modify that
+           supplants named components, show an explicit "replaces" line so the
+           reviewer can see what each recommendation retires. */
+        var reps = Array.isArray(s.replaces) ? s.replaces.filter(Boolean) : [];
+        var repHtml = ((act === "add" || act === "modify") && reps.length)
+          ? '<span class="ai-replaces">&#8627; replaces: ' + esc(reps.join(", ")) + '</span>'
+          : '';
         html += '<label class="ai-row">' +
           '<input type="checkbox" class="ai-accept" data-i="' + r.i + '"' + checked + '>' +
           '<span class="ai-row-main">' +
@@ -18666,7 +18713,7 @@ console.log("[arch-studio] init complete");
               (s.component_id ? '' : ' <span class="ai-tag ai-net">net-new</span>') +
             '</span>' +
             '<span class="ai-reason">' + esc(s.reason || "") + '</span>' +
-            (s.availability ? '' : '') +
+            repHtml +
           '</span></label>';
       });
       html += '</div>';
@@ -18683,11 +18730,17 @@ console.log("[arch-studio] init complete");
     });
     if(!accepted.length){ toast("No suggestions accepted."); return; }
     try{
-      var next = B.applySuggestionsToBoard(boardSnapshot(), accepted);
+      /* Pass the flow + focus set so the bridge can mark focus/peripheral tiles
+         and stamp flow ordinals; reason/replaces stamping happens in there too. */
+      var next = B.applySuggestionsToBoard(boardSnapshot(), accepted, { flow:_lastFlow, focus:_lastFocus });
       if(typeof storedStateUsable === "function" && !storedStateUsable(next)){
         toast("The resulting architecture failed validation; nothing applied."); return;
       }
       rememberUndo(); loadBoardSnap(next); persistCustom(); build(); fitBoard();
+      /* Open the applied target in focus mode when the agent gave us a focus set,
+         so the use-case flow reads immediately; the toolbar toggle reveals the
+         full reference board again. */
+      if(typeof setFocusMode === "function") setFocusMode(_lastFocus && _lastFocus.length > 0);
       toast("Applied " + accepted.length + " suggestion" + (accepted.length === 1 ? "" : "s") + " to the canvas.");
     }catch(err){ console.error("Apply suggestions failed", err); toast("Could not apply suggestions."); }
   }
@@ -18826,6 +18879,16 @@ console.log("[arch-studio] init complete");
         "). It now fills the Current-state field above and will be sent with Get Suggestions."; }
   }
   if(aiBtn) aiBtn.onclick = openAiPanel;
+
+  /* Use-case focus mode is a pure view state (persisted nowhere): the
+     body.ai-focus-mode class gates the .ai-peripheral dimming in CSS, so
+     toggling it off reveals the full reference board again. Defaults ON right
+     after an apply that carried a focus set (see applyAiAccepted). */
+  function setFocusMode(on){
+    document.body.classList.toggle("ai-focus-mode", !!on);
+    if(focusBtn){ focusBtn.classList.toggle("on", !!on); focusBtn.setAttribute("aria-pressed", on ? "true" : "false"); }
+  }
+  if(focusBtn) focusBtn.onclick = function(){ setFocusMode(!document.body.classList.contains("ai-focus-mode")); };
 
   function updateMultiUI(){
     multiBtn.classList.toggle("on", multiMode);
@@ -19351,6 +19414,26 @@ console.log("[arch-studio] init complete");
   .ai-legend .lg-add { background:var(--g-blue-bg); border-color:var(--g-blue-line); }
   .ai-legend .lg-modify { background:var(--g-amber-bg); border-color:var(--g-amber-line); }
   .ai-legend .lg-remove { background:transparent; border-color:var(--muted); }
+  /* Feature 1 — the replacement-mapping line under a suggestion's reason. */
+  .ai-replaces { opacity:.7; font-style:italic; }
+  /* Feature 2 — use-case focus mode. The bridge marks peripheral reference tiles
+     _peripheral and the use-case flow _focus; the dimming is GATED on the
+     body.ai-focus-mode toggle so the user can reveal the full reference board.
+     opacity + grayscale are theme-independent, so one rule serves light AND
+     body.theme-dark; only the flow ordinal pill needs a per-theme text colour. */
+  body.ai-focus-mode .atom.ai-peripheral { opacity:.3; filter:grayscale(.75);
+    transition:opacity .18s ease, filter .18s ease; }
+  /* The end-to-end flow ordinal badge: a small numbered blue pill (palette blue
+     tokens) pinned to the tile's top-left so the ingestion→serving order reads
+     at a glance. .ai-flow makes the tile the positioning context. */
+  .atom.ai-flow { position:relative; }
+  .ai-flow-badge { position:absolute; top:-7px; left:-7px; z-index:3; pointer-events:none;
+    min-width:16px; height:16px; padding:0 4px; box-sizing:border-box;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:10px; font-weight:700; line-height:1; border-radius:999px;
+    color:#fff; background:var(--g-blue-line); border:1px solid var(--g-blue-ink);
+    box-shadow:0 1px 2px rgba(0,0,0,.28); }
+  body.theme-dark .ai-flow-badge { color:#10131a; }
 </style>
 
 <!-- Format bridge (pure ES module) + studio config. Guarded so the page still
